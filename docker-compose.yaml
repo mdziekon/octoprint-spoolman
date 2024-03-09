@@ -8,7 +8,7 @@ services:
       - 7180:80
     volumes:
       - ./docker-data/octoprint:/octoprint/octoprint
-      - ./octoprint_spoolman:/octoprint/octoprint/plugins/octoprint_spoolman
+      - ./octoprint_Spoolman:/octoprint/octoprint/plugins/octoprint_Spoolman
   spoolman:
     image: ghcr.io/donkie/spoolman:latest
     restart: unless-stopped
