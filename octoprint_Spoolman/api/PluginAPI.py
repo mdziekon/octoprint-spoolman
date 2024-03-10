@@ -5,12 +5,23 @@ import octoprint.plugin
 import flask
 import requests
 
+from octoprint_Spoolman.common.settings import SettingsKeys
+
 class PluginAPI(octoprint.plugin.BlueprintPlugin):
+    def _createSpoolmanApiUrl(self):
+        instance_url = self._settings.get([ SettingsKeys.SPOOLMAN_URL ])
+        api_path = "/api/v1"
+
+        return instance_url + api_path
+
+    def _createSpoolmanEndpointUrl(self, endpoint):
+        return self._createSpoolmanApiUrl() + endpoint;
+
     @octoprint.plugin.BlueprintPlugin.route("/spoolman/spools", methods=["GET"])
     def handleGetSpoolsAvailable(self):
         self._logger.debug("API: GET /spoolman/spools")
 
-        response = requests.get('http://spoolman:8000/api/v1/spool')
+        response = requests.get(self._createSpoolmanEndpointUrl("/spool"))
 
         if response.status_code != 200:
             self._logger.error("[Spoolman API] request failed with status %s" % response.status_code)

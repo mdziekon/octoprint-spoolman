@@ -1,6 +1,7 @@
 import octoprint.plugin
 
 from octoprint_Spoolman.api.PluginAPI import PluginAPI
+from octoprint_Spoolman.common.settings import SettingsKeys
 
 class SpoolmanPlugin(
     PluginAPI,
@@ -10,7 +11,7 @@ class SpoolmanPlugin(
     octoprint.plugin.SettingsPlugin,
 ):
     def on_after_startup(self):
-        self._logger.info("Hello World!")
+        self._logger.info("[Spoolman][init] Plugin activated")
 
     # --- Mixins ---
 
@@ -35,14 +36,20 @@ class SpoolmanPlugin(
             {
                 "type": "settings",
                 "template": "Spoolman_settings.jinja2",
-                "custom_bindings": True,
             }
         ]
 
     # SettingsPlugin
     def get_settings_defaults(self):
         settings = {
-            "installed_version": self._plugin_version
+            "installed_version": self._plugin_version,
+            SettingsKeys.SPOOLMAN_URL: "",
+            SettingsKeys.LOGGING_IS_ENABLED: False,
         }
 
         return settings
+
+    def on_settings_save(self, data):
+        self._logger.info("[Spoolman][Settings] Saved data")
+
+        octoprint.plugin.SettingsPlugin.on_settings_save(self, data)

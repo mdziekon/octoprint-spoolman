@@ -5,30 +5,48 @@ $(() => {
     function SpoolmanViewModel(params) {
         const self = this;
 
+        self.settingsViewModel = params[0];
+
+        self.pluginSettings = null;
+
         const apiClient = new APIClient(PLUGIN_ID, BASEURL);
 
-        const $resultEl = document.querySelector(".spoolman_tab__placeholder_connect_result");
+        const initPlugin = () => {
+            const $resultEl = document.querySelector(".spoolman_tab__placeholder_connect_result");
 
-        document.querySelector(".spoolman_tab__btn_connect").addEventListener("click", async () => {
-            const request = await apiClient.callApi("spoolman/spools", {});
+            document.querySelector(".spoolman_tab__btn_connect").addEventListener("click", async () => {
+                const request = await apiClient.callApi("spoolman/spools", {});
 
-            if (!request.isSuccess) {
-                console.error("Request error", request.error);
+                if (!request.isSuccess) {
+                    console.error("Request error", request.error);
 
-                $resultEl.innerHTML = "Request failed";
+                    $resultEl.innerHTML = "Request failed";
 
-                return;
-            }
+                    return;
+                }
 
-            console.log("Request success", request.payload.response);
+                console.log("Request success", request.payload.response);
 
-            $resultEl.innerHTML = "Request succeeded";
-        });
+                $resultEl.innerHTML = "Request succeeded";
+            });
+        }
+
+        self.onBeforeBinding = () => {
+            self.pluginSettings = self.settingsViewModel.settings.plugins[PLUGIN_ID];
+        };
+
+        self.onAfterBinding = () => {
+            initPlugin();
+        };
     };
 
     OCTOPRINT_VIEWMODELS.push({
         construct: SpoolmanViewModel,
-        dependencies: [],
-        elements: []
+        dependencies: [
+            "settingsViewModel"
+        ],
+        elements: [
+            document.querySelector("#settings_spoolman"),
+        ]
     });
 });

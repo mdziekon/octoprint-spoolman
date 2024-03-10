@@ -46,7 +46,7 @@
                         <input
                             type="text"
                             class="input-xlarge text-left"
-                            data-bind="textInput: pluginSettings.qrCodeURLPrefix, enable: pluginSettings.qrCodeUseURLPrefix"
+                            data-bind="textInput: pluginSettings.spoolmanUrl"
                             placeholder="http://192.168.1.100:7912"
                         >
                     </div>
@@ -59,16 +59,21 @@
                 class="tab-pane"
             >
                 <div class="control-group">
+                    <label class="control-label">
+                        Logging enabled
+                    </label>
                     <div class="controls">
-                        <label class="checkbox">
+                        <div>
                             <input
                                 type="checkbox"
-                                data-bind="checked: pluginSettings.sqlLoggingEnabled"
-                            > Logging enabled
-                        </label>
-                        <span class="help-inline">
-                            Hint: You need to restart your server after you changed the checkbox value.
-                        </span>
+                                data-bind="checked: pluginSettings.logginIsEnabled"
+                            >
+                        </div>
+                        <div>
+                            <span class="help-inline">
+                                Hint: You need to restart your server after you changed the checkbox value.
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
