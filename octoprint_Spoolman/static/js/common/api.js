@@ -71,6 +71,10 @@ const methodsWithBody = [
     "PATCH",
 ];
 
+/**
+ * @param {string} pluginId
+ * @param {string} baseUrl
+ */
 function APIClient(pluginId, baseUrl) {
     const _buildRequestQuery = function (data) {
         if (typeof (data) === 'string') {

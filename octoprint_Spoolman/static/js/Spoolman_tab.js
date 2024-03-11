@@ -27,7 +27,7 @@ $(() => {
             onBtnConnectClick: async () => {
                 const $resultEl = getParentEl().querySelector(".placeholder_connect_result");
 
-                const request = await apiClient.callApi("spoolman/spools", {});
+                const request = await getSpoolmanSpools(apiClient);
 
                 if (!request.isSuccess) {
                     console.error("Request error", request.error);

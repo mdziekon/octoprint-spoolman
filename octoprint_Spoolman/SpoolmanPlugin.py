@@ -20,6 +20,7 @@ class SpoolmanPlugin(
         return {
             "js": [
                 "js/common/api.js",
+                "js/api/getSpoolmanSpools.js",
                 "js/Spoolman_tab.js",
                 "js/Spoolman_settings.js",
             ],
