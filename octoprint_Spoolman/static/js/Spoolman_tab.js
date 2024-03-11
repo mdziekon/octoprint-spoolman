@@ -1,11 +1,15 @@
-// from setup.py plugin_identifier
-const PLUGIN_ID = "octoprint_Spoolman";
-
 $(() => {
+    // from setup.py plugin_identifier
+    const PLUGIN_ID = "octoprint_Spoolman";
+
     function SpoolmanViewModel(params) {
         const self = this;
 
         self.settingsViewModel = params[0];
+
+        const getSettings = () => {
+            return self.settingsViewModel.settings.plugins[PLUGIN_ID];
+        };
 
         const apiClient = new APIClient(PLUGIN_ID, BASEURL);
 
@@ -19,7 +23,6 @@ $(() => {
             return $parentEl;
         };
 
-        self.pluginSettings = null;
         self.templateApi = {
             onBtnConnectClick: async () => {
                 const $resultEl = getParentEl().querySelector(".placeholder_connect_result");
@@ -40,10 +43,7 @@ $(() => {
             }
         };
 
-        self.onBeforeBinding = () => {
-            self.pluginSettings = self.settingsViewModel.settings.plugins[PLUGIN_ID];
-        };
-
+        self.onBeforeBinding = () => {};
         self.onAfterBinding = () => {};
     };
 
@@ -54,7 +54,6 @@ $(() => {
         ],
         elements: [
             document.querySelector("#tab_spoolman"),
-            document.querySelector("#settings_spoolman"),
         ]
     });
 });

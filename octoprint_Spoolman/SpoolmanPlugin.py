@@ -21,6 +21,7 @@ class SpoolmanPlugin(
             "js": [
                 "js/common/api.js",
                 "js/Spoolman_tab.js",
+                "js/Spoolman_settings.js",
             ],
             "css": [],
             "less": [],
