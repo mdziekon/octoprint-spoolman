@@ -7,14 +7,23 @@ $(() => {
 
         self.settingsViewModel = params[0];
 
-        self.pluginSettings = null;
-
         const apiClient = new APIClient(PLUGIN_ID, BASEURL);
 
-        const initPlugin = () => {
-            const $resultEl = document.querySelector(".spoolman_tab__placeholder_connect_result");
+        const getParentEl = () => {
+            const $parentEl = document.querySelector("#tab_spoolman");
 
-            document.querySelector(".spoolman_tab__btn_connect").addEventListener("click", async () => {
+            if (!$parentEl) {
+                throw new Error('[Spoolman] parentEl not found');
+            }
+
+            return $parentEl;
+        };
+
+        self.pluginSettings = null;
+        self.templateApi = {
+            onBtnConnectClick: async () => {
+                const $resultEl = getParentEl().querySelector(".placeholder_connect_result");
+
                 const request = await apiClient.callApi("spoolman/spools", {});
 
                 if (!request.isSuccess) {
@@ -28,16 +37,14 @@ $(() => {
                 console.log("Request success", request.payload.response);
 
                 $resultEl.innerHTML = "Request succeeded";
-            });
-        }
+            }
+        };
 
         self.onBeforeBinding = () => {
             self.pluginSettings = self.settingsViewModel.settings.plugins[PLUGIN_ID];
         };
 
-        self.onAfterBinding = () => {
-            initPlugin();
-        };
+        self.onAfterBinding = () => {};
     };
 
     OCTOPRINT_VIEWMODELS.push({
@@ -46,6 +53,7 @@ $(() => {
             "settingsViewModel"
         ],
         elements: [
+            document.querySelector("#tab_spoolman"),
             document.querySelector("#settings_spoolman"),
         ]
     });
