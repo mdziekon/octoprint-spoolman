@@ -12,5 +12,61 @@
         <div>
             <span class="placeholder_connect_result"></span>
         </div>
+
+        <table
+            class="table table-striped table-hover table-condensed table-hover"
+            style="clear: both;"
+        >
+            <thead>
+                <tr>
+                    <th
+                        style="width: 5%"
+                        data-bind="visible: tableAttributeVisibility.id"
+                    >
+                        ID
+                    </th>
+                    <th
+                        style="width: 55%"
+                        data-bind="visible: tableAttributeVisibility.spoolName"
+                    >
+                        Name
+                    </th>
+                    <th
+                        style="width: 20%"
+                        data-bind="visible: tableAttributeVisibility.material"
+                    >
+                        Material
+                    </th>
+                    <th
+                        style="text-align: center; width: 15%;"
+                        data-bind="visible: tableAttributeVisibility.weight"
+                    >
+                        Weight
+                    </th>
+                </tr>
+            </thead>
+            <tbody data-bind="foreach: tableItemsOnCurrentPage">
+                <tr data-bind="click: function() { $root.showSpoolDialogAction($data.id); }">
+                    <td data-bind="visible: $root.tableAttributeVisibility.id">
+                        <span data-bind="text: id, attr: { title: id }"></span>
+                    </td>
+                    <td data-bind="visible: $root.tableAttributeVisibility.spoolName">
+                        <span data-bind="text: filament.name, attr: { title: filament.name }"></span>
+                        <br>
+                        <i>
+                            <span data-bind="text: filament.vendor.name, attr: { title: filament.vendor.name }"></span>
+                        </i>
+                    </td>
+                    <td data-bind="visible: $root.tableAttributeVisibility.material">
+                        <span data-bind="text: filament.material, attr: { title: filament.material }"></span>
+                    </td>
+                    <td data-bind="visible: $root.tableAttributeVisibility.used" style="text-align: right;">
+                        <span data-bind="text: remaining_weight.toFixed(1), attr: {title: 'Remaining weight'}"></span><span data-bind="text: $root.constants.weight_unit"></span>
+                        <br>
+                        <span data-bind="text: used_weight.toFixed(1), attr: {title: 'Used weight'}"></span><span data-bind="text: $root.constants.weight_unit"></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </section>

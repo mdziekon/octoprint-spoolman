@@ -23,25 +23,45 @@ $(() => {
             return $parentEl;
         };
 
+        /**
+         * @param {Spool[]} items
+         */
+        const updateTableItemsOnCurrentPage = (items) => {
+            self.tableItemsOnCurrentPage(items);
+        };
+
+        /** Bindings for the template */
+        self.constants = {
+            weight_unit: 'g',
+        };
+        self.tableAttributeVisibility = {
+            id: true,
+            spoolName: true,
+            material: true,
+            weight: true,
+            used: true,
+        };
+        self.tableItemsOnCurrentPage = ko.observable([]);
+        self.showSpoolDialogAction = (spoolId) => {};
+
         self.templateApi = {
             onBtnConnectClick: async () => {
-                const $resultEl = getParentEl().querySelector(".placeholder_connect_result");
-
                 const request = await getSpoolmanSpools(apiClient);
 
                 if (!request.isSuccess) {
                     console.error("Request error", request.error);
+
+                    const $resultEl = getParentEl().querySelector(".placeholder_connect_result");
 
                     $resultEl.innerHTML = "Request failed";
 
                     return;
                 }
 
-                console.log("Request success", request.payload.response);
-
-                $resultEl.innerHTML = "Request succeeded";
+                updateTableItemsOnCurrentPage(request.payload.response.data.spools);
             }
         };
+        /** -- end of bindings -- */
 
         self.onBeforeBinding = () => {};
         self.onAfterBinding = () => {};
