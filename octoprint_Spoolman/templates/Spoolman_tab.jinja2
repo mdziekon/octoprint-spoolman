@@ -46,7 +46,7 @@
                 </tr>
             </thead>
             <tbody data-bind="foreach: tableItemsOnCurrentPage">
-                <tr data-bind="click: function() { $root.showSpoolDialogAction($data.id); }">
+                <tr style="cursor: pointer;" data-bind="click: function() { $root.selectSpool($data.id); }, attr: { class: String($root.templateData.selectedSpoolId()) === String($data.id) ? 'success' : '' }">
                     <td data-bind="visible: $root.tableAttributeVisibility.id">
                         <span data-bind="text: id, attr: { title: id }"></span>
                     </td>

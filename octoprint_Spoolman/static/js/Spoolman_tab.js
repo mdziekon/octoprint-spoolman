@@ -42,7 +42,22 @@ $(() => {
             used: true,
         };
         self.tableItemsOnCurrentPage = ko.observable([]);
-        self.showSpoolDialogAction = (spoolId) => {};
+        self.selectSpool = async (spoolId) => {
+            const request = await updateActiveSpool(apiClient, { spoolId });
+
+            if (!request.isSuccess) {
+                console.error("Request error", request.error);
+
+                return;
+            }
+
+            console.log("Request success");
+
+            // TODO: consider doing this update indirectly, not hardcoding accessor
+            self.templateData.selectedSpoolId(request.payload.response.data.spoolId);
+
+            // TODO: during printing, display "where to commit past spool usage" Modal
+        };
 
         self.templateApi = {
             onBtnConnectClick: async () => {
@@ -64,7 +79,11 @@ $(() => {
         /** -- end of bindings -- */
 
         self.onBeforeBinding = () => {};
-        self.onAfterBinding = () => {};
+        self.onAfterBinding = () => {
+            self.templateData = {
+                selectedSpoolId: ko.observable(getSettings().selectedSpoolId()),
+            };
+        };
     };
 
     OCTOPRINT_VIEWMODELS.push({

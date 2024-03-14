@@ -17,6 +17,18 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
     def _createSpoolmanEndpointUrl(self, endpoint):
         return self._createSpoolmanApiUrl() + endpoint;
 
+    def _getValueFromJSONOrNone(self, key, json):
+        if key in json:
+            return json[key]
+        return None
+
+    def _getStringFromJSONOrNone(self, key, json):
+        value = self._getValueFromJSONOrNone(key, json)
+
+        if value:
+            return str(value)
+        return None
+
     @octoprint.plugin.BlueprintPlugin.route("/spoolman/spools", methods=["GET"])
     def handleGetSpoolsAvailable(self):
         self._logger.debug("API: GET /spoolman/spools")
@@ -42,5 +54,22 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
         return flask.jsonify({
             "data": {
                 "spools": data
+            }
+        })
+
+    @octoprint.plugin.BlueprintPlugin.route("/self/spool", methods=["POST"])
+    def handleUpdateActiveSpool(self):
+        self._logger.debug("API: POST /self/spool")
+
+        jsonData = flask.request.json
+
+        spoolId = self._getStringFromJSONOrNone("spoolId", jsonData)
+
+        self._settings.set([SettingsKeys.SELECTED_SPOOL_ID], spoolId)
+        self._settings.save()
+
+        return flask.jsonify({
+            "data": {
+                "spoolId": spoolId,
             }
         })

@@ -42,11 +42,3 @@ async function getSpoolmanSpools(apiClient) {
 
     return /** @type Success<{ response: GetSpoolsResponse }> */ (request);
 }
-
-(async () => {
-    const test = await getSpoolmanSpools(dasdsa);
-
-    if (test.isSuccess) {
-        test.payload.response
-    }
-})

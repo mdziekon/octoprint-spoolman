@@ -21,6 +21,7 @@ class SpoolmanPlugin(
             "js": [
                 "js/common/api.js",
                 "js/api/getSpoolmanSpools.js",
+                "js/api/updateActiveSpool.js",
                 "js/Spoolman_tab.js",
                 "js/Spoolman_settings.js",
             ],
@@ -47,6 +48,7 @@ class SpoolmanPlugin(
             "installed_version": self._plugin_version,
             SettingsKeys.SPOOLMAN_URL: "",
             SettingsKeys.LOGGING_IS_ENABLED: False,
+            SettingsKeys.SELECTED_SPOOL_ID: None,
         }
 
         return settings
