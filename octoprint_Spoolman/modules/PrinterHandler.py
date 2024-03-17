@@ -7,7 +7,7 @@ from octoprint.events import Events
 from octoprint_Spoolman.thirdparty.gcodeInterpreter import gcode
 
 class PrinterHandler(octoprint.plugin.BlueprintPlugin):
-    def initialize(self):
+    def __init__(self):
         self.lastPrintCancelled = False
         self.lastPrintOdometer = None
         self.lastPrintOdometerLoad = None
