@@ -1,17 +1,39 @@
 import octoprint.plugin
+from octoprint.events import Events
 
 from octoprint_Spoolman.api.PluginAPI import PluginAPI
+from octoprint_Spoolman.modules.PrinterHandler import PrinterHandler
 from octoprint_Spoolman.common.settings import SettingsKeys
 
 class SpoolmanPlugin(
     PluginAPI,
+    PrinterHandler,
     octoprint.plugin.StartupPlugin,
     octoprint.plugin.AssetPlugin,
     octoprint.plugin.TemplatePlugin,
     octoprint.plugin.SettingsPlugin,
+    octoprint.plugin.EventHandlerPlugin,
 ):
     def on_after_startup(self):
         self._logger.info("[Spoolman][init] Plugin activated")
+
+    # Printing events handlers
+    def on_event(self, event, payload):
+        if (
+            event == Events.PRINT_STARTED or
+            event == Events.PRINT_PAUSED or
+            event == Events.PRINT_DONE or
+            event == Events.PRINT_FAILED or
+            event == Events.PRINT_CANCELLED
+        ):
+            self.handlePrintingStatusChange(event)
+
+        pass
+
+    def on_sentGCodeHook(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
+        self.handlePrintingGCode(cmd)
+
+        pass
 
     # --- Mixins ---
 
