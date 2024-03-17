@@ -1,8 +1,22 @@
-__author__ = "Gina Häußge <osd@foosel.net> based on work by David Braam"
+__author__ = "Michał Dziekoński <michaldziekonski+github@gmail.com>, based on work by Gina Häußge <osd@foosel.net> based on work by David Braam"
 __license__ = "GNU Affero General Public License http://www.gnu.org/licenses/agpl.html"
-__copyright__ = "Copyright (C) 2013 David Braam, Gina Häußge - Released under terms of the AGPLv3 License"
+__copyright__ = "Copyright (C) 2013 David Braam, Gina Häußge, Michał Dziekoński - Released under terms of the AGPLv3 License"
 
+# Based on OctoPrint's `src/octoprint/util/gcodeInterpreter.py` (version 1.10.0-rc2)
 # @source: https://github.com/OctoPrint/OctoPrint/blob/c8bd98ce78b899901091f74369d780fd1c806a10/src/octoprint/util/gcodeInterpreter.py
+# The goal is to take code "as is" and introduce as little as possible modifications to make the API fit plugin's needs.
+#
+# Modifications:
+#
+# * _load()
+#       Modified so that it produces a generator, allowing to `send` next lines of GCode,
+#       which allows to handle them as they come, rather than from a pre-existing list.
+#       This approach does not require us to store all GCode lines, saving on RAM.
+#       Each `send()` call accepts an argument, which should either be:
+#       - a GCode line
+#       - `False`: does not affect stats acquisition, but allows to retrieve `peek_stats_helpers`
+#       - `None`: stops stats acquisition and allows to reach the end of generator
+#               (with `peek_stats_helpers` being yielded one last time)
 
 import base64
 import codecs
@@ -364,7 +378,30 @@ class gcode:
         if len(offsets) < max_extruders:
             offsets += [(0, 0)] * (max_extruders - len(offsets))
 
-        for line in gcodeFile:
+        def get_current_extrusion_stats():
+            return {
+                'extrusionAmount': maxExtrusion
+            }
+
+        # Reset extrusion stats without affecting other temporary states
+        def reset_extrusion_stats():
+            for toolIndex in range(len(maxExtrusion)):
+                maxExtrusion[toolIndex] = 0.0
+                totalExtrusion[toolIndex] = 0.0
+
+        peek_stats_helpers = {
+            'get_current_extrusion_stats': get_current_extrusion_stats,
+            'reset_extrusion_stats': reset_extrusion_stats,
+        }
+
+        while True:
+            line = yield peek_stats_helpers
+
+            if line == False:
+                continue
+            if line == None:
+                break
+
             if self._abort:
                 raise AnalysisAborted(reenqueue=self._reenqueue)
             lineNo += 1
@@ -781,6 +818,9 @@ class gcode:
 
             if throttle is not None:
                 throttle(lineNo, readBytes)
+
+        yield peek_stats_helpers
+
         if self._progress_callback is not None:
             self._progress_callback(100.0)
 
