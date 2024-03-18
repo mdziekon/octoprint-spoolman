@@ -1,0 +1,81 @@
+<div
+    id="sidebar_spoolman"
+    class="control-group"
+>
+    <div data-bind="visible: templateData.isLoadingData()" style="margin: 16px; text-align: center;">
+        <i class='fa fa-2xl fa-spinner fa-spin' ></i>
+    </div>
+
+    <div data-bind="visible: !(templateData.isLoadingData())">
+        <div
+            id="selectedSpoolsByToolIdx"
+            data-bind="foreach: templateData.selectedSpoolsByToolIdx"
+        >
+            <div>
+                <!-- ko if: $parent.templateData.selectedSpoolsByToolIdx().length > 1 -->
+                    <div>
+                        <b>Tool #<span data-bind="text: ($index() + 1)"></span>:</b>
+                    </div>
+                <!-- /ko -->
+
+                <!-- ko ifnot: $data -->
+                    <div class="spool-label">
+                        <i>No spool selected</i>
+                    </div>
+                    <div>
+                        <div class="btn-group">
+                            <button
+                                class="btn btn-mini"
+                                data-bind="click: $parent.templateApi.handleSelectSpool.bind($data, $index())"
+                                title="Select spool"
+                            >
+                                ...
+                            </button>
+                        </div>
+                    </div>
+                <!-- /ko -->
+
+                <!-- ko if: $data -->
+                    <div>
+                        <span
+                            class="color-preview"
+                            data-bind="style: { 'background-color': filament.color_hex }, attr: { title: filament.name }"
+                        ></span>
+                    </div>
+                    <div class="spool-label">
+                        <!-- ko if: filament.material -->
+                        <span data-bind="text: filament.material"></span> -
+                        <!-- /ko -->
+                        <span data-bind="text: filament.name"></span>
+                        <!-- ko if: filament.vendor.name -->
+                        (<span data-bind="text: filament.vendor.name"></span>)
+                        <!-- /ko -->
+                        <span
+                            data-bind="text: remaining_weight"
+                            class="spool-remaining"
+                            title="Remaining weight"
+                        ></span><span data-bind="text: $root.constants.weight_unit"></span>
+                    </div>
+                    <div>
+                        <div class="btn-group">
+                            <button
+                                class="btn btn-mini"
+                                data-bind="click: $parent.templateApi.handleDeselectSpool.bind($data, $index())"
+                                title="Deselect Spool"
+                            >
+                                <span class="icon-remove"></span>
+                            </button>
+                            <button
+                                class="btn btn-mini"
+                                data-bind="click: $parent.templateApi.handleSelectSpool.bind($data, $index())"
+                                title="Change Spool"
+                            >
+                                ...
+                            </button>
+                        </div>
+                    </div>
+                <!-- /ko -->
+            </div>
+        </div>
+    </div>
+</div>

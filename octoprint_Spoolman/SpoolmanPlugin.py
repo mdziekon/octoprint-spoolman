@@ -45,6 +45,7 @@ class SpoolmanPlugin(
                 "js/api/getSpoolmanSpools.js",
                 "js/api/updateActiveSpool.js",
                 "js/Spoolman_tab.js",
+                "js/Spoolman_sidebar.js",
                 "js/Spoolman_settings.js",
             ],
             "css": [],
@@ -59,6 +60,10 @@ class SpoolmanPlugin(
                 "template": "Spoolman_tab.jinja2",
             },
             {
+                "type": "sidebar",
+                "template": "Spoolman_sidebar.jinja2",
+            },
+            {
                 "type": "settings",
                 "template": "Spoolman_settings.jinja2",
             }
@@ -71,6 +76,7 @@ class SpoolmanPlugin(
             SettingsKeys.SPOOLMAN_URL: "",
             SettingsKeys.LOGGING_IS_ENABLED: False,
             SettingsKeys.SELECTED_SPOOL_ID: None,
+            SettingsKeys.SELECTED_SPOOL_IDS: [],
         }
 
         return settings
