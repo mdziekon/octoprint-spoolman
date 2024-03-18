@@ -29,6 +29,22 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
             return str(value)
         return None
 
+    def _getIntFromJSONOrNone(self, key, json):
+        value = self._getValueFromJSONOrNone(key, json)
+
+        if value == None:
+            return value
+
+        try:
+            value = int(value)
+        except Exception as e:
+            value = None
+
+            errorMessage = str(e)
+            self._logger.error("could not transform value '" + str(value) + "' for key '" + key + "' to int:" + errorMessage)
+
+        return value
+
     @octoprint.plugin.BlueprintPlugin.route("/spoolman/spools", methods=["GET"])
     def handleGetSpoolsAvailable(self):
         self._logger.debug("API: GET /spoolman/spools")
@@ -63,13 +79,18 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
 
         jsonData = flask.request.json
 
+        toolId = self._getIntFromJSONOrNone("toolIdx", jsonData)
         spoolId = self._getStringFromJSONOrNone("spoolId", jsonData)
 
-        self._settings.set([SettingsKeys.SELECTED_SPOOL_ID], spoolId)
+        spools = self._settings.get([SettingsKeys.SELECTED_SPOOL_IDS])
+
+        spools[toolId] = {
+            'spoolId': spoolId,
+        }
+
+        self._settings.set([SettingsKeys.SELECTED_SPOOL_IDS], spools)
         self._settings.save()
 
         return flask.jsonify({
-            "data": {
-                "spoolId": spoolId,
-            }
+            "data": {}
         })

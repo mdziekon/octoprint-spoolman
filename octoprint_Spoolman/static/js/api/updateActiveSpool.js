@@ -17,6 +17,7 @@ async function updateActiveSpool(apiClient, payload) {
     const request = await apiClient.callApi("self/spool", {
         method: "POST",
         body: JSON.stringify({
+            toolIdx: payload.toolIdx,
             spoolId: payload.spoolId,
         }),
     });

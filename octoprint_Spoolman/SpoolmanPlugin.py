@@ -77,8 +77,7 @@ class SpoolmanPlugin(
             "installed_version": self._plugin_version,
             SettingsKeys.SPOOLMAN_URL: "",
             SettingsKeys.LOGGING_IS_ENABLED: False,
-            SettingsKeys.SELECTED_SPOOL_ID: None,
-            SettingsKeys.SELECTED_SPOOL_IDS: [],
+            SettingsKeys.SELECTED_SPOOL_IDS: {},
         }
 
         return settings

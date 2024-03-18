@@ -65,11 +65,9 @@ $(() => {
                 length: currentExtrudersCount
             }, () => undefined)
 
-            // TODO: Use selectedSpoolIds()
-            // const selectedSpoolIds = selectedSpoolIds();
-            const selectedSpoolIds = [ getSettings().selectedSpoolId() ];
+            const selectedSpoolIds = getSettings().selectedSpoolIds;
             const selectedSpools = extruders.map((_, extruderIdx) => {
-                const spoolId = selectedSpoolIds[extruderIdx];
+                const spoolId = selectedSpoolIds[extruderIdx]?.spoolId();
 
                 return spoolmanSpools.find((spool) => String(spool.id) === spoolId);
             });
@@ -93,10 +91,8 @@ $(() => {
             /** @type Spool[] */
             const spoolmanSpools = await spoolmanSpoolsCachePromise;
 
-            // TODO: Use selectedSpoolIds()
-            // const selectedSpoolIds = selectedSpoolIds();
-            const selectedSpoolIds = [ getSettings().selectedSpoolId() ];
-            const toolSpoolId = selectedSpoolIds[toolIdx];
+            const selectedSpoolIds = getSettings().selectedSpoolIds;
+            const toolSpoolId = selectedSpoolIds[toolIdx]?.spoolId();
             const toolSpool = spoolmanSpools.find((spool) => {
                 return String(spool.id) === toolSpoolId;
             });
@@ -111,7 +107,7 @@ $(() => {
          * @param {number} toolIdx
          */
         const handleDeselectSpool = async (toolIdx) => {
-            const request = await updateActiveSpool(apiClient, { spoolId: undefined });
+            const request = await updateActiveSpool(apiClient, { toolIdx, spoolId: undefined });
 
             if (!request.isSuccess) {
                 console.error("Request error", request.error);
@@ -120,6 +116,7 @@ $(() => {
             }
 
             const settingsSavePromise = new Promise((resolve) => {
+                // TODO: Investigate if `saveData` can replace custom API endpoint
                 // Force save empty data to trigger `settingsViewModel` reload
                 self.settingsViewModel.saveData({}, resolve);
             });
@@ -136,7 +133,7 @@ $(() => {
          * @param {number} spoolId
          */
         const handleSelectSpoolForTool = async (toolIdx, spoolId) => {
-            const request = await updateActiveSpool(apiClient, { spoolId });
+            const request = await updateActiveSpool(apiClient, { toolIdx, spoolId });
 
             if (!request.isSuccess) {
                 console.error("Request error", request.error);
@@ -145,6 +142,7 @@ $(() => {
             }
 
             const settingsSavePromise = new Promise((resolve) => {
+                // TODO: Investigate if `saveData` can replace custom API endpoint
                 // Force save empty data to trigger `settingsViewModel` reload
                 self.settingsViewModel.saveData({}, resolve);
             });
