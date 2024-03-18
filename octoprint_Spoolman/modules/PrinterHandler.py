@@ -4,7 +4,9 @@ from __future__ import absolute_import
 import copy
 import octoprint.plugin
 from octoprint.events import Events
+
 from octoprint_Spoolman.thirdparty.gcodeInterpreter import gcode
+from octoprint_Spoolman.common.settings import SettingsKeys
 
 class PrinterHandler(octoprint.plugin.BlueprintPlugin):
     def __init__(self):
@@ -56,7 +58,20 @@ class PrinterHandler(octoprint.plugin.BlueprintPlugin):
 
         peek_stats_helpers['reset_extrusion_stats']()
 
-        self._logger.info("Result: %s", current_extrusion_stats['extrusionAmount'])
+        selectedSpoolIds = self._settings.get([SettingsKeys.SELECTED_SPOOL_IDS])
 
-        # TODO: get selected spool
-        # TODO: get usage amount
+        for toolIdx, toolExtrusionLength in enumerate(current_extrusion_stats['extrusionAmount']):
+            try:
+                selectedSpool = selectedSpoolIds[str(toolIdx)]
+            except:
+                self._logger.info("Extruder '%s', spool id: none", toolIdx)
+
+            if selectedSpool:
+                self._logger.info(
+                    "Extruder '%s', spool id: %s, usage: %s",
+                    toolIdx,
+                    selectedSpool['spoolId'],
+                    toolExtrusionLength
+                )
+
+                self.handleCommitSpoolUsage(selectedSpool['spoolId'], toolExtrusionLength)

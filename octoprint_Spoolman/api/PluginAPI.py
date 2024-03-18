@@ -94,3 +94,29 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
         return flask.jsonify({
             "data": {}
         })
+
+    def handleCommitSpoolUsage(self, spoolId, spoolUsedLength):
+        response = requests.put(
+            url = self._createSpoolmanEndpointUrl("/spool/" + str(spoolId) + "/use"),
+            json = {
+                'use_length': spoolUsedLength,
+            }
+        )
+
+        if response.status_code != 200:
+            self._logger.error("[Spoolman API] request failed with status %s" % response.status_code)
+
+            return {
+                "error": {
+                    "code": "spoolman_api__request_failed",
+                    "spoolman_api": {
+                        "status_code": response.status_code,
+                    },
+                }
+            }
+
+        self._logger.debug("[Spoolman API] request succeeded with status %s" % response.status_code)
+
+        return {
+            "data": {}
+        }
