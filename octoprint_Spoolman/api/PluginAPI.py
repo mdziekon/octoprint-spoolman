@@ -8,6 +8,9 @@ import requests
 from octoprint_Spoolman.common.settings import SettingsKeys
 
 class PluginAPI(octoprint.plugin.BlueprintPlugin):
+    def is_blueprint_csrf_protected(self):
+        return True
+
     def _createSpoolmanApiUrl(self):
         instance_url = self._settings.get([ SettingsKeys.SPOOLMAN_URL ])
         api_path = "/api/v1"
