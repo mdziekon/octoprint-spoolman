@@ -110,7 +110,26 @@ $(() => {
         /**
          * @param {number} toolIdx
          */
-        const handleDeselectSpool = async (toolIdx) => {};
+        const handleDeselectSpool = async (toolIdx) => {
+            const request = await updateActiveSpool(apiClient, { spoolId: undefined });
+
+            if (!request.isSuccess) {
+                console.error("Request error", request.error);
+
+                throw new Error("Request error");
+            }
+
+            const settingsSavePromise = new Promise((resolve) => {
+                // Force save empty data to trigger `settingsViewModel` reload
+                self.settingsViewModel.saveData({}, resolve);
+            });
+
+            await settingsSavePromise;
+
+            self.modals.selectSpool.modal("hide");
+
+            updateSelectedSpools();
+        };
 
         /**
          * @param {number} toolIdx
