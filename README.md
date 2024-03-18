@@ -2,6 +2,19 @@
 
 An OctoPrint plugin integrating with [Spoolman](https://github.com/Donkie/Spoolman/), a universal filament spools inventory manager.
 
+## Features
+
+- [x] Basic Spoolman integration
+    - [x] Connect to configured Spoolman
+    - [x] Display available spools
+    - [x] Select & deselect spools for specified tools / extruders
+    - [x] Commit spools usage to Spoolman
+- [ ] Spools filtering
+- [ ] Check spools before starting a print
+    - [ ] Warn when no spools are selected
+    - [ ] Warn when selected spools do not have enough material
+    - [ ] Warn when wrong spool material has been selected (PrusaSlicer / OrcaSlicer gcodes)
+
 ## Development
 
 You can use `docker compose` to start a development server, consisting of a test OctoPrint & Spoolman instances.

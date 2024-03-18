@@ -2,13 +2,12 @@
 from __future__ import absolute_import
 
 import copy
-import octoprint.plugin
 from octoprint.events import Events
 
 from octoprint_Spoolman.thirdparty.gcodeInterpreter import gcode
 from octoprint_Spoolman.common.settings import SettingsKeys
 
-class PrinterHandler(octoprint.plugin.BlueprintPlugin):
+class PrinterHandler():
     def __init__(self):
         self.lastPrintCancelled = False
         self.lastPrintOdometer = None
@@ -66,12 +65,14 @@ class PrinterHandler(octoprint.plugin.BlueprintPlugin):
             except:
                 self._logger.info("Extruder '%s', spool id: none", toolIdx)
 
-            if selectedSpool:
-                self._logger.info(
-                    "Extruder '%s', spool id: %s, usage: %s",
-                    toolIdx,
-                    selectedSpool['spoolId'],
-                    toolExtrusionLength
-                )
+            if not selectedSpool:
+                continue
 
-                self.handleCommitSpoolUsage(selectedSpool['spoolId'], toolExtrusionLength)
+            self._logger.info(
+                "Extruder '%s', spool id: %s, usage: %s",
+                toolIdx,
+                selectedSpool['spoolId'],
+                toolExtrusionLength
+            )
+
+            self.handleCommitSpoolUsage(selectedSpool['spoolId'], toolExtrusionLength)

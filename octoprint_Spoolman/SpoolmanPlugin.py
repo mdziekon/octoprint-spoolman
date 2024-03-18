@@ -74,7 +74,7 @@ class SpoolmanPlugin(
     # SettingsPlugin
     def get_settings_defaults(self):
         settings = {
-            "installed_version": self._plugin_version,
+            SettingsKeys.INSTALLED_VERSION: self._plugin_version,
             SettingsKeys.SPOOLMAN_URL: "",
             SettingsKeys.LOGGING_IS_ENABLED: False,
             SettingsKeys.SELECTED_SPOOL_IDS: {},

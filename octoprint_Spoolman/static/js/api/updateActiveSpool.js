@@ -1,5 +1,6 @@
 /**
  * @typedef {Object} Payload
+ * @property {number} toolIdx
  * @property {string} spoolId
  */
 
