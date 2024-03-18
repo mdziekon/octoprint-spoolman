@@ -17,6 +17,10 @@ $(() => {
 
         self.settingsViewModel = params[0];
 
+        self.modals = {
+            selectSpool: $("#spoolman_modal_selectspool"),
+        };
+
         const getSettings = () => {
             return self.settingsViewModel.settings.plugins[PLUGIN_ID];
         };
@@ -77,12 +81,61 @@ $(() => {
         /**
          * @param {number} toolIdx
          */
-        const handleSelectSpool = (toolIdx) => {};
+        const handleSelectSpool = async (toolIdx) => {
+            // TODO: Improve DX, maybe move to separate component
+
+            self.templateData.modals.selectSpool.toolIdx(toolIdx);
+
+            self.modals.selectSpool.modal("show");
+
+            self.templateData.modals.selectSpool.isLoadingData(true);
+
+            /** @type Spool[] */
+            const spoolmanSpools = await spoolmanSpoolsCachePromise;
+
+            // TODO: Use selectedSpoolIds()
+            // const selectedSpoolIds = selectedSpoolIds();
+            const selectedSpoolIds = [ getSettings().selectedSpoolId() ];
+            const toolSpoolId = selectedSpoolIds[toolIdx];
+            const toolSpool = spoolmanSpools.find((spool) => {
+                return String(spool.id) === toolSpoolId;
+            });
+
+            self.templateData.modals.selectSpool.toolCurrentSpool(toolSpool);
+            self.templateData.modals.selectSpool.tableItemsOnCurrentPage(spoolmanSpools);
+
+            self.templateData.modals.selectSpool.isLoadingData(false);
+        };
 
         /**
          * @param {number} toolIdx
          */
-        const handleDeselectSpool = (toolIdx) => {};
+        const handleDeselectSpool = async (toolIdx) => {};
+
+        /**
+         * @param {number} toolIdx
+         * @param {number} spoolId
+         */
+        const handleSelectSpoolForTool = async (toolIdx, spoolId) => {
+            const request = await updateActiveSpool(apiClient, { spoolId });
+
+            if (!request.isSuccess) {
+                console.error("Request error", request.error);
+
+                throw new Error("Request error");
+            }
+
+            const settingsSavePromise = new Promise((resolve) => {
+                // Force save empty data to trigger `settingsViewModel` reload
+                self.settingsViewModel.saveData({}, resolve);
+            });
+
+            await settingsSavePromise;
+
+            self.modals.selectSpool.modal("hide");
+
+            updateSelectedSpools();
+        };
 
         /** Bindings for the template */
         self.constants = {
@@ -91,10 +144,33 @@ $(() => {
         self.templateApi = {
             handleSelectSpool,
             handleDeselectSpool,
+
+            modals: {
+                selectSpool: {
+                    handleSelectSpoolForTool,
+                },
+            },
         };
         self.templateData = {
             isLoadingData: ko.observable(true),
             selectedSpoolsByToolIdx: ko.observable([]),
+
+            modals: {
+                selectSpool: {
+                    isLoadingData: ko.observable(true),
+
+                    toolIdx: ko.observable(undefined),
+                    toolCurrentSpool: ko.observable(undefined),
+
+                    tableAttributeVisibility: {
+                        id: true,
+                        spoolName: true,
+                        material: true,
+                        weight: true,
+                    },
+                    tableItemsOnCurrentPage: ko.observable([]),
+                },
+            },
         };
         /** -- end of bindings -- */
 
@@ -119,6 +195,7 @@ $(() => {
         ],
         elements: [
             document.querySelector("#sidebar_spoolman"),
+            document.querySelector("#spoolman_modal_selectspool"),
         ]
     });
 });

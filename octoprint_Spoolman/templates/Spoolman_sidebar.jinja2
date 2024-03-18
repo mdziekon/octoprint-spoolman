@@ -2,7 +2,10 @@
     id="sidebar_spoolman"
     class="control-group"
 >
-    <div data-bind="visible: templateData.isLoadingData()" style="margin: 16px; text-align: center;">
+    <div
+        data-bind="visible: templateData.isLoadingData()"
+        style="margin: 16px; text-align: center;"
+    >
         <i class='fa fa-2xl fa-spinner fa-spin' ></i>
     </div>
 
@@ -79,3 +82,7 @@
         </div>
     </div>
 </div>
+
+<span id="modal-dialogs-spoolManager" style="display:none" >
+    {% include "Spoolman_sidebar_modal_selectspool.jinja2" %}
+</span>

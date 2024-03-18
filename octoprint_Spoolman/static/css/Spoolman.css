@@ -1,0 +1,8 @@
+#spoolman_modal_selectspool .modal-body {
+    display: flex;
+    flex-direction: column;
+}
+
+#spoolman_modal_selectspool .table {
+    margin-bottom: 0;
+}

@@ -48,7 +48,9 @@ class SpoolmanPlugin(
                 "js/Spoolman_sidebar.js",
                 "js/Spoolman_settings.js",
             ],
-            "css": [],
+            "css": [
+                "css/Spoolman.css",
+            ],
             "less": [],
         }
 
