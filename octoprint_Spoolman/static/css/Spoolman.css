@@ -6,3 +6,24 @@
 #spoolman_modal_selectspool .table {
     margin-bottom: 0;
 }
+
+.spool-label {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25em;
+}
+
+.tool-row {
+    display: flex;
+    gap: 0.5em;
+}
+
+.color-preview {
+    border: 1px solid #ccc;
+    border-radius:4px;
+    box-shadow: inset 0 0 2px 2px rgba(0, 0, 0, 0.075);
+    height: 1.5em;
+    width: 1.5em;
+    display: inline-block;
+    margin-right: 5px
+}

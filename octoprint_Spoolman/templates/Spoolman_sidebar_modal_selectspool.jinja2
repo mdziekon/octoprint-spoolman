@@ -23,7 +23,7 @@
                     <span
                         class="color-preview"
                         style="margin-bottom: -5px;"
-                        data-bind="style: { 'background-color': templateData.modals.selectSpool.toolCurrentSpool().filament.color_hex },
+                        data-bind="style: { 'background-color': '#' + templateData.modals.selectSpool.toolCurrentSpool().filament.color_hex },
                                     attr: { title: templateData.modals.selectSpool.toolCurrentSpool().filament.name }"
                     ></span>
                     <span>
@@ -39,7 +39,6 @@
 
                         <span
                             data-bind="text: templateData.modals.selectSpool.toolCurrentSpool().remaining_weight"
-                            class="spool-remaining"
                             title="Remaining weight"
                         ></span><span data-bind="text: $root.constants.weight_unit"></span>
                     </span>
@@ -112,11 +111,21 @@
                                 <span data-bind="text: id, attr: { title: id }"></span>
                             </td>
                             <td data-bind="visible: $root.templateData.modals.selectSpool.tableAttributeVisibility.spoolName">
-                                <span data-bind="text: filament.name, attr: { title: filament.name }"></span>
-                                <br>
-                                <i>
-                                    <span data-bind="text: filament.vendor.name, attr: { title: filament.vendor.name }"></span>
-                                </i>
+                                <div style="display: flex;">
+                                    <div>
+                                        <span
+                                            class="color-preview"
+                                            data-bind="style: { 'background-color': '#' + filament.color_hex }, attr: { title: filament.name }"
+                                        ></span>
+                                    </div>
+                                    <div>
+                                        <span data-bind="text: filament.name, attr: { title: filament.name }"></span>
+                                        <br>
+                                        <i>
+                                            <span data-bind="text: filament.vendor.name, attr: { title: filament.vendor.name }"></span>
+                                        </i>
+                                    </div>
+                                </div>
                             </td>
                             <td data-bind="visible: $root.templateData.modals.selectSpool.tableAttributeVisibility.material">
                                 <span data-bind="text: filament.material, attr: { title: filament.material }"></span>

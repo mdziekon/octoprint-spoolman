@@ -14,7 +14,7 @@
             id="selectedSpoolsByToolIdx"
             data-bind="foreach: templateData.selectedSpoolsByToolIdx"
         >
-            <div>
+            <div class="tool-row">
                 <!-- ko if: $parent.templateData.selectedSpoolsByToolIdx().length > 1 -->
                     <div>
                         <b>Tool #<span data-bind="text: ($index() + 1)"></span>:</b>
@@ -42,22 +42,23 @@
                     <div>
                         <span
                             class="color-preview"
-                            data-bind="style: { 'background-color': filament.color_hex }, attr: { title: filament.name }"
+                            data-bind="style: { 'background-color': '#' + filament.color_hex }, attr: { title: filament.name }"
                         ></span>
                     </div>
                     <div class="spool-label">
                         <!-- ko if: filament.material -->
-                        <span data-bind="text: filament.material"></span> -
+                        <span>[<span data-bind="text: filament.material"></span>]</span>
                         <!-- /ko -->
                         <span data-bind="text: filament.name"></span>
                         <!-- ko if: filament.vendor.name -->
-                        (<span data-bind="text: filament.vendor.name"></span>)
+                        <span>(<span data-bind="text: filament.vendor.name"></span>)</span>
                         <!-- /ko -->
-                        <span
-                            data-bind="text: remaining_weight"
-                            class="spool-remaining"
-                            title="Remaining weight"
-                        ></span><span data-bind="text: $root.constants.weight_unit"></span>
+                        <span>
+                            <span
+                                data-bind="text: remaining_weight"
+                                title="Remaining weight"
+                            ></span><span data-bind="text: $root.constants.weight_unit"></span>
+                        </span>
                     </div>
                     <div>
                         <div class="btn-group">
