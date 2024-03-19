@@ -105,14 +105,20 @@ $(() => {
             // TODO: Add error handling for modal
 
             self.templateData.modals.selectSpool.toolIdx(toolIdx);
+            self.templateData.modals.selectSpool.loadingError(undefined);
+            self.templateData.modals.selectSpool.isLoadingData(true);
 
             self.modals.selectSpool.modal("show");
-
-            self.templateData.modals.selectSpool.isLoadingData(true);
 
             const spoolmanSpoolsResult = await fetchSpoolmanSpools();
 
             self.templateData.modals.selectSpool.isLoadingData(false);
+
+            if (!spoolmanSpoolsResult.isSuccess) {
+                self.templateData.modals.selectSpool.loadingError(spoolmanSpoolsResult.error.response.error)
+
+                return;
+            }
 
             const spoolmanSpools = spoolmanSpoolsResult.payload.response.data.spools;
 
@@ -199,6 +205,7 @@ $(() => {
             modals: {
                 selectSpool: {
                     isLoadingData: ko.observable(true),
+                    loadingError: ko.observable(undefined),
 
                     toolIdx: ko.observable(undefined),
                     toolCurrentSpool: ko.observable(undefined),

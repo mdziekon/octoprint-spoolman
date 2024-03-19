@@ -57,6 +57,21 @@
                 <i class='fa fa-2xl fa-spinner fa-spin' ></i>
             </div>
 
+            <!-- ko if: (!templateData.modals.selectSpool.isLoadingData() && templateData.modals.selectSpool.loadingError()) -->
+                <div>
+                    <!-- ko if: (templateData.modals.selectSpool.loadingError().code === 'spoolman_api__instance_url_empty') -->
+                        <div class="alert alert-block alert-info">
+                            Spoolman plugin has not been configured yet
+                        </div>
+                    <!-- /ko -->
+                    <!-- ko if: (templateData.modals.selectSpool.loadingError().code ?? 'unknown') === 'unknown' -->
+                        <div class="alert alert-block alert-error">
+                            Unknown error
+                        </div>
+                    <!-- /ko -->
+                </div>
+            <!-- /ko -->
+
             <div data-bind="visible: !(templateData.modals.selectSpool.isLoadingData())">
                 <table
                     class="table table-striped table-hover table-condensed table-hover"
