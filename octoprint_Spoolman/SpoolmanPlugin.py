@@ -1,19 +1,19 @@
 import octoprint.plugin
 from octoprint.events import Events
 
-from octoprint_Spoolman.modules.PluginAPI import PluginAPI
-from octoprint_Spoolman.modules.PrinterHandler import PrinterHandler
-from octoprint_Spoolman.modules.SpoolmanConnector import SpoolmanConnector
-from octoprint_Spoolman.common.settings import SettingsKeys
+from .modules.PluginAPI import PluginAPI
+from .modules.PrinterHandler import PrinterHandler
+from .modules.SpoolmanConnector import SpoolmanConnector
+from .common.settings import SettingsKeys
 
 class SpoolmanPlugin(
-    PluginAPI,
-    PrinterHandler,
     octoprint.plugin.StartupPlugin,
     octoprint.plugin.AssetPlugin,
     octoprint.plugin.TemplatePlugin,
     octoprint.plugin.SettingsPlugin,
     octoprint.plugin.EventHandlerPlugin,
+    PluginAPI,
+    PrinterHandler,
 ):
     def initialize(self):
         spoolmanInstanceUrl = self._settings.get([ SettingsKeys.SPOOLMAN_URL ])

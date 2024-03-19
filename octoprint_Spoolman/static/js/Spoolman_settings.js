@@ -1,6 +1,6 @@
 $(() => {
     // from setup.py plugin_identifier
-    const PLUGIN_ID = "octoprint_Spoolman";
+    const PLUGIN_ID = "Spoolman";
 
     function SpoolmanSettingsViewModel(params) {
         const self = this;

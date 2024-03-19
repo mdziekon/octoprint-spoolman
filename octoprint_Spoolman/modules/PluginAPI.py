@@ -4,7 +4,7 @@ from __future__ import absolute_import
 import octoprint.plugin
 import flask
 
-from octoprint_Spoolman.common.settings import SettingsKeys
+from ..common.settings import SettingsKeys
 
 class PluginAPI(octoprint.plugin.BlueprintPlugin):
     def is_blueprint_csrf_protected(self):

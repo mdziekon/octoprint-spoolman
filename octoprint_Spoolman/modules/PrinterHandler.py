@@ -4,8 +4,8 @@ from __future__ import absolute_import
 import copy
 from octoprint.events import Events
 
-from octoprint_Spoolman.thirdparty.gcodeInterpreter import gcode
-from octoprint_Spoolman.common.settings import SettingsKeys
+from ..thirdparty.gcodeInterpreter import gcode
+from ..common.settings import SettingsKeys
 
 class PrinterHandler():
     def initialize(self):
