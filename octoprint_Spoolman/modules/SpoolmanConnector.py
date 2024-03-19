@@ -50,7 +50,7 @@ class SpoolmanConnector():
     def handleGetSpoolsAvailable(self):
         precheckResult = self._precheckSpoolman()
 
-        if precheckResult and precheckResult['error']:
+        if precheckResult and precheckResult.get('error', False):
             return precheckResult
 
         endpointUrl = self._createSpoolmanEndpointUrl("/spool")
@@ -75,7 +75,7 @@ class SpoolmanConnector():
     def handleCommitSpoolUsage(self, spoolId, spoolUsedLength):
         precheckResult = self._precheckSpoolman()
 
-        if precheckResult and precheckResult['error']:
+        if precheckResult and precheckResult.get('error', False):
             return precheckResult
 
         endpointUrl = self._createSpoolmanEndpointUrl("/spool/" + str(spoolId) + "/use")

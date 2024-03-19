@@ -45,7 +45,7 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
 
         result = self._spoolmanConnector.handleGetSpoolsAvailable()
 
-        if result['error']:
+        if result.get('error', False):
             response = flask.jsonify(result)
             response.status = http.HTTPStatus.BAD_REQUEST
 
