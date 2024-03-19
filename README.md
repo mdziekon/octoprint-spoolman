@@ -15,14 +15,6 @@ An OctoPrint plugin integrating with [Spoolman](https://github.com/Donkie/Spoolm
     - [ ] Warn when selected spools do not have enough material
     - [ ] Warn when wrong spool material has been selected (PrusaSlicer / OrcaSlicer gcodes)
 
-## Development
-
-You can use `docker compose` to start a development server, consisting of a test OctoPrint & Spoolman instances.
-
-```bash
-docker compose up
-```
-
 ### Setup
 
 On initial spin-up, you'll need to manually change permissions of the Spoolman directory:
@@ -40,7 +32,31 @@ For Spoolman, there's currently no backup & restore method, so you'll have to cr
 
 ### Development
 
-- Octoprint should be available at `localhost:7180`
-- Spoolman should be available at `localhost:7181`
+You can use `docker compose` to start a development server, consisting of a test OctoPrint & Spoolman instances.
 
-After applying any changes, restart the Octoprint server so that it picks up your changes.
+```bash
+docker compose up
+```
+
+### App locations
+
+- Octoprint should be available at `localhost:7180`.
+- Spoolman (outside of Docker) should be available at `localhost:7181`.
+- Spoolman (inside Docker) should be available at `http://spoolman:8000`.
+    - This is the value you should paste into Spoolman plugin's settings in Octoprint.
+- Data used by Docker containers is stored in `docker-data` folder.
+
+#### Protips
+
+- After applying any changes, restart the Octoprint server so that it picks up your changes.
+- You can place Octoprint's code in `octoprint_Spoolman/octoprint` directory.
+    - This helps with some autocompletions, mostly in places where we're using Octoprint's shared APIs.
+    - Don't worry about polluting git repo - this folder has been added to `.gitignore` already.
+
+## Distributing
+
+### Zip folder method (manual)
+
+```bash
+zip -r octoprint-spoolman.zip octoprint-spoolman -x "**/.git/*" "**/docker-data/*" "**/octoprint_Spoolman/octoprint/**" "**/__pycache__/*"
+```

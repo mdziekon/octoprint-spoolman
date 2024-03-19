@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 import octoprint.plugin
 import flask
+import http
 
 from ..common.settings import SettingsKeys
 
@@ -42,7 +43,13 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
     def handleGetSpoolsAvailable(self):
         self._logger.debug("API: GET /spoolman/spools")
 
-        result = self._spoolmanConnector.handleGetSpoolsAvailable()
+        result = self.getSpoolmanConnector().handleGetSpoolsAvailable()
+
+        if result.get('error', False):
+            response = flask.jsonify(result)
+            response.status = http.HTTPStatus.BAD_REQUEST
+
+            return response
 
         return flask.jsonify(result)
 

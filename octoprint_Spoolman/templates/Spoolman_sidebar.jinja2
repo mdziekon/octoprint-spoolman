@@ -9,7 +9,22 @@
         <i class='fa fa-2xl fa-spinner fa-spin' ></i>
     </div>
 
-    <div data-bind="visible: !(templateData.isLoadingData())">
+    <!-- ko if: (!templateData.isLoadingData() && templateData.loadingError()) -->
+        <div>
+            <!-- ko if: (templateData.loadingError().code === 'spoolman_api__instance_url_empty') -->
+                <div class="alert alert-block alert-info">
+                    Spoolman plugin has not been configured yet
+                </div>
+            <!-- /ko -->
+            <!-- ko if: (templateData.loadingError().code ?? 'unknown') === 'unknown' -->
+                <div class="alert alert-block alert-error">
+                    Unknown error
+                </div>
+            <!-- /ko -->
+        </div>
+    <!-- /ko -->
+
+    <div data-bind="visible: (!templateData.isLoadingData() && !templateData.loadingError())">
         <div
             id="selectedSpoolsByToolIdx"
             data-bind="foreach: templateData.selectedSpoolsByToolIdx"

@@ -78,4 +78,4 @@ class PrinterHandler():
                 toolExtrusionLength
             )
 
-            self._spoolmanConnector.handleCommitSpoolUsage(selectedSpool['spoolId'], toolExtrusionLength)
+            self.getSpoolmanConnector().handleCommitSpoolUsage(selectedSpool['spoolId'], toolExtrusionLength)

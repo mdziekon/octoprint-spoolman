@@ -25,6 +25,16 @@ class SpoolmanConnector():
     def _logSpoolmanSuccess(self, response):
         self._logger.debug("[Spoolman API] request succeeded with status %s" % response.status_code)
 
+    def _precheckSpoolman(self):
+        if not self.instanceUrl:
+            return {
+                "error": {
+                    "code": "spoolman_api__instance_url_empty",
+                },
+            }
+
+        return None
+
     def _handleSpoolmanError(self, response):
         self._logSpoolmanError(response)
 
@@ -38,6 +48,11 @@ class SpoolmanConnector():
         }
 
     def handleGetSpoolsAvailable(self):
+        precheckResult = self._precheckSpoolman()
+
+        if precheckResult and precheckResult.get('error', False):
+            return precheckResult
+
         endpointUrl = self._createSpoolmanEndpointUrl("/spool")
 
         self._logSpoolmanCall(endpointUrl)
@@ -58,6 +73,11 @@ class SpoolmanConnector():
         }
 
     def handleCommitSpoolUsage(self, spoolId, spoolUsedLength):
+        precheckResult = self._precheckSpoolman()
+
+        if precheckResult and precheckResult.get('error', False):
+            return precheckResult
+
         endpointUrl = self._createSpoolmanEndpointUrl("/spool/" + str(spoolId) + "/use")
 
         self._logSpoolmanCall(endpointUrl)

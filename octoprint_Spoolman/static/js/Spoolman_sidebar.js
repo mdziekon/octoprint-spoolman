@@ -5,15 +5,42 @@ $(() => {
     function SpoolmanSidebarViewModel(params) {
         const self = this;
 
-        // TODO: Improve DX
-        const spoolmanSpoolsCachePromiseUtils = {
-            resolve: () => {},
-            reject: () => {},
+        const previousSettings = {
+            spoolmanUrl: undefined,
         };
-        const spoolmanSpoolsCachePromise = new Promise((resolve, reject) => {
-            spoolmanSpoolsCachePromiseUtils.resolve = resolve;
-            spoolmanSpoolsCachePromiseUtils.reject = reject;
-        });
+
+        const fetchSpoolmanSpools = (() => {
+            const cache = {
+                /** @type Promise<Spool[]> */
+                spools: undefined,
+            };
+
+            const fetcher = async () => {
+                if (cache.spools) {
+                    return cache.spools;
+                }
+
+                const fetchPromise = (async () => {
+                    const request = await getSpoolmanSpools(apiClient);
+
+                    if (!request.isSuccess) {
+                        console.error("Request error", request.error);
+                    }
+
+                    return request;
+                })();
+
+                cache.spools = fetchPromise;
+
+                return cache.spools;
+            };
+
+            fetcher.clearCache = () => {
+                cache.spools = undefined;
+            };
+
+            return fetcher;
+        })();
 
         self.settingsViewModel = params[0];
 
@@ -21,7 +48,7 @@ $(() => {
             selectSpool: $("#spoolman_modal_selectspool"),
         };
 
-        const getSettings = () => {
+        const getPluginSettings = () => {
             return self.settingsViewModel.settings.plugins[PLUGIN_ID];
         };
 
@@ -29,30 +56,24 @@ $(() => {
         const apiClient = new APIClient(PLUGIN_ID, BASEURL);
 
         const initView = async () => {
-            const request = await getSpoolmanSpools(apiClient);
-
-            if (!request.isSuccess) {
-                console.error("Request error", request.error);
-
-                spoolmanSpoolsCachePromiseUtils.reject();
-
-                return;
-            }
-
-            const spools = request.payload.response.data.spools;
-
-            spoolmanSpoolsCachePromiseUtils.resolve(spools);
-
             updateSelectedSpools();
         };
 
         const updateSelectedSpools = async () => {
+            self.templateData.loadingError(undefined);
             self.templateData.isLoadingData(true);
 
-            /** @type Spool[] */
-            const spoolmanSpools = await spoolmanSpoolsCachePromise;
+            const spoolmanSpoolsResult = await fetchSpoolmanSpools();
 
             self.templateData.isLoadingData(false);
+
+            if (!spoolmanSpoolsResult.isSuccess) {
+                self.templateData.loadingError(spoolmanSpoolsResult.error.response.error)
+
+                return;
+            }
+
+            const spoolmanSpools = spoolmanSpoolsResult.payload.response.data.spools;
 
             const currentProfileData = self.settingsViewModel.printerProfiles.currentProfileData();
             const currentExtrudersCount = (
@@ -65,7 +86,7 @@ $(() => {
                 length: currentExtrudersCount
             }, () => undefined)
 
-            const selectedSpoolIds = getSettings().selectedSpoolIds;
+            const selectedSpoolIds = getPluginSettings().selectedSpoolIds;
             const selectedSpools = extruders.map((_, extruderIdx) => {
                 const spoolId = selectedSpoolIds[extruderIdx]?.spoolId();
 
@@ -81,17 +102,27 @@ $(() => {
          */
         const handleSelectSpool = async (toolIdx) => {
             // TODO: Improve DX, maybe move to separate component
+            // TODO: Add error handling for modal
 
             self.templateData.modals.selectSpool.toolIdx(toolIdx);
+            self.templateData.modals.selectSpool.loadingError(undefined);
+            self.templateData.modals.selectSpool.isLoadingData(true);
 
             self.modals.selectSpool.modal("show");
 
-            self.templateData.modals.selectSpool.isLoadingData(true);
+            const spoolmanSpoolsResult = await fetchSpoolmanSpools();
 
-            /** @type Spool[] */
-            const spoolmanSpools = await spoolmanSpoolsCachePromise;
+            self.templateData.modals.selectSpool.isLoadingData(false);
 
-            const selectedSpoolIds = getSettings().selectedSpoolIds;
+            if (!spoolmanSpoolsResult.isSuccess) {
+                self.templateData.modals.selectSpool.loadingError(spoolmanSpoolsResult.error.response.error)
+
+                return;
+            }
+
+            const spoolmanSpools = spoolmanSpoolsResult.payload.response.data.spools;
+
+            const selectedSpoolIds = getPluginSettings().selectedSpoolIds;
             const toolSpoolId = selectedSpoolIds[toolIdx]?.spoolId();
             const toolSpool = spoolmanSpools.find((spool) => {
                 return String(spool.id) === toolSpoolId;
@@ -99,8 +130,6 @@ $(() => {
 
             self.templateData.modals.selectSpool.toolCurrentSpool(toolSpool);
             self.templateData.modals.selectSpool.tableItemsOnCurrentPage(spoolmanSpools);
-
-            self.templateData.modals.selectSpool.isLoadingData(false);
         };
 
         /**
@@ -170,11 +199,13 @@ $(() => {
         };
         self.templateData = {
             isLoadingData: ko.observable(true),
+            loadingError: ko.observable(undefined),
             selectedSpoolsByToolIdx: ko.observable([]),
 
             modals: {
                 selectSpool: {
                     isLoadingData: ko.observable(true),
+                    loadingError: ko.observable(undefined),
 
                     toolIdx: ko.observable(undefined),
                     toolCurrentSpool: ko.observable(undefined),
@@ -191,7 +222,12 @@ $(() => {
         };
         /** -- end of bindings -- */
 
-        self.onBeforeBinding = () => {
+        self.onBeforeBinding = () => {};
+        self.onAfterBinding = () => {
+            initView();
+
+            previousSettings.spoolmanUrl = getPluginSettings().spoolmanUrl();
+
             /**
              * Update spools on printer's profile update,
              * to handle any potential tool-count changes.
@@ -200,8 +236,26 @@ $(() => {
                 void updateSelectedSpools();
             });
         };
-        self.onAfterBinding = () => {
-            initView();
+
+        /**
+         * Update spools on Spoolman instance change.
+         * Subscribing to settings entry is unreliable, as its observable updates
+         * on every input change, rather than on save.
+         */
+        self.onSettingsHidden = () => {
+            const newSettings = {
+                spoolmanUrl: getPluginSettings().spoolmanUrl(),
+            };
+
+            if (previousSettings.spoolmanUrl === newSettings.spoolmanUrl) {
+                return;
+            }
+
+            previousSettings.spoolmanUrl = newSettings.spoolmanUrl;
+
+            fetchSpoolmanSpools.clearCache();
+
+            void updateSelectedSpools();
         };
     };
 
