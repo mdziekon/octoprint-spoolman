@@ -3,6 +3,7 @@ from octoprint.events import Events
 
 from octoprint_Spoolman.api.PluginAPI import PluginAPI
 from octoprint_Spoolman.modules.PrinterHandler import PrinterHandler
+from octoprint_Spoolman.modules.SpoolmanConnector import SpoolmanConnector
 from octoprint_Spoolman.common.settings import SettingsKeys
 
 class SpoolmanPlugin(
@@ -14,6 +15,14 @@ class SpoolmanPlugin(
     octoprint.plugin.SettingsPlugin,
     octoprint.plugin.EventHandlerPlugin,
 ):
+    def initialize(self):
+        spoolmanInstanceUrl = self._settings.get([ SettingsKeys.SPOOLMAN_URL ])
+
+        self._spoolmanConnector = SpoolmanConnector(
+            instanceUrl = spoolmanInstanceUrl,
+            logger = self._logger
+        )
+
     def on_after_startup(self):
         self._logger.info("[Spoolman][init] Plugin activated")
 

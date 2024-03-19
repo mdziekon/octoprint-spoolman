@@ -8,7 +8,7 @@ from octoprint_Spoolman.thirdparty.gcodeInterpreter import gcode
 from octoprint_Spoolman.common.settings import SettingsKeys
 
 class PrinterHandler():
-    def __init__(self):
+    def initialize(self):
         self.lastPrintCancelled = False
         self.lastPrintOdometer = None
         self.lastPrintOdometerLoad = None
@@ -45,7 +45,10 @@ class PrinterHandler():
             self.lastPrintOdometerLoad = None
 
     def handlePrintingGCode(self, command):
-        if self.lastPrintOdometerLoad == None:
+        if (
+            not hasattr(self, "lastPrintOdometerLoad") or
+            self.lastPrintOdometerLoad == None
+        ):
             return
 
         peek_stats_helpers = self.lastPrintOdometerLoad.send(command)
@@ -75,4 +78,4 @@ class PrinterHandler():
                 toolExtrusionLength
             )
 
-            self.handleCommitSpoolUsage(selectedSpool['spoolId'], toolExtrusionLength)
+            self._spoolmanConnector.handleCommitSpoolUsage(selectedSpool['spoolId'], toolExtrusionLength)

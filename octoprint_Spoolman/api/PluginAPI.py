@@ -3,22 +3,12 @@ from __future__ import absolute_import
 
 import octoprint.plugin
 import flask
-import requests
 
 from octoprint_Spoolman.common.settings import SettingsKeys
 
 class PluginAPI(octoprint.plugin.BlueprintPlugin):
     def is_blueprint_csrf_protected(self):
         return True
-
-    def _createSpoolmanApiUrl(self):
-        instance_url = self._settings.get([ SettingsKeys.SPOOLMAN_URL ])
-        api_path = "/api/v1"
-
-        return instance_url + api_path
-
-    def _createSpoolmanEndpointUrl(self, endpoint):
-        return self._createSpoolmanApiUrl() + endpoint;
 
     def _getValueFromJSONOrNone(self, key, json):
         if key in json:
@@ -52,29 +42,9 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
     def handleGetSpoolsAvailable(self):
         self._logger.debug("API: GET /spoolman/spools")
 
-        response = requests.get(self._createSpoolmanEndpointUrl("/spool"))
+        result = self._spoolmanConnector.handleGetSpoolsAvailable()
 
-        if response.status_code != 200:
-            self._logger.error("[Spoolman API] request failed with status %s" % response.status_code)
-
-            return flask.jsonify({
-                "error": {
-                    "code": "spoolman_api__request_failed",
-                    "spoolman_api": {
-                        "status_code": response.status_code,
-                    },
-                }
-            })
-
-        self._logger.debug("[Spoolman API] request succeeded with status %s" % response.status_code)
-
-        data = response.json()
-
-        return flask.jsonify({
-            "data": {
-                "spools": data
-            }
-        })
+        return flask.jsonify(result)
 
     @octoprint.plugin.BlueprintPlugin.route("/self/spool", methods=["POST"])
     def handleUpdateActiveSpool(self):
@@ -97,29 +67,3 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
         return flask.jsonify({
             "data": {}
         })
-
-    def handleCommitSpoolUsage(self, spoolId, spoolUsedLength):
-        response = requests.put(
-            url = self._createSpoolmanEndpointUrl("/spool/" + str(spoolId) + "/use"),
-            json = {
-                'use_length': spoolUsedLength,
-            }
-        )
-
-        if response.status_code != 200:
-            self._logger.error("[Spoolman API] request failed with status %s" % response.status_code)
-
-            return {
-                "error": {
-                    "code": "spoolman_api__request_failed",
-                    "spoolman_api": {
-                        "status_code": response.status_code,
-                    },
-                }
-            }
-
-        self._logger.debug("[Spoolman API] request succeeded with status %s" % response.status_code)
-
-        return {
-            "data": {}
-        }
