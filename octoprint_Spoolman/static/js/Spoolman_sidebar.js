@@ -5,15 +5,38 @@ $(() => {
     function SpoolmanSidebarViewModel(params) {
         const self = this;
 
-        // TODO: Improve DX
-        const spoolmanSpoolsCachePromiseUtils = {
-            resolve: () => {},
-            reject: () => {},
-        };
-        const spoolmanSpoolsCachePromise = new Promise((resolve, reject) => {
-            spoolmanSpoolsCachePromiseUtils.resolve = resolve;
-            spoolmanSpoolsCachePromiseUtils.reject = reject;
-        });
+        const fetchSpoolmanSpools = (() => {
+            const cache = {
+                /** @type Promise<Spool[]> */
+                spools: undefined,
+            };
+
+            const fetcher = async () => {
+                if (cache.spools) {
+                    return cache.spools;
+                }
+
+                const fetchPromise = (async () => {
+                    const request = await getSpoolmanSpools(apiClient);
+
+                    if (!request.isSuccess) {
+                        console.error("Request error", request.error);
+                    }
+
+                    return request;
+                })();
+
+                cache.spools = fetchPromise;
+
+                return cache.spools;
+            };
+
+            fetcher.clearCache = () => {
+                cache.spools = undefined;
+            };
+
+            return fetcher;
+        })();
 
         self.settingsViewModel = params[0];
 
@@ -21,7 +44,7 @@ $(() => {
             selectSpool: $("#spoolman_modal_selectspool"),
         };
 
-        const getSettings = () => {
+        const getPluginSettings = () => {
             return self.settingsViewModel.settings.plugins[PLUGIN_ID];
         };
 
@@ -29,90 +52,80 @@ $(() => {
         const apiClient = new APIClient(PLUGIN_ID, BASEURL);
 
         const initView = async () => {
-            const request = await getSpoolmanSpools(apiClient);
-
-            if (!request.isSuccess) {
-                console.error("Request error", request.error);
-
-                self.templateData.loadingError(request?.error?.response?.error ?? { code: 'unknown' });
-
-                spoolmanSpoolsCachePromiseUtils.reject();
-
-                return;
-            }
-
-            const spools = request.payload.response.data.spools;
-
-            spoolmanSpoolsCachePromiseUtils.resolve(spools);
-
             updateSelectedSpools();
         };
 
         const updateSelectedSpools = async () => {
-            try {
-                self.templateData.loadingError(undefined);
-                self.templateData.isLoadingData(true);
+            self.templateData.loadingError(undefined);
+            self.templateData.isLoadingData(true);
 
-                /** @type Spool[] */
-                const spoolmanSpools = await spoolmanSpoolsCachePromise;
+            const spoolmanSpoolsResult = await fetchSpoolmanSpools();
 
-                const currentProfileData = self.settingsViewModel.printerProfiles.currentProfileData();
-                const currentExtrudersCount = (
-                    currentProfileData
-                        ? currentProfileData.extruder.count()
-                        : 0
-                );
+            self.templateData.isLoadingData(false);
 
-                const extruders = Array.from({
-                    length: currentExtrudersCount
-                }, () => undefined)
+            if (!spoolmanSpoolsResult.isSuccess) {
+                self.templateData.loadingError(spoolmanSpoolsResult.error.response.error)
 
-                const selectedSpoolIds = getSettings().selectedSpoolIds;
-                const selectedSpools = extruders.map((_, extruderIdx) => {
-                    const spoolId = selectedSpoolIds[extruderIdx]?.spoolId();
-
-                    return spoolmanSpools.find((spool) => String(spool.id) === spoolId);
-                });
-
-                self.templateData.selectedSpoolsByToolIdx(selectedSpools);
-                self.templateData.selectedSpoolsByToolIdx.valueHasMutated();
-            } catch (error) {
-                // Do nothing
-            } finally {
-                self.templateData.isLoadingData(false);
+                return;
             }
+
+            const spoolmanSpools = spoolmanSpoolsResult.payload.response.data.spools;
+
+            const currentProfileData = self.settingsViewModel.printerProfiles.currentProfileData();
+            const currentExtrudersCount = (
+                currentProfileData
+                    ? currentProfileData.extruder.count()
+                    : 0
+            );
+
+            const extruders = Array.from({
+                length: currentExtrudersCount
+            }, () => undefined)
+
+            const selectedSpoolIds = getPluginSettings().selectedSpoolIds;
+            const selectedSpools = extruders.map((_, extruderIdx) => {
+                const spoolId = selectedSpoolIds[extruderIdx]?.spoolId();
+
+                return spoolmanSpools.find((spool) => String(spool.id) === spoolId);
+            });
+
+            self.templateData.selectedSpoolsByToolIdx(selectedSpools);
+            self.templateData.selectedSpoolsByToolIdx.valueHasMutated();
         };
 
         /**
          * @param {number} toolIdx
          */
         const handleSelectSpool = async (toolIdx) => {
-            try {
-                // TODO: Improve DX, maybe move to separate component
+            // TODO: Improve DX, maybe move to separate component
 
-                self.templateData.modals.selectSpool.toolIdx(toolIdx);
+            self.templateData.modals.selectSpool.toolIdx(toolIdx);
 
-                self.modals.selectSpool.modal("show");
+            self.modals.selectSpool.modal("show");
 
-                self.templateData.loadingError(undefined);
-                self.templateData.modals.selectSpool.isLoadingData(true);
+            self.templateData.loadingError(undefined);
+            self.templateData.modals.selectSpool.isLoadingData(true);
 
-                /** @type Spool[] */
-                const spoolmanSpools = await spoolmanSpoolsCachePromise;
+            const spoolmanSpoolsResult = await fetchSpoolmanSpools();
 
-                const selectedSpoolIds = getSettings().selectedSpoolIds;
-                const toolSpoolId = selectedSpoolIds[toolIdx]?.spoolId();
-                const toolSpool = spoolmanSpools.find((spool) => {
-                    return String(spool.id) === toolSpoolId;
-                });
+            self.templateData.isLoadingData(false);
 
-                self.templateData.modals.selectSpool.toolCurrentSpool(toolSpool);
-                self.templateData.modals.selectSpool.tableItemsOnCurrentPage(spoolmanSpools);
-            } catch (error) {
-                // Do nothing
-            } finally {
-                self.templateData.modals.selectSpool.isLoadingData(false);
+            if (!spoolmanSpoolsResult.isSuccess) {
+                self.templateData.loadingError(spoolmanSpoolsResult.error.response.error)
+
+                return;
             }
+
+            const spoolmanSpools = spoolmanSpoolsResult.payload.response.data.spools;
+
+            const selectedSpoolIds = getPluginSettings().selectedSpoolIds;
+            const toolSpoolId = selectedSpoolIds[toolIdx]?.spoolId();
+            const toolSpool = spoolmanSpools.find((spool) => {
+                return String(spool.id) === toolSpoolId;
+            });
+
+            self.templateData.modals.selectSpool.toolCurrentSpool(toolSpool);
+            self.templateData.modals.selectSpool.tableItemsOnCurrentPage(spoolmanSpools);
         };
 
         /**
