@@ -5,6 +5,10 @@ $(() => {
     function SpoolmanSidebarViewModel(params) {
         const self = this;
 
+        const previousSettings = {
+            spoolmanUrl: undefined,
+        };
+
         const fetchSpoolmanSpools = (() => {
             const cache = {
                 /** @type Promise<Spool[]> */
@@ -217,7 +221,12 @@ $(() => {
         };
         /** -- end of bindings -- */
 
-        self.onBeforeBinding = () => {
+        self.onBeforeBinding = () => {};
+        self.onAfterBinding = () => {
+            initView();
+
+            previousSettings.spoolmanUrl = getPluginSettings().spoolmanUrl();
+
             /**
              * Update spools on printer's profile update,
              * to handle any potential tool-count changes.
@@ -226,8 +235,26 @@ $(() => {
                 void updateSelectedSpools();
             });
         };
-        self.onAfterBinding = () => {
-            initView();
+
+        /**
+         * Update spools on Spoolman instance change.
+         * Subscribing to settings entry is unreliable, as its observable updates
+         * on every input change, rather than on save.
+         */
+        self.onSettingsHidden = () => {
+            const newSettings = {
+                spoolmanUrl: getPluginSettings().spoolmanUrl(),
+            };
+
+            if (previousSettings.spoolmanUrl === newSettings.spoolmanUrl) {
+                return;
+            }
+
+            previousSettings.spoolmanUrl = newSettings.spoolmanUrl;
+
+            fetchSpoolmanSpools.clearCache();
+
+            void updateSelectedSpools();
         };
     };
 
