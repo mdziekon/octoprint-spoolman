@@ -121,3 +121,20 @@ class SpoolmanPlugin(
             PluginEvents.SPOOL_USAGE_COMMITTED,
             PluginEvents.SPOOL_USAGE_ERROR,
         ]
+
+    def get_update_information(self):
+        return {
+            "Spoolman": {
+                "displayName": "Spoolman Plugin",
+                "displayVersion": self._plugin_version,
+
+                # version check: github repository
+                "type": "github_release",
+                "user": "mdziekon",
+                "repo": "octoprint-spoolman",
+                "current": self._plugin_version,
+
+                # update method: pip
+                "pip": "https://github.com/mdziekon/octoprint-spoolman/archive/{target_version}.zip",
+            }
+        }
