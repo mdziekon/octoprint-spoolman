@@ -102,23 +102,17 @@ $(() => {
          */
         const handleSelectSpool = async (toolIdx) => {
             // TODO: Improve DX, maybe move to separate component
+            // TODO: Add error handling for modal
 
             self.templateData.modals.selectSpool.toolIdx(toolIdx);
 
             self.modals.selectSpool.modal("show");
 
-            self.templateData.loadingError(undefined);
             self.templateData.modals.selectSpool.isLoadingData(true);
 
             const spoolmanSpoolsResult = await fetchSpoolmanSpools();
 
-            self.templateData.isLoadingData(false);
-
-            if (!spoolmanSpoolsResult.isSuccess) {
-                self.templateData.loadingError(spoolmanSpoolsResult.error.response.error)
-
-                return;
-            }
+            self.templateData.modals.selectSpool.isLoadingData(false);
 
             const spoolmanSpools = spoolmanSpoolsResult.payload.response.data.spools;
 
