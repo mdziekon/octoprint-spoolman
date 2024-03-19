@@ -15,10 +15,18 @@ class SpoolmanPlugin(
     PluginAPI,
     PrinterHandler,
 ):
+    _isInitialized = False
+
     def initialize(self):
+        self._isInitialized = True
+
+    # TODO: Investigate caching again in the future.
+    # Currently re-instatiating is fine, as there's nothing "heavy" in the ctor,
+    # nor there's any useful persistence in the class itself.
+    def getSpoolmanConnector(self):
         spoolmanInstanceUrl = self._settings.get([ SettingsKeys.SPOOLMAN_URL ])
 
-        self._spoolmanConnector = SpoolmanConnector(
+        return SpoolmanConnector(
             instanceUrl = spoolmanInstanceUrl,
             logger = self._logger
         )
@@ -40,6 +48,9 @@ class SpoolmanPlugin(
         pass
 
     def on_sentGCodeHook(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
+        if not self.isInitialized:
+            return
+
         self.handlePrintingGCode(cmd)
 
         pass

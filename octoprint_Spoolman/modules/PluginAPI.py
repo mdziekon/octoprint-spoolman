@@ -43,7 +43,7 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
     def handleGetSpoolsAvailable(self):
         self._logger.debug("API: GET /spoolman/spools")
 
-        result = self._spoolmanConnector.handleGetSpoolsAvailable()
+        result = self.getSpoolmanConnector().handleGetSpoolsAvailable()
 
         if result.get('error', False):
             response = flask.jsonify(result)
