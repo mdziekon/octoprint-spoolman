@@ -1,7 +1,7 @@
 import octoprint.plugin
 from octoprint.events import Events
 
-from octoprint_Spoolman.api.PluginAPI import PluginAPI
+from octoprint_Spoolman.modules.PluginAPI import PluginAPI
 from octoprint_Spoolman.modules.PrinterHandler import PrinterHandler
 from octoprint_Spoolman.modules.SpoolmanConnector import SpoolmanConnector
 from octoprint_Spoolman.common.settings import SettingsKeys
