@@ -48,7 +48,7 @@ class SpoolmanPlugin(
         pass
 
     def on_sentGCodeHook(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
-        if not self.isInitialized:
+        if not self._isInitialized:
             return
 
         self.handlePrintingGCode(cmd)
