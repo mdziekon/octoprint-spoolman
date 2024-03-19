@@ -53,7 +53,6 @@ class SpoolmanPlugin(
                 "js/common/api.js",
                 "js/api/getSpoolmanSpools.js",
                 "js/api/updateActiveSpool.js",
-                "js/Spoolman_tab.js",
                 "js/Spoolman_sidebar.js",
                 "js/Spoolman_settings.js",
             ],
@@ -66,10 +65,6 @@ class SpoolmanPlugin(
     # TemplatePlugin
     def get_template_configs(self):
         return [
-            {
-                "type": "tab",
-                "template": "Spoolman_tab.jinja2",
-            },
             {
                 "type": "sidebar",
                 "template": "Spoolman_sidebar.jinja2",
