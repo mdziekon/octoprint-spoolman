@@ -91,12 +91,23 @@ $(() => {
             });
         };
 
+        const handleForceRefresh = async () => {
+            pluginSpoolmanApi.getSpoolmanSpools.invalidate();
+
+            await refreshView();
+        };
+        const handleTryAgainOnError = async () => {
+            await handleForceRefresh();
+        };
+
         /** Bindings for the template */
         self.constants = {
             weight_unit: 'g',
         };
         self.templateApi = {
             handleSelectSpoolForTool,
+            handleTryAgainOnError,
+            handleForceRefresh,
         };
         self.templateData = {
             isLoadingData: ko.observable(true),
@@ -116,7 +127,9 @@ $(() => {
         /** -- end of bindings -- */
 
         $(document).on("shown", SpoolmanModalSelectSpoolComponent.modalSelector, async () => {
-            handleDisplayModal(params.toolIdx());
+            await handleDisplayModal(params.toolIdx());
+
+            self.modals.selectSpool.modal("layout");
         });
 
         self.onBeforeBinding = () => {};

@@ -19,8 +19,16 @@
                 </div>
             <!-- /ko -->
             <!-- ko if: (templateData.loadingError().code ?? 'unknown') === 'unknown' -->
-                <div class="alert alert-block alert-error">
+                <div class="alert alert-block alert-error margin-bottom-mini">
                     Unknown error
+                </div>
+                <div>
+                    <button
+                        class="btn btn-mini btn-block btn-warning"
+                        data-bind="click: templateApi.handleTryAgainOnError.bind($data)"
+                    >
+                        Try again
+                    </button>
                 </div>
             <!-- /ko -->
         </div>
@@ -95,6 +103,16 @@
                     </div>
                 <!-- /ko -->
             </div>
+        </div>
+
+        <div class="tool-list-controls">
+            <button
+                class="btn btn-mini btn-default"
+                data-bind="click: templateApi.handleForceRefresh.bind($data)"
+            >
+                <i class="fa fa-sm fa-refresh"></i>
+                Refresh
+            </button>
         </div>
     </div>
 </div>

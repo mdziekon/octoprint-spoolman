@@ -66,8 +66,16 @@
                         </div>
                     <!-- /ko -->
                     <!-- ko if: (templateData.loadingError().code ?? 'unknown') === 'unknown' -->
-                        <div class="alert alert-block alert-error">
+                        <div class="alert alert-block alert-error margin-bottom-mini">
                             Unknown error
+                        </div>
+                        <div>
+                            <button
+                                class="btn btn-mini btn-block btn-warning"
+                                data-bind="click: templateApi.handleTryAgainOnError.bind($data)"
+                            >
+                                Try again
+                            </button>
                         </div>
                     <!-- /ko -->
                 </div>
@@ -160,14 +168,29 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a
-            href="#"
-            class="btn"
-            data-dismiss="modal"
-            aria-hidden="true"
-        >
-            Close
-        </a>
+        <div class="control-group" style="margin-bottom: 0">
+            <div class="controls row-fluid">
+                <span class="span8" style="text-align:left">
+                    <button
+                        class="btn"
+                        data-bind="click: templateApi.handleForceRefresh.bind($data)"
+                    >
+                        <i class="fa fa-sm fa-refresh"></i>
+                        Refresh
+                    </button>
+                </span>
+                <span class="span4 text-right">
+                    <a
+                        href="#"
+                        class="btn"
+                        data-dismiss="modal"
+                        aria-hidden="true"
+                    >
+                        Close
+                    </a>
+                </span>
+            </div>
+        </div>
     </div>
 </div>
 </template>

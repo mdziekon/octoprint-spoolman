@@ -22,12 +22,15 @@
     gap: 0.5em;
     padding-top: 0.25em;
     padding-bottom: 0.25em;
-}
-.tool-row:not(:last-child) {
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 .tool-row .tool-idx {
     flex-shrink: 0;
+}
+.tool-list-controls {
+    text-align: right;
+    padding-top: 0.25em;
+    padding-bottom: 0.25em;
 }
 
 .color-preview {
@@ -38,4 +41,8 @@
     width: 1.5em;
     display: inline-block;
     margin-right: 5px
+}
+
+.margin-bottom-mini {
+    margin-bottom: 0.25em;
 }
