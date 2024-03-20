@@ -89,8 +89,6 @@ $(() => {
 
             await settingsSavePromise;
 
-            self.modals.selectSpool().modal("hide");
-
             updateSelectedSpools();
         };
 
