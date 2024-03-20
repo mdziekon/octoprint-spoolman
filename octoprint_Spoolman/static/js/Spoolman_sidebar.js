@@ -9,51 +9,15 @@ $(() => {
             spoolmanUrl: undefined,
         };
 
-        const fetchSpoolmanSpools = (() => {
-            const cache = {
-                /** @type Promise<Spool[]> */
-                spools: undefined,
-            };
-
-            const fetcher = async () => {
-                if (cache.spools) {
-                    return cache.spools;
-                }
-
-                const fetchPromise = (async () => {
-                    const request = await getSpoolmanSpools(apiClient);
-
-                    if (!request.isSuccess) {
-                        console.error("Request error", request.error);
-                    }
-
-                    return request;
-                })();
-
-                cache.spools = fetchPromise;
-
-                return cache.spools;
-            };
-
-            fetcher.clearCache = () => {
-                cache.spools = undefined;
-            };
-
-            return fetcher;
-        })();
-
         self.settingsViewModel = params[0];
 
         self.modals = {
-            selectSpool: $("#spoolman_modal_selectspool"),
+            selectSpool: () => $(SpoolmanModalSelectSpoolComponent.modalSelector),
         };
 
         const getPluginSettings = () => {
             return self.settingsViewModel.settings.plugins[PLUGIN_ID];
         };
-
-        // TODO: Share with other ViewModels?
-        const apiClient = new APIClient(PLUGIN_ID, BASEURL);
 
         const initView = async () => {
             updateSelectedSpools();
@@ -63,7 +27,7 @@ $(() => {
             self.templateData.loadingError(undefined);
             self.templateData.isLoadingData(true);
 
-            const spoolmanSpoolsResult = await fetchSpoolmanSpools();
+            const spoolmanSpoolsResult = await pluginSpoolmanApi.getSpoolmanSpools();
 
             self.templateData.isLoadingData(false);
 
@@ -100,85 +64,24 @@ $(() => {
         /**
          * @param {number} toolIdx
          */
-        const handleSelectSpool = async (toolIdx) => {
-            // TODO: Improve DX, maybe move to separate component
-            // TODO: Add error handling for modal
-
+        const handleOpenSpoolSelector = async (toolIdx) => {
             self.templateData.modals.selectSpool.toolIdx(toolIdx);
-            self.templateData.modals.selectSpool.loadingError(undefined);
-            self.templateData.modals.selectSpool.isLoadingData(true);
 
-            self.modals.selectSpool.modal("show");
-
-            const spoolmanSpoolsResult = await fetchSpoolmanSpools();
-
-            self.templateData.modals.selectSpool.isLoadingData(false);
-
-            if (!spoolmanSpoolsResult.isSuccess) {
-                self.templateData.modals.selectSpool.loadingError(spoolmanSpoolsResult.error.response.error)
-
-                return;
-            }
-
-            const spoolmanSpools = spoolmanSpoolsResult.payload.response.data.spools;
-
-            const selectedSpoolIds = getPluginSettings().selectedSpoolIds;
-            const toolSpoolId = selectedSpoolIds[toolIdx]?.spoolId();
-            const toolSpool = spoolmanSpools.find((spool) => {
-                return String(spool.id) === toolSpoolId;
-            });
-
-            self.templateData.modals.selectSpool.toolCurrentSpool(toolSpool);
-            self.templateData.modals.selectSpool.tableItemsOnCurrentPage(spoolmanSpools);
+            self.modals.selectSpool().modal("show");
         };
 
         /**
          * @param {number} toolIdx
          */
         const handleDeselectSpool = async (toolIdx) => {
-            const request = await updateActiveSpool(apiClient, { toolIdx, spoolId: undefined });
+            const request = await pluginSpoolmanApi.updateActiveSpool({ toolIdx, spoolId: undefined });
 
+            // TODO: Add error handling for modal
             if (!request.isSuccess) {
-                console.error("Request error", request.error);
-
-                throw new Error("Request error");
+                return;
             }
 
-            const settingsSavePromise = new Promise((resolve) => {
-                // TODO: Investigate if `saveData` can replace custom API endpoint
-                // Force save empty data to trigger `settingsViewModel` reload
-                self.settingsViewModel.saveData({}, resolve);
-            });
-
-            await settingsSavePromise;
-
-            self.modals.selectSpool.modal("hide");
-
-            updateSelectedSpools();
-        };
-
-        /**
-         * @param {number} toolIdx
-         * @param {number} spoolId
-         */
-        const handleSelectSpoolForTool = async (toolIdx, spoolId) => {
-            const request = await updateActiveSpool(apiClient, { toolIdx, spoolId });
-
-            if (!request.isSuccess) {
-                console.error("Request error", request.error);
-
-                throw new Error("Request error");
-            }
-
-            const settingsSavePromise = new Promise((resolve) => {
-                // TODO: Investigate if `saveData` can replace custom API endpoint
-                // Force save empty data to trigger `settingsViewModel` reload
-                self.settingsViewModel.saveData({}, resolve);
-            });
-
-            await settingsSavePromise;
-
-            self.modals.selectSpool.modal("hide");
+            await reloadSettingsViewModel(self.settingsViewModel);
 
             updateSelectedSpools();
         };
@@ -188,42 +91,37 @@ $(() => {
             weight_unit: 'g',
         };
         self.templateApi = {
-            handleSelectSpool,
+            handleOpenSpoolSelector,
             handleDeselectSpool,
-
-            modals: {
-                selectSpool: {
-                    handleSelectSpoolForTool,
-                },
-            },
         };
         self.templateData = {
             isLoadingData: ko.observable(true),
             loadingError: ko.observable(undefined),
             selectedSpoolsByToolIdx: ko.observable([]),
 
+            settingsViewModel: ko.observable(undefined),
+
             modals: {
                 selectSpool: {
-                    isLoadingData: ko.observable(true),
-                    loadingError: ko.observable(undefined),
-
                     toolIdx: ko.observable(undefined),
-                    toolCurrentSpool: ko.observable(undefined),
-
-                    tableAttributeVisibility: {
-                        id: true,
-                        spoolName: true,
-                        material: true,
-                        weight: true,
-                    },
-                    tableItemsOnCurrentPage: ko.observable([]),
+                    eventsSink: ko.observable(),
                 },
             },
         };
         /** -- end of bindings -- */
 
-        self.onBeforeBinding = () => {};
+        self.onBeforeBinding = () => {
+            SpoolmanModalSelectSpoolComponent.registerComponent();
+
+            self.templateData.modals.selectSpool.eventsSink.subscribe((newEvent) => {
+                if (newEvent.type === 'onSelectSpoolForTool') {
+                    updateSelectedSpools();
+                }
+            });
+        };
         self.onAfterBinding = () => {
+            self.templateData.settingsViewModel(self.settingsViewModel);
+
             initView();
 
             previousSettings.spoolmanUrl = getPluginSettings().spoolmanUrl();
@@ -253,7 +151,7 @@ $(() => {
 
             previousSettings.spoolmanUrl = newSettings.spoolmanUrl;
 
-            fetchSpoolmanSpools.clearCache();
+            pluginSpoolmanApi.getSpoolmanSpools.invalidate();
 
             void updateSelectedSpools();
         };
@@ -266,7 +164,7 @@ $(() => {
         ],
         elements: [
             document.querySelector("#sidebar_spoolman"),
-            document.querySelector("#spoolman_modal_selectspool"),
+            document.querySelector("#spoolman-modals"),
         ]
     });
 });

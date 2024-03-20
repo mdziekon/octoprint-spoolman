@@ -62,10 +62,14 @@ class SpoolmanPlugin(
         return {
             "js": [
                 "js/common/api.js",
+                "js/common/promiseCache.js",
+                "js/common/octoprint.js",
                 "js/api/getSpoolmanSpools.js",
                 "js/api/updateActiveSpool.js",
+                "js/Spoolman_api.js",
                 "js/Spoolman_sidebar.js",
                 "js/Spoolman_settings.js",
+                "js/Spoolman_modal_selectSpool.js",
             ],
             "css": [
                 "css/Spoolman.css",

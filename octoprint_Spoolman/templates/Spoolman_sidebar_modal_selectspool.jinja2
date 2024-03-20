@@ -1,3 +1,4 @@
+<template id="spoolman-modal-selectSpool-template">
 <div
     id="spoolman_modal_selectspool"
     class="modal hide fade-in"
@@ -16,34 +17,34 @@
     <div class="modal-body">
         <div>
             <div>
-                Tool #<span data-bind="text: (templateData.modals.selectSpool.toolIdx() + 1)"></span>:
+                Tool #<span data-bind="text: (templateData.toolIdx() + 1)"></span>:
                 &nbsp;
 
-                <!-- ko if: templateData.modals.selectSpool.toolCurrentSpool() -->
+                <!-- ko if: templateData.toolCurrentSpool() -->
                     <span
                         class="color-preview"
                         style="margin-bottom: -5px;"
-                        data-bind="style: { 'background-color': '#' + templateData.modals.selectSpool.toolCurrentSpool().filament.color_hex },
-                                    attr: { title: templateData.modals.selectSpool.toolCurrentSpool().filament.name }"
+                        data-bind="style: { 'background-color': '#' + templateData.toolCurrentSpool().filament.color_hex },
+                                    attr: { title: templateData.toolCurrentSpool().filament.name }"
                     ></span>
                     <span>
-                        <!-- ko if: templateData.modals.selectSpool.toolCurrentSpool().filament.material -->
-                            <span data-bind="text: templateData.modals.selectSpool.toolCurrentSpool().filament.material"></span> -
+                        <!-- ko if: templateData.toolCurrentSpool().filament.material -->
+                            <span data-bind="text: templateData.toolCurrentSpool().filament.material"></span> -
                         <!-- /ko -->
 
-                        <span data-bind="text: templateData.modals.selectSpool.toolCurrentSpool().filament.name"></span>
+                        <span data-bind="text: templateData.toolCurrentSpool().filament.name"></span>
 
-                        <!-- ko if: templateData.modals.selectSpool.toolCurrentSpool().filament.vendor.name -->
-                            (<span data-bind="text: templateData.modals.selectSpool.toolCurrentSpool().filament.vendor.name"></span>)
+                        <!-- ko if: templateData.toolCurrentSpool().filament.vendor.name -->
+                            (<span data-bind="text: templateData.toolCurrentSpool().filament.vendor.name"></span>)
                         <!-- /ko -->
 
                         <span
-                            data-bind="text: templateData.modals.selectSpool.toolCurrentSpool().remaining_weight"
+                            data-bind="text: templateData.toolCurrentSpool().remaining_weight"
                             title="Remaining weight"
-                        ></span><span data-bind="text: $root.constants.weight_unit"></span>
+                        ></span><span data-bind="text: $component.constants.weight_unit"></span>
                     </span>
                 <!-- /ko -->
-                <!-- ko ifnot: templateData.modals.selectSpool.toolCurrentSpool() -->
+                <!-- ko ifnot: templateData.toolCurrentSpool() -->
                     <i>No spool selected</i>
                 <!-- /ko -->
             </div>
@@ -51,20 +52,20 @@
             <hr style="margin: 10px 0;"/>
 
             <div
-                data-bind="visible: templateData.modals.selectSpool.isLoadingData()"
+                data-bind="visible: templateData.isLoadingData()"
                 style="margin: 16px; text-align: center;"
             >
                 <i class='fa fa-2xl fa-spinner fa-spin' ></i>
             </div>
 
-            <!-- ko if: (!templateData.modals.selectSpool.isLoadingData() && templateData.modals.selectSpool.loadingError()) -->
+            <!-- ko if: (!templateData.isLoadingData() && templateData.loadingError()) -->
                 <div>
-                    <!-- ko if: (templateData.modals.selectSpool.loadingError().code === 'spoolman_api__instance_url_empty') -->
+                    <!-- ko if: (templateData.loadingError().code === 'spoolman_api__instance_url_empty') -->
                         <div class="alert alert-block alert-info">
                             Spoolman plugin has not been configured yet
                         </div>
                     <!-- /ko -->
-                    <!-- ko if: (templateData.modals.selectSpool.loadingError().code ?? 'unknown') === 'unknown' -->
+                    <!-- ko if: (templateData.loadingError().code ?? 'unknown') === 'unknown' -->
                         <div class="alert alert-block alert-error">
                             Unknown error
                         </div>
@@ -72,7 +73,7 @@
                 </div>
             <!-- /ko -->
 
-            <div data-bind="visible: !(templateData.modals.selectSpool.isLoadingData())">
+            <div data-bind="visible: !(templateData.isLoadingData())">
                 <table
                     class="table table-striped table-hover table-condensed table-hover"
                     style="clear: both;"
@@ -81,51 +82,51 @@
                         <tr>
                             <th
                                 style="width: 5%"
-                                data-bind="visible: templateData.modals.selectSpool.tableAttributeVisibility.id"
+                                data-bind="visible: templateData.tableAttributeVisibility.id"
                             >
                                 ID
                             </th>
                             <th
                                 style="width: 55%"
-                                data-bind="visible: templateData.modals.selectSpool.tableAttributeVisibility.spoolName"
+                                data-bind="visible: templateData.tableAttributeVisibility.spoolName"
                             >
                                 Name
                             </th>
                             <th
                                 style="width: 20%"
-                                data-bind="visible: templateData.modals.selectSpool.tableAttributeVisibility.material"
+                                data-bind="visible: templateData.tableAttributeVisibility.material"
                             >
                                 Material
                             </th>
                             <th
                                 style="text-align: center; width: 15%;"
-                                data-bind="visible: templateData.modals.selectSpool.tableAttributeVisibility.weight"
+                                data-bind="visible: templateData.tableAttributeVisibility.weight"
                             >
                                 Weight
                             </th>
                         </tr>
                     </thead>
-                    <tbody data-bind="foreach: templateData.modals.selectSpool.tableItemsOnCurrentPage">
+                    <tbody data-bind="foreach: templateData.tableItemsOnCurrentPage">
                         <tr
                             style="cursor: pointer;"
                             data-bind="
                                 click: function() {
-                                    $root.templateApi.modals.selectSpool.handleSelectSpoolForTool($root.templateData.modals.selectSpool.toolIdx(), $data.id);
+                                    $component.templateApi.handleSelectSpoolForTool($component.templateData.toolIdx(), $data.id);
                                 },
                                 attr: {
                                     class: (
-                                        $root.templateData.modals.selectSpool.toolCurrentSpool() &&
-                                        String($root.templateData.modals.selectSpool.toolCurrentSpool().id) === String($data.id)
+                                        $component.templateData.toolCurrentSpool() &&
+                                        String($component.templateData.toolCurrentSpool().id) === String($data.id)
                                     )
                                         ? 'success'
                                         : ''
                                     }
                             "
                         >
-                            <td data-bind="visible: $root.templateData.modals.selectSpool.tableAttributeVisibility.id">
+                            <td data-bind="visible: $component.templateData.tableAttributeVisibility.id">
                                 <span data-bind="text: id, attr: { title: id }"></span>
                             </td>
-                            <td data-bind="visible: $root.templateData.modals.selectSpool.tableAttributeVisibility.spoolName">
+                            <td data-bind="visible: $component.templateData.tableAttributeVisibility.spoolName">
                                 <div style="display: flex;">
                                     <div>
                                         <span
@@ -142,15 +143,15 @@
                                     </div>
                                 </div>
                             </td>
-                            <td data-bind="visible: $root.templateData.modals.selectSpool.tableAttributeVisibility.material">
+                            <td data-bind="visible: $component.templateData.tableAttributeVisibility.material">
                                 <span data-bind="text: filament.material, attr: { title: filament.material }"></span>
                             </td>
                             <td
-                                data-bind="visible: $root.templateData.modals.selectSpool.tableAttributeVisibility.weight" style="text-align: right;"
+                                data-bind="visible: $component.templateData.tableAttributeVisibility.weight" style="text-align: right;"
                             >
-                                <span data-bind="text: remaining_weight.toFixed(1), attr: {title: 'Remaining weight'}"></span><span data-bind="text: $root.constants.weight_unit"></span>
+                                <span data-bind="text: remaining_weight.toFixed(1), attr: {title: 'Remaining weight'}"></span><span data-bind="text: $component.constants.weight_unit"></span>
                                 <br>
-                                <span data-bind="text: used_weight.toFixed(1), attr: {title: 'Used weight'}"></span><span data-bind="text: $root.constants.weight_unit"></span>
+                                <span data-bind="text: used_weight.toFixed(1), attr: {title: 'Used weight'}"></span><span data-bind="text: $component.constants.weight_unit"></span>
                             </td>
                         </tr>
                     </tbody>
@@ -169,3 +170,4 @@
         </a>
     </div>
 </div>
+</template>
