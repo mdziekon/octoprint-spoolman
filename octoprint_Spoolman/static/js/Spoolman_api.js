@@ -16,12 +16,22 @@ $(() => {
             return request;
         },
     });
+    const sharedUpdateActiveSpool = async ({ toolIdx, spoolId }) => {
+        const request = await updateActiveSpool(apiClient, { toolIdx, spoolId });
+
+        if (!request.isSuccess) {
+            console.error("Request error", request.error);
+        }
+
+        return request;
+    };
 
     if (!cacheGetSpoolmanSpoolsResult.isSuccess) {
         throw new Error('[Spoolman][api] Could not create cached "getSpoolmanSpools"');
     }
 
-    window.pluginSpoolmanCachedApi = {
+    window.pluginSpoolmanApi = {
         getSpoolmanSpools: cacheGetSpoolmanSpoolsResult.getter,
+        updateActiveSpool: sharedUpdateActiveSpool,
     };
 });

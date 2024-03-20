@@ -19,9 +19,6 @@ $(() => {
             return self.settingsViewModel.settings.plugins[PLUGIN_ID];
         };
 
-        // TODO: Share with other ViewModels?
-        const apiClient = new APIClient(PLUGIN_ID, BASEURL);
-
         const initView = async () => {
             updateSelectedSpools();
         };
@@ -30,7 +27,7 @@ $(() => {
             self.templateData.loadingError(undefined);
             self.templateData.isLoadingData(true);
 
-            const spoolmanSpoolsResult = await pluginSpoolmanCachedApi.getSpoolmanSpools();
+            const spoolmanSpoolsResult = await pluginSpoolmanApi.getSpoolmanSpools();
 
             self.templateData.isLoadingData(false);
 
@@ -77,12 +74,11 @@ $(() => {
          * @param {number} toolIdx
          */
         const handleDeselectSpool = async (toolIdx) => {
-            const request = await updateActiveSpool(apiClient, { toolIdx, spoolId: undefined });
+            const request = await pluginSpoolmanApi.updateActiveSpool({ toolIdx, spoolId: undefined });
 
+            // TODO: Add error handling for modal
             if (!request.isSuccess) {
-                console.error("Request error", request.error);
-
-                throw new Error("Request error");
+                return;
             }
 
             const settingsSavePromise = new Promise((resolve) => {
@@ -163,7 +159,7 @@ $(() => {
 
             previousSettings.spoolmanUrl = newSettings.spoolmanUrl;
 
-            pluginSpoolmanCachedApi.getSpoolmanSpools.invalidate();
+            pluginSpoolmanApi.getSpoolmanSpools.invalidate();
 
             void updateSelectedSpools();
         };
