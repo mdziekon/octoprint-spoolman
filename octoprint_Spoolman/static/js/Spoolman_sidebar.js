@@ -115,7 +115,7 @@ $(() => {
                 return;
             }
             if (eventType === "plugin_Spoolman_spool_usage_comitted") {
-                await handleForceRefresh();
+                return await handleForceRefresh();
             }
 
             console.warn(`[Spoolman][event] Unknown plugin event "${eventType}"`);
