@@ -71,11 +71,23 @@ class PrinterHandler():
             if not selectedSpool:
                 continue
 
+            selectedSpoolId = selectedSpool['spoolId']
+
             self._logger.info(
                 "Extruder '%s', spool id: %s, usage: %s",
                 toolIdx,
-                selectedSpool['spoolId'],
+                selectedSpoolId,
                 toolExtrusionLength
             )
 
-            self.getSpoolmanConnector().handleCommitSpoolUsage(selectedSpool['spoolId'], toolExtrusionLength)
+            # TODO: add error handling
+            self.getSpoolmanConnector().handleCommitSpoolUsage(selectedSpoolId, toolExtrusionLength)
+
+            self.triggerPluginEvent(
+                Events.PLUGIN_SPOOLMAN_SPOOL_USAGE_COMITTED,
+                {
+                    'toolIdx': toolIdx,
+                    'spoolId': selectedSpoolId,
+                    'extrusionLength': toolExtrusionLength,
+                }
+            )

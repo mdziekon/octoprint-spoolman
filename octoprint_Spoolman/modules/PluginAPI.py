@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 
 import octoprint.plugin
+from octoprint.events import Events
 import flask
 import http
 
@@ -70,6 +71,14 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
 
         self._settings.set([SettingsKeys.SELECTED_SPOOL_IDS], spools)
         self._settings.save()
+
+        self.triggerPluginEvent(
+            Events.PLUGIN_SPOOLMAN_SPOOL_SELECTED,
+            {
+                'toolIdx': toolId,
+                'spoolId': spoolId,
+            }
+        )
 
         return flask.jsonify({
             "data": {}
