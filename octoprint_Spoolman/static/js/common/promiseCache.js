@@ -15,6 +15,8 @@ class PromiseCache {
          * }>}
          */
         this.resourcesByKey = {};
+
+        this.invalidationHandlersByKey = {};
     }
 
     _createCachedGetter(resourceKey) {
@@ -38,6 +40,22 @@ class PromiseCache {
         };
 
         return getter;
+    }
+
+    _triggerInvalidationHandlersFor(resourceKeys) {
+        const handlersToRun = new Set();
+
+        resourceKeys.forEach((resourceKey) => {
+            const handlersForKey = this.invalidationHandlersByKey[resourceKey] ?? [];
+
+            handlersForKey.forEach((handler) => {
+                handlersToRun.add(handler);
+            });
+        });
+
+        handlersToRun.forEach((handler) => {
+            handler();
+        });
     }
 
     registerResource(resourceKey, params) {
@@ -64,7 +82,7 @@ class PromiseCache {
         };
     }
 
-    invalidateResource(resourceKey) {
+    invalidateResource(resourceKey, options = {}) {
         const resource = this.resourcesByKey[resourceKey];
 
         if (!resource) {
@@ -80,9 +98,41 @@ class PromiseCache {
             isCached: false,
         };
 
+        if (!options.preventHandlersTrigger) {
+            this._triggerInvalidationHandlersFor([ resourceKey ]);
+        }
+
         return {
             isSuccess: true,
             payload: undefined,
         };
+    }
+
+    invalidateResources(resourceKeys, options = {}) {
+        resourceKeys.forEach((resourceKey) => {
+            this.invalidateResource(resourceKey, { preventHandlersTrigger: true });
+        });
+
+        if (!options.preventHandlersTrigger) {
+            this._triggerInvalidationHandlersFor([ resourceKey ]);
+        }
+    }
+
+    /**
+     * Attaches handler which is triggered on invalidation event.
+     * Each handler is guaranteed to run only once, regardless of how many resources
+     * get invalidated in one run.
+     *
+     * Note: does not properly support async handlers, in a sense that
+     * each executed handler will be executed synchronously, not awaiting the resulting promise.
+     */
+    onResourcesInvalidated(resourceKeys, handler) {
+        resourceKeys.forEach((resourceKey) => {
+            if (!this.invalidationHandlersByKey[resourceKey]) {
+                this.invalidationHandlersByKey[resourceKey] = [];
+            }
+
+            this.invalidationHandlersByKey[resourceKey].push(handler);
+        });
     }
 };
