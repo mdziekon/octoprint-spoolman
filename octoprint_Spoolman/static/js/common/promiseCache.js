@@ -24,7 +24,7 @@ class PromiseCache {
             const resourceCache = this.resourcesByKey[resourceKey];
 
             if (!resourceCache.resourceState.isCached) {
-                const resourceData = await resourceCache.getter(...args);
+                const resourceData = resourceCache.getter(...args);
 
                 resourceCache.resourceState = {
                     isCached: true,
