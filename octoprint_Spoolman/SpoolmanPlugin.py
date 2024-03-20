@@ -5,6 +5,7 @@ from .modules.PluginAPI import PluginAPI
 from .modules.PrinterHandler import PrinterHandler
 from .modules.SpoolmanConnector import SpoolmanConnector
 from .common.settings import SettingsKeys
+from .common.events import PluginEvents
 
 class SpoolmanPlugin(
     octoprint.plugin.StartupPlugin,
@@ -29,6 +30,13 @@ class SpoolmanPlugin(
         return SpoolmanConnector(
             instanceUrl = spoolmanInstanceUrl,
             logger = self._logger
+        )
+
+    def triggerPluginEvent(self, eventType, eventPayload = {}):
+        self._logger.info("[Spoolman][event] Triggered '" + eventType + "' with payload '" + str(eventPayload) + "'")
+        self._event_bus.fire(
+            eventType,
+            payload = eventPayload
         )
 
     def on_after_startup(self):
@@ -105,3 +113,10 @@ class SpoolmanPlugin(
         self._logger.info("[Spoolman][Settings] Saved data")
 
         octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
+
+    # Event bus
+    def register_custom_events(*args, **kwargs):
+        return [
+            PluginEvents.SPOOL_SELECTED,
+            PluginEvents.SPOOL_USAGE_COMITTED,
+        ]

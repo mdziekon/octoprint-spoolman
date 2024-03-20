@@ -15,4 +15,5 @@ def __plugin_load__():
 	global __plugin_hooks__
 	__plugin_hooks__ = {
 		"octoprint.comm.protocol.gcode.sent": __plugin_implementation__.on_sentGCodeHook,
+		"octoprint.events.register_custom_events": __plugin_implementation__.register_custom_events,
 	}

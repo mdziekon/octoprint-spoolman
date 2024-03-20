@@ -23,6 +23,8 @@ $(() => {
         self.settingsViewModel = params.settingsViewModel;
         self.eventsSink = params.eventsSink;
 
+        self._isVisible = false;
+
         self.modals = {
             selectSpool: $(SpoolmanModalSelectSpoolComponent.modalSelector),
         };
@@ -31,13 +33,23 @@ $(() => {
             return self.settingsViewModel().settings.plugins[PLUGIN_ID];
         };
 
+        const refreshModalLayout = () => {
+            self.modals.selectSpool.modal("layout");
+        };
+
         const refreshView = async () => {
+            if (!self._isVisible) {
+                return;
+            }
+
             // TODO: Add error handling for modal
 
             const toolIdx = self.templateData.toolIdx();
 
             self.templateData.loadingError(undefined);
             self.templateData.isLoadingData(true);
+
+            refreshModalLayout();
 
             const spoolmanSpoolsResult = await pluginSpoolmanApi.getSpoolmanSpools();
 
@@ -61,6 +73,8 @@ $(() => {
             self.templateData.tableItemsOnCurrentPage(spoolmanSpools);
 
             self.templateData.spoolmanUrl(getPluginSettings().spoolmanUrl());
+
+            refreshModalLayout();
         };
 
         /**
@@ -95,8 +109,6 @@ $(() => {
 
         const handleForceRefresh = async () => {
             pluginSpoolmanApi.getSpoolmanSpools.invalidate();
-
-            await refreshView();
         };
         const handleTryAgainOnError = async () => {
             await handleForceRefresh();
@@ -131,14 +143,20 @@ $(() => {
         /** -- end of bindings -- */
 
         $(document).on("shown", SpoolmanModalSelectSpoolComponent.modalSelector, async () => {
-            await handleDisplayModal(params.toolIdx());
+            this._isVisible = true;
 
-            self.modals.selectSpool.modal("layout");
+            await handleDisplayModal(params.toolIdx());
+        });
+        $(document).on("hidden", SpoolmanModalSelectSpoolComponent.modalSelector, async () => {
+            this._isVisible = false;
         });
 
-        self.onBeforeBinding = () => {};
-        self.onAfterBinding = () => {};
+        const init = () => {
+            pluginSpoolmanApi.cache.onResourcesInvalidated([ "getSpoolmanSpools" ], () => {
+                void refreshView();
+            });
+        };
 
-        // TODO: Should we refresh on getSpoolmanSpools.invalidate()?
+        init();
     };
 });

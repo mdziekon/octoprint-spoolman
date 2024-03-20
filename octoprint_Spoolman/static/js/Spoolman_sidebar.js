@@ -23,6 +23,21 @@ $(() => {
             updateSelectedSpools();
         };
 
+        /**
+         * TODO: Consider moving this to somewhere even more generic?
+         * This is not inherently tied to the Sidebar, but since Sidebar is "always present"
+         * it acts like that "generic place" for now.
+         */
+        const initSocket = async () => {
+            OctoPrint.socket.onMessage("event", (message) => {
+                if (!(message.data.type || '').includes("plugin_Spoolman_")) {
+                    return;
+                }
+
+                handlePluginSocketEvents(message.data.type, message.data.payload);
+            });
+        };
+
         const updateSelectedSpools = async () => {
             self.templateData.loadingError(undefined);
             self.templateData.isLoadingData(true);
@@ -90,11 +105,20 @@ $(() => {
 
         const handleForceRefresh = async () => {
             pluginSpoolmanApi.getSpoolmanSpools.invalidate();
-
-            await updateSelectedSpools();
         };
         const handleTryAgainOnError = async () => {
             await handleForceRefresh();
+        };
+
+        const handlePluginSocketEvents = async (eventType, eventPayload) => {
+            if (eventType === "plugin_Spoolman_spool_selected") {
+                return;
+            }
+            if (eventType === "plugin_Spoolman_spool_usage_comitted") {
+                return await handleForceRefresh();
+            }
+
+            console.warn(`[Spoolman][event] Unknown plugin event "${eventType}"`);
         };
 
         /** Bindings for the template */
@@ -137,6 +161,7 @@ $(() => {
             self.templateData.settingsViewModel(self.settingsViewModel);
 
             initView();
+            initSocket();
 
             previousSettings.spoolmanUrl = getPluginSettings().spoolmanUrl();
 
@@ -145,6 +170,10 @@ $(() => {
              * to handle any potential tool-count changes.
              */
             self.settingsViewModel.printerProfiles.currentProfileData.subscribe(() => {
+                void updateSelectedSpools();
+            });
+
+            pluginSpoolmanApi.cache.onResourcesInvalidated([ "getSpoolmanSpools" ], () => {
                 void updateSelectedSpools();
             });
         };
@@ -166,8 +195,6 @@ $(() => {
             previousSettings.spoolmanUrl = newSettings.spoolmanUrl;
 
             pluginSpoolmanApi.getSpoolmanSpools.invalidate();
-
-            void updateSelectedSpools();
         };
     };
 

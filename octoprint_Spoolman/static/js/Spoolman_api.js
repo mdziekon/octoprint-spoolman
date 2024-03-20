@@ -31,6 +31,8 @@ $(() => {
     }
 
     window.pluginSpoolmanApi = {
+        cache,
+
         getSpoolmanSpools: cacheGetSpoolmanSpoolsResult.getter,
         updateActiveSpool: sharedUpdateActiveSpool,
     };
