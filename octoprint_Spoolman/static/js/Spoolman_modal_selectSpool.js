@@ -91,10 +91,13 @@ $(() => {
             });
         };
 
-        const handleTryAgainOnError = async () => {
+        const handleForceRefresh = async () => {
             pluginSpoolmanApi.getSpoolmanSpools.invalidate();
 
             await refreshView();
+        };
+        const handleTryAgainOnError = async () => {
+            await handleForceRefresh();
         };
 
         /** Bindings for the template */
@@ -104,6 +107,7 @@ $(() => {
         self.templateApi = {
             handleSelectSpoolForTool,
             handleTryAgainOnError,
+            handleForceRefresh,
         };
         self.templateData = {
             isLoadingData: ko.observable(true),

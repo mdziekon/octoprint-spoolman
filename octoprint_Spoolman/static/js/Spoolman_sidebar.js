@@ -89,10 +89,10 @@ $(() => {
         const handleForceRefresh = async () => {
             pluginSpoolmanApi.getSpoolmanSpools.invalidate();
 
-            void updateSelectedSpools();
+            await updateSelectedSpools();
         };
         const handleTryAgainOnError = async () => {
-            void handleForceRefresh();
+            await handleForceRefresh();
         };
 
         /** Bindings for the template */
