@@ -11,11 +11,23 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0.25em;
+
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
 }
 
 .tool-row {
     display: flex;
+    justify-content: space-between;
     gap: 0.5em;
+    padding-top: 0.25em;
+    padding-bottom: 0.25em;
+}
+.tool-row:not(:last-child) {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+.tool-row .tool-idx {
+    flex-shrink: 0;
 }
 
 .color-preview {
