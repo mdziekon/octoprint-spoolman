@@ -32,6 +32,7 @@ $(() => {
         };
 
         const refreshView = async () => {
+            // TODO: Do not refresh if modal is not visible
             // TODO: Add error handling for modal
 
             const toolIdx = self.templateData.toolIdx();
@@ -95,8 +96,6 @@ $(() => {
 
         const handleForceRefresh = async () => {
             pluginSpoolmanApi.getSpoolmanSpools.invalidate();
-
-            await refreshView();
         };
         const handleTryAgainOnError = async () => {
             await handleForceRefresh();
@@ -136,9 +135,12 @@ $(() => {
             self.modals.selectSpool.modal("layout");
         });
 
-        self.onBeforeBinding = () => {};
-        self.onAfterBinding = () => {};
+        const init = () => {
+            pluginSpoolmanApi.cache.onResourcesInvalidated([ "getSpoolmanSpools" ], () => {
+                void refreshView();
+            });
+        };
 
-        // TODO: Should we refresh on getSpoolmanSpools.invalidate()?
+        init();
     };
 });

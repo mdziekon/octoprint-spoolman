@@ -105,8 +105,6 @@ $(() => {
 
         const handleForceRefresh = async () => {
             pluginSpoolmanApi.getSpoolmanSpools.invalidate();
-
-            await updateSelectedSpools();
         };
         const handleTryAgainOnError = async () => {
             await handleForceRefresh();
@@ -174,6 +172,10 @@ $(() => {
             self.settingsViewModel.printerProfiles.currentProfileData.subscribe(() => {
                 void updateSelectedSpools();
             });
+
+            pluginSpoolmanApi.cache.onResourcesInvalidated([ "getSpoolmanSpools" ], () => {
+                void updateSelectedSpools();
+            });
         };
 
         /**
@@ -193,8 +195,6 @@ $(() => {
             previousSettings.spoolmanUrl = newSettings.spoolmanUrl;
 
             pluginSpoolmanApi.getSpoolmanSpools.invalidate();
-
-            void updateSelectedSpools();
         };
     };
 
