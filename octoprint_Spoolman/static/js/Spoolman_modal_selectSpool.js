@@ -123,7 +123,9 @@ $(() => {
         /** -- end of bindings -- */
 
         $(document).on("shown", SpoolmanModalSelectSpoolComponent.modalSelector, async () => {
-            handleDisplayModal(params.toolIdx());
+            await handleDisplayModal(params.toolIdx());
+
+            self.modals.selectSpool.modal("layout");
         });
 
         self.onBeforeBinding = () => {};
