@@ -9,39 +9,6 @@ $(() => {
             spoolmanUrl: undefined,
         };
 
-        const fetchSpoolmanSpools = (() => {
-            const cache = {
-                /** @type Promise<Spool[]> */
-                spools: undefined,
-            };
-
-            const fetcher = async () => {
-                if (cache.spools) {
-                    return cache.spools;
-                }
-
-                const fetchPromise = (async () => {
-                    const request = await getSpoolmanSpools(apiClient);
-
-                    if (!request.isSuccess) {
-                        console.error("Request error", request.error);
-                    }
-
-                    return request;
-                })();
-
-                cache.spools = fetchPromise;
-
-                return cache.spools;
-            };
-
-            fetcher.clearCache = () => {
-                cache.spools = undefined;
-            };
-
-            return fetcher;
-        })();
-
         self.settingsViewModel = params[0];
 
         self.modals = {
@@ -63,7 +30,7 @@ $(() => {
             self.templateData.loadingError(undefined);
             self.templateData.isLoadingData(true);
 
-            const spoolmanSpoolsResult = await fetchSpoolmanSpools();
+            const spoolmanSpoolsResult = await pluginSpoolmanCachedApi.getSpoolmanSpools();
 
             self.templateData.isLoadingData(false);
 
@@ -196,7 +163,7 @@ $(() => {
 
             previousSettings.spoolmanUrl = newSettings.spoolmanUrl;
 
-            fetchSpoolmanSpools.clearCache();
+            pluginSpoolmanCachedApi.getSpoolmanSpools.invalidate();
 
             void updateSelectedSpools();
         };
