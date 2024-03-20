@@ -23,6 +23,8 @@ $(() => {
         self.settingsViewModel = params.settingsViewModel;
         self.eventsSink = params.eventsSink;
 
+        self._isVisible = false;
+
         self.modals = {
             selectSpool: $(SpoolmanModalSelectSpoolComponent.modalSelector),
         };
@@ -32,7 +34,10 @@ $(() => {
         };
 
         const refreshView = async () => {
-            // TODO: Do not refresh if modal is not visible
+            if (!self._isVisible) {
+                return;
+            }
+
             // TODO: Add error handling for modal
 
             const toolIdx = self.templateData.toolIdx();
@@ -130,9 +135,14 @@ $(() => {
         /** -- end of bindings -- */
 
         $(document).on("shown", SpoolmanModalSelectSpoolComponent.modalSelector, async () => {
+            this._isVisible = true;
+
             await handleDisplayModal(params.toolIdx());
 
             self.modals.selectSpool.modal("layout");
+        });
+        $(document).on("hidden", SpoolmanModalSelectSpoolComponent.modalSelector, async () => {
+            this._isVisible = false;
         });
 
         const init = () => {
