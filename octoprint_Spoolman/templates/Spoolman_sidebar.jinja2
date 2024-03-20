@@ -33,7 +33,7 @@
         >
             <div class="tool-row">
                 <!-- ko if: $parent.templateData.selectedSpoolsByToolIdx().length > 1 -->
-                    <div>
+                    <div class="tool-idx">
                         <b>Tool #<span data-bind="text: ($index() + 1)"></span>:</b>
                     </div>
                 <!-- /ko -->
@@ -70,12 +70,10 @@
                         <!-- ko if: filament.vendor.name -->
                         <span>(<span data-bind="text: filament.vendor.name"></span>)</span>
                         <!-- /ko -->
-                        <span>
-                            <span
-                                data-bind="text: remaining_weight"
-                                title="Remaining weight"
-                            ></span><span data-bind="text: $root.constants.weight_unit"></span>
-                        </span>
+                        <span><span
+                            data-bind="text: (remaining_weight ?? 0).toFixed(1)"
+                            title="Remaining weight"
+                        ></span><span data-bind="text: $root.constants.weight_unit"></span></span>
                     </div>
                     <div>
                         <div class="btn-group">
