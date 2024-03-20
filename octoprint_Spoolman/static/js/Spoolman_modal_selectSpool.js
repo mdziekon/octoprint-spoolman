@@ -2,8 +2,24 @@ $(() => {
     // from setup.py plugin_identifier
     const PLUGIN_ID = "Spoolman";
 
-    function SpoolmanSidebarViewModel(params) {
+    const SpoolmanModalSelectSpoolComponent = {
+        registerComponent: () => {
+            ko.components.register('spoolman-modal-select-spool', {
+                viewModel: SpoolmanModalSelectSpoolViewModel,
+                template: {
+                    element: 'spoolman-modal-selectSpool-template',
+                },
+            });
+        }
+    }
+
+    window.SpoolmanModalSelectSpoolComponent = SpoolmanModalSelectSpoolComponent;
+
+    function SpoolmanModalSelectSpoolViewModel(params) {
         const self = this;
+
+        self.settingsViewModel = params.settingsViewModel;
+        self.eventsSink = params.eventsSink;
 
         const previousSettings = {
             spoolmanUrl: undefined,
@@ -42,24 +58,22 @@ $(() => {
             return fetcher;
         })();
 
-        self.settingsViewModel = params[0];
-
         self.modals = {
-            selectSpool: () => $("#spoolman_modal_selectspool"),
+            selectSpool: $("#spoolman_modal_selectspool"),
         };
 
         const getPluginSettings = () => {
-            return self.settingsViewModel.settings.plugins[PLUGIN_ID];
+            return self.settingsViewModel().settings.plugins[PLUGIN_ID];
         };
 
         // TODO: Share with other ViewModels?
         const apiClient = new APIClient(PLUGIN_ID, BASEURL);
 
-        const initView = async () => {
-            updateSelectedSpools();
-        };
+        const refreshView = async () => {
+            // TODO: Add error handling for modal
 
-        const updateSelectedSpools = async () => {
+            const toolIdx = self.templateData.toolIdx();
+
             self.templateData.loadingError(undefined);
             self.templateData.isLoadingData(true);
 
@@ -75,42 +89,33 @@ $(() => {
 
             const spoolmanSpools = spoolmanSpoolsResult.payload.response.data.spools;
 
-            const currentProfileData = self.settingsViewModel.printerProfiles.currentProfileData();
-            const currentExtrudersCount = (
-                currentProfileData
-                    ? currentProfileData.extruder.count()
-                    : 0
-            );
-
-            const extruders = Array.from({
-                length: currentExtrudersCount
-            }, () => undefined)
-
             const selectedSpoolIds = getPluginSettings().selectedSpoolIds;
-            const selectedSpools = extruders.map((_, extruderIdx) => {
-                const spoolId = selectedSpoolIds[extruderIdx]?.spoolId();
-
-                return spoolmanSpools.find((spool) => String(spool.id) === spoolId);
+            const toolSpoolId = selectedSpoolIds[toolIdx]?.spoolId();
+            const toolSpool = spoolmanSpools.find((spool) => {
+                return String(spool.id) === toolSpoolId;
             });
 
-            self.templateData.selectedSpoolsByToolIdx(selectedSpools);
-            self.templateData.selectedSpoolsByToolIdx.valueHasMutated();
+            self.templateData.toolCurrentSpool(toolSpool);
+            self.templateData.tableItemsOnCurrentPage(spoolmanSpools);
         };
 
         /**
          * @param {number} toolIdx
          */
-        const handleOpenSpoolSelector = async (toolIdx) => {
-            self.templateData.modals.selectSpool.toolIdx(toolIdx);
+        const handleDisplayModal = async (toolIdx) => {
+            self.templateData.toolIdx(toolIdx);
 
-            self.modals.selectSpool().modal("show");
+            await refreshView();
         };
 
         /**
          * @param {number} toolIdx
+         * @param {number} spoolId
          */
-        const handleDeselectSpool = async (toolIdx) => {
-            const request = await updateActiveSpool(apiClient, { toolIdx, spoolId: undefined });
+        const handleSelectSpoolForTool = async (toolIdx, spoolId) => {
+            // TODO: Add error handling for modal
+
+            const request = await updateActiveSpool(apiClient, { toolIdx, spoolId });
 
             if (!request.isSuccess) {
                 console.error("Request error", request.error);
@@ -121,14 +126,16 @@ $(() => {
             const settingsSavePromise = new Promise((resolve) => {
                 // TODO: Investigate if `saveData` can replace custom API endpoint
                 // Force save empty data to trigger `settingsViewModel` reload
-                self.settingsViewModel.saveData({}, resolve);
+                self.settingsViewModel().saveData({}, resolve);
             });
 
             await settingsSavePromise;
 
-            self.modals.selectSpool().modal("hide");
+            self.modals.selectSpool.modal("hide");
 
-            updateSelectedSpools();
+            self.eventsSink({
+                type: 'onSelectSpoolForTool',
+            });
         };
 
         /** Bindings for the template */
@@ -136,48 +143,32 @@ $(() => {
             weight_unit: 'g',
         };
         self.templateApi = {
-            handleOpenSpoolSelector,
-            handleDeselectSpool,
+            handleSelectSpoolForTool,
         };
         self.templateData = {
             isLoadingData: ko.observable(true),
             loadingError: ko.observable(undefined),
-            selectedSpoolsByToolIdx: ko.observable([]),
 
-            settingsViewModel: ko.observable(undefined),
+            toolIdx: ko.observable(undefined),
+            toolCurrentSpool: ko.observable(undefined),
 
-            modals: {
-                selectSpool: {
-                    toolIdx: ko.observable(undefined),
-                    eventsSink: ko.observable(),
-                },
+            tableAttributeVisibility: {
+                id: true,
+                spoolName: true,
+                material: true,
+                weight: true,
             },
+            tableItemsOnCurrentPage: ko.observable([]),
         };
         /** -- end of bindings -- */
 
-        self.onBeforeBinding = () => {
-            SpoolmanModalSelectSpoolComponent.registerComponent();
+        $(document).on("shown", "#spoolman_modal_selectspool", async () => {
+            handleDisplayModal(params.toolIdx());
+        });
 
-            self.templateData.modals.selectSpool.eventsSink.subscribe((newEvent) => {
-                if (newEvent.type === 'onSelectSpoolForTool') {
-                    updateSelectedSpools();
-                }
-            });
-        };
+        self.onBeforeBinding = () => {};
         self.onAfterBinding = () => {
-            self.templateData.settingsViewModel(self.settingsViewModel);
-
-            initView();
-
             previousSettings.spoolmanUrl = getPluginSettings().spoolmanUrl();
-
-            /**
-             * Update spools on printer's profile update,
-             * to handle any potential tool-count changes.
-             */
-            self.settingsViewModel.printerProfiles.currentProfileData.subscribe(() => {
-                void updateSelectedSpools();
-            });
         };
 
         /**
@@ -198,18 +189,7 @@ $(() => {
 
             fetchSpoolmanSpools.clearCache();
 
-            void updateSelectedSpools();
+            refreshView();
         };
     };
-
-    OCTOPRINT_VIEWMODELS.push({
-        construct: SpoolmanSidebarViewModel,
-        dependencies: [
-            "settingsViewModel"
-        ],
-        elements: [
-            document.querySelector("#sidebar_spoolman"),
-            document.querySelector("#spoolman-modals"),
-        ]
-    });
 });

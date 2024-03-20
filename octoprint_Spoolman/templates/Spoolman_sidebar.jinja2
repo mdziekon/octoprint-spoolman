@@ -1,3 +1,5 @@
+{% include "Spoolman_sidebar_modal_selectspool.jinja2" %}
+
 <div
     id="sidebar_spoolman"
     class="control-group"
@@ -44,7 +46,7 @@
                         <div class="btn-group">
                             <button
                                 class="btn btn-mini"
-                                data-bind="click: $parent.templateApi.handleSelectSpool.bind($data, $index())"
+                                data-bind="click: $parent.templateApi.handleOpenSpoolSelector.bind($data, $index())"
                                 title="Select spool"
                             >
                                 ...
@@ -86,7 +88,7 @@
                             </button>
                             <button
                                 class="btn btn-mini"
-                                data-bind="click: $parent.templateApi.handleSelectSpool.bind($data, $index())"
+                                data-bind="click: $parent.templateApi.handleOpenSpoolSelector.bind($data, $index())"
                                 title="Change Spool"
                             >
                                 ...
@@ -99,6 +101,11 @@
     </div>
 </div>
 
-<span id="modal-dialogs-spoolManager" style="display:none" >
-    {% include "Spoolman_sidebar_modal_selectspool.jinja2" %}
+<span id="spoolman-modals" style="display:none">
+    <spoolman-modal-select-spool params="
+        settingsViewModel: templateData.settingsViewModel,
+        toolIdx: templateData.modals.selectSpool.toolIdx,
+        eventsSink: templateData.modals.selectSpool.eventsSink,
+        "
+    ></spoolman-modal-select-spool>
 </span>
