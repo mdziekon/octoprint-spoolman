@@ -39,3 +39,7 @@
     display: inline-block;
     margin-right: 5px
 }
+
+.margin-bottom-mini {
+    margin-bottom: 0.25em;
+}

@@ -91,12 +91,19 @@ $(() => {
             });
         };
 
+        const handleTryAgainOnError = async () => {
+            pluginSpoolmanApi.getSpoolmanSpools.invalidate();
+
+            await refreshView();
+        };
+
         /** Bindings for the template */
         self.constants = {
             weight_unit: 'g',
         };
         self.templateApi = {
             handleSelectSpoolForTool,
+            handleTryAgainOnError,
         };
         self.templateData = {
             isLoadingData: ko.observable(true),

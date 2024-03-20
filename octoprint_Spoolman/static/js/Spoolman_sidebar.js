@@ -86,6 +86,12 @@ $(() => {
             updateSelectedSpools();
         };
 
+        const handleTryAgainOnError = async () => {
+            pluginSpoolmanApi.getSpoolmanSpools.invalidate();
+
+            void updateSelectedSpools();
+        };
+
         /** Bindings for the template */
         self.constants = {
             weight_unit: 'g',
@@ -93,6 +99,7 @@ $(() => {
         self.templateApi = {
             handleOpenSpoolSelector,
             handleDeselectSpool,
+            handleTryAgainOnError,
         };
         self.templateData = {
             isLoadingData: ko.observable(true),
