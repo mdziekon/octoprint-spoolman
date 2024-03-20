@@ -12,7 +12,7 @@ $(() => {
         self.settingsViewModel = params[0];
 
         self.modals = {
-            selectSpool: () => $("#spoolman_modal_selectspool"),
+            selectSpool: () => $(SpoolmanModalSelectSpoolComponent.modalSelector),
         };
 
         const getPluginSettings = () => {

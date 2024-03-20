@@ -10,7 +10,8 @@ $(() => {
                     element: 'spoolman-modal-selectSpool-template',
                 },
             });
-        }
+        },
+        modalSelector: "#spoolman_modal_selectspool",
     }
 
     window.SpoolmanModalSelectSpoolComponent = SpoolmanModalSelectSpoolComponent;
@@ -23,7 +24,7 @@ $(() => {
         self.eventsSink = params.eventsSink;
 
         self.modals = {
-            selectSpool: $("#spoolman_modal_selectspool"),
+            selectSpool: $(SpoolmanModalSelectSpoolComponent.modalSelector),
         };
 
         const getPluginSettings = () => {
@@ -120,7 +121,7 @@ $(() => {
         };
         /** -- end of bindings -- */
 
-        $(document).on("shown", "#spoolman_modal_selectspool", async () => {
+        $(document).on("shown", SpoolmanModalSelectSpoolComponent.modalSelector, async () => {
             handleDisplayModal(params.toolIdx());
         });
 
