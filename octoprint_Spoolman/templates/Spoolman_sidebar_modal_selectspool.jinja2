@@ -39,7 +39,7 @@
                         <!-- /ko -->
 
                         <span
-                            data-bind="text: templateData.toolCurrentSpool().remaining_weight"
+                            data-bind="text: (templateData.toolCurrentSpool().remaining_weight ?? 0).toFixed(1)"
                             title="Remaining weight"
                         ></span><span data-bind="text: $component.constants.weight_unit"></span>
                     </span>
@@ -149,7 +149,7 @@
                             <td
                                 data-bind="visible: $component.templateData.tableAttributeVisibility.weight" style="text-align: right;"
                             >
-                                <span data-bind="text: remaining_weight.toFixed(1), attr: {title: 'Remaining weight'}"></span><span data-bind="text: $component.constants.weight_unit"></span>
+                                <span data-bind="text: (remaining_weight ?? 0).toFixed(1), attr: {title: 'Remaining weight'}"></span><span data-bind="text: $component.constants.weight_unit"></span>
                                 <br>
                                 <span data-bind="text: used_weight.toFixed(1), attr: {title: 'Used weight'}"></span><span data-bind="text: $component.constants.weight_unit"></span>
                             </td>
