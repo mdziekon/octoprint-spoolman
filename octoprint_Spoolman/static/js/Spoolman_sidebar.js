@@ -23,6 +23,21 @@ $(() => {
             updateSelectedSpools();
         };
 
+        /**
+         * TODO: Consider moving this to somewhere even more generic?
+         * This is not inherently tied to the Sidebar, but since Sidebar is "always present"
+         * it acts like that "generic place" for now.
+         */
+        const initSocket = async () => {
+            OctoPrint.socket.onMessage("event", (message) => {
+                if (!(message.data.type || '').includes("plugin_Spoolman_")) {
+                    return;
+                }
+
+                handlePluginSocketEvents(message.data.type, message.data.payload);
+            });
+        };
+
         const updateSelectedSpools = async () => {
             self.templateData.loadingError(undefined);
             self.templateData.isLoadingData(true);
@@ -97,6 +112,17 @@ $(() => {
             await handleForceRefresh();
         };
 
+        const handlePluginSocketEvents = async (eventType, eventPayload) => {
+            if (eventType === "plugin_Spoolman_spool_selected") {
+                return;
+            }
+            if (eventType === "plugin_Spoolman_spool_usage_comitted") {
+                await handleForceRefresh();
+            }
+
+            console.warn(`[Spoolman][event] Unknown plugin event "${eventType}"`);
+        };
+
         /** Bindings for the template */
         self.constants = {
             weight_unit: 'g',
@@ -137,6 +163,7 @@ $(() => {
             self.templateData.settingsViewModel(self.settingsViewModel);
 
             initView();
+            initSocket();
 
             previousSettings.spoolmanUrl = getPluginSettings().spoolmanUrl();
 
