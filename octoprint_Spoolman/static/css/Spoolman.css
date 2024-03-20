@@ -28,7 +28,7 @@
     flex-shrink: 0;
 }
 .tool-list-controls {
-    text-align: right;
+    text-align: left;
     padding-top: 0.25em;
     padding-bottom: 0.25em;
 }
