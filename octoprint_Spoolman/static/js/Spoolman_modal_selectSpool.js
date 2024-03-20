@@ -33,6 +33,10 @@ $(() => {
             return self.settingsViewModel().settings.plugins[PLUGIN_ID];
         };
 
+        const refreshModalLayout = () => {
+            self.modals.selectSpool.modal("layout");
+        };
+
         const refreshView = async () => {
             if (!self._isVisible) {
                 return;
@@ -44,6 +48,8 @@ $(() => {
 
             self.templateData.loadingError(undefined);
             self.templateData.isLoadingData(true);
+
+            refreshModalLayout();
 
             const spoolmanSpoolsResult = await pluginSpoolmanApi.getSpoolmanSpools();
 
@@ -67,6 +73,8 @@ $(() => {
             self.templateData.tableItemsOnCurrentPage(spoolmanSpools);
 
             self.templateData.spoolmanUrl(getPluginSettings().spoolmanUrl());
+
+            refreshModalLayout();
         };
 
         /**
@@ -138,8 +146,6 @@ $(() => {
             this._isVisible = true;
 
             await handleDisplayModal(params.toolIdx());
-
-            self.modals.selectSpool.modal("layout");
         });
         $(document).on("hidden", SpoolmanModalSelectSpoolComponent.modalSelector, async () => {
             this._isVisible = false;
