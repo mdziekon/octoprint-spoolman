@@ -59,6 +59,8 @@ $(() => {
 
             self.templateData.selectedSpoolsByToolIdx(selectedSpools);
             self.templateData.selectedSpoolsByToolIdx.valueHasMutated();
+
+            self.templateData.spoolmanUrl(getPluginSettings().spoolmanUrl());
         };
 
         /**
@@ -109,6 +111,7 @@ $(() => {
             isLoadingData: ko.observable(true),
             loadingError: ko.observable(undefined),
             selectedSpoolsByToolIdx: ko.observable([]),
+            spoolmanUrl: ko.observable(undefined),
 
             settingsViewModel: ko.observable(undefined),
 

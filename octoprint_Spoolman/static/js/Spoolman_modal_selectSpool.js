@@ -59,6 +59,8 @@ $(() => {
 
             self.templateData.toolCurrentSpool(toolSpool);
             self.templateData.tableItemsOnCurrentPage(spoolmanSpools);
+
+            self.templateData.spoolmanUrl(getPluginSettings().spoolmanUrl());
         };
 
         /**
@@ -123,6 +125,8 @@ $(() => {
                 weight: true,
             },
             tableItemsOnCurrentPage: ko.observable([]),
+
+            spoolmanUrl: ko.observable(undefined),
         };
         /** -- end of bindings -- */
 
