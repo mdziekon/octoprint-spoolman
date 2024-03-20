@@ -15,15 +15,12 @@ $(() => {
 
     window.SpoolmanModalSelectSpoolComponent = SpoolmanModalSelectSpoolComponent;
 
+    // TODO: Add support for multi-targetting
     function SpoolmanModalSelectSpoolViewModel(params) {
         const self = this;
 
         self.settingsViewModel = params.settingsViewModel;
         self.eventsSink = params.eventsSink;
-
-        const previousSettings = {
-            spoolmanUrl: undefined,
-        };
 
         self.modals = {
             selectSpool: $("#spoolman_modal_selectspool"),
@@ -128,29 +125,8 @@ $(() => {
         });
 
         self.onBeforeBinding = () => {};
-        self.onAfterBinding = () => {
-            previousSettings.spoolmanUrl = getPluginSettings().spoolmanUrl();
-        };
+        self.onAfterBinding = () => {};
 
-        /**
-         * Update spools on Spoolman instance change.
-         * Subscribing to settings entry is unreliable, as its observable updates
-         * on every input change, rather than on save.
-         */
-        self.onSettingsHidden = () => {
-            const newSettings = {
-                spoolmanUrl: getPluginSettings().spoolmanUrl(),
-            };
-
-            if (previousSettings.spoolmanUrl === newSettings.spoolmanUrl) {
-                return;
-            }
-
-            previousSettings.spoolmanUrl = newSettings.spoolmanUrl;
-
-            pluginSpoolmanApi.getSpoolmanSpools.invalidate();
-
-            refreshView();
-        };
+        // TODO: Should we refresh on getSpoolmanSpools.invalidate()?
     };
 });
