@@ -42,7 +42,7 @@
             <div class="tool-row">
                 <!-- ko if: $parent.templateData.selectedSpoolsByToolIdx().length > 1 -->
                     <div class="tool-idx">
-                        <b>Tool #<span data-bind="text: ($index() + 1)"></span>:</b>
+                        <b>Tool #<span data-bind="text: $index()"></span>:</b>
                     </div>
                 <!-- /ko -->
 
