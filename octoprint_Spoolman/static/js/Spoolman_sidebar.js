@@ -109,6 +109,37 @@ $(() => {
         const handleTryAgainOnError = async () => {
             await handleForceRefresh();
         };
+        const handleSpoolUsageError = async (eventPayload) => {
+            if (eventPayload.code === "spoolman_api__spool_not_found") {
+                const spoolId = eventPayload.data.spoolId;
+                const selectedSpoolIds = getPluginSettings().selectedSpoolIds;
+
+                const spoolTool = Object.entries(selectedSpoolIds)
+                    .find(([ toolIdx, toolProps ]) => toolProps.spoolId() === spoolId);
+                const [ spoolToolIdx ] = spoolTool ?? [ undefined ];
+
+                const spoolUsedLength = eventPayload.data.usedLength;
+
+                showSpoolmanPopup({
+                    type: 'error',
+                    subject: 'Spool no longer exists',
+                    message: `
+                        The previously selected spool ${spoolToolIdx !== undefined ? `for tool #${spoolToolIdx} (spool #${spoolId}) ` : `#${spoolId}`} seems to no longer exist in Spoolman's database.
+                        Spool used length of ${(spoolUsedLength ?? 0).toFixed(1)}${self.constants.length_unit} has been discarded.
+                        The spool has been deselected.
+                    `,
+                    shouldAutoclose: false,
+                    shouldShowType: true,
+                });
+
+                // Note: cleanup state
+                if (spoolToolIdx !== undefined) {
+                    await handleDeselectSpool(spoolToolIdx);
+                }
+            }
+
+            return await handleForceRefresh();
+        };
 
         const handlePluginSocketEvents = async (eventType, eventPayload) => {
             if (eventType === "plugin_Spoolman_spool_selected") {
@@ -117,6 +148,9 @@ $(() => {
             if (eventType === "plugin_Spoolman_spool_usage_comitted") {
                 return await handleForceRefresh();
             }
+            if (eventType === "plugin_Spoolman_spool_usage_error") {
+                return await handleSpoolUsageError(eventPayload);
+            }
 
             console.warn(`[Spoolman][event] Unknown plugin event "${eventType}"`);
         };
@@ -124,6 +158,7 @@ $(() => {
         /** Bindings for the template */
         self.constants = {
             weight_unit: 'g',
+            length_unit: 'mm',
         };
         self.templateApi = {
             handleOpenSpoolSelector,
