@@ -133,6 +133,7 @@ $(() => {
                         Spool used length of ${(spoolUsedLength ?? 0).toFixed(1)}${self.constants.length_unit} has been discarded.
                         The spool has been deselected.
                     `,
+                    shouldDeduplicate: false,
                     shouldAutoclose: false,
                     shouldShowType: true,
                 });
@@ -140,10 +141,23 @@ $(() => {
                 // Note: cleanup state
                 if (spoolToolIdx !== undefined) {
                     await handleDeselectSpool(spoolToolIdx);
+                    await handleForceRefresh();
                 }
+
+                return;
             }
 
-            return await handleForceRefresh();
+            showSpoolmanPopup({
+                type: 'error',
+                subject: 'Unknown error while committing usage',
+                message: `
+                    There was an unknown error while committing usage to Spoolman.
+                    Spool usage update has been lost...
+                `,
+                shouldDeduplicate: false,
+                shouldAutoclose: false,
+                shouldShowType: true,
+            });
         };
 
         const handlePluginSocketEvents = async (eventType, eventPayload) => {

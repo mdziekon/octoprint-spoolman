@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 
 import requests
+from requests.adapters import HTTPAdapter, Retry
 
 class SpoolmanConnector():
     def __init__(self, instanceUrl, logger):
@@ -35,6 +36,15 @@ class SpoolmanConnector():
 
         return None
 
+    def _handleSpoolmanConnectionError(self, caughtException):
+        self._logger.error("[Spoolman API] connection failed with %s" % caughtException)
+
+        return {
+            "error": {
+                "code": "spoolman_api__connection_failed",
+            },
+            "exception": caughtException,
+        }
     def _handleSpoolmanError(self, response, customError = None):
         self._logSpoolmanError(response)
 
@@ -88,12 +98,21 @@ class SpoolmanConnector():
 
         self._logSpoolmanCall(endpointUrl)
 
-        response = requests.put(
-            url = endpointUrl,
-            json = {
-                'use_length': spoolUsedLength,
-            }
-        )
+        try:
+            session = requests.Session()
+            retries = Retry(total = 3, backoff_factor = 1, status_forcelist = [ 500, 502, 503, 504 ])
+
+            session.mount(self.instanceUrl, HTTPAdapter(max_retries=retries))
+
+            response = session.put(
+                url = endpointUrl,
+                json = {
+                    'use_length': spoolUsedLength,
+                },
+                timeout = 1
+            )
+        except Exception as caughtException:
+            return self._handleSpoolmanConnectionError(caughtException)
 
         if response.status_code == 404:
             return self._handleSpoolmanError(
