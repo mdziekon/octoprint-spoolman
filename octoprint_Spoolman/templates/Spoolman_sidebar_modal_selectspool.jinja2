@@ -45,7 +45,12 @@
                     </span>
                 <!-- /ko -->
                 <!-- ko ifnot: templateData.toolCurrentSpool() -->
-                    <i>No spool selected</i>
+                    <!-- ko if: templateData.toolCurrentSpoolId() -->
+                        <i class="text-error">Unknown spool selected</i>
+                    <!-- /ko -->
+                    <!-- ko ifnot: templateData.toolCurrentSpoolId() -->
+                        <i class="muted">No spool selected</i>
+                    <!-- /ko -->
                 <!-- /ko -->
             </div>
 

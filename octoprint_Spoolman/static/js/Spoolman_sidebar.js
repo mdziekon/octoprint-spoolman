@@ -69,7 +69,12 @@ $(() => {
             const selectedSpools = extruders.map((_, extruderIdx) => {
                 const spoolId = selectedSpoolIds[extruderIdx]?.spoolId();
 
-                return spoolmanSpools.find((spool) => String(spool.id) === spoolId);
+                const spoolData = spoolmanSpools.find((spool) => String(spool.id) === spoolId);
+
+                return {
+                    spoolId,
+                    spoolData,
+                };
             });
 
             self.templateData.selectedSpoolsByToolIdx(selectedSpools);
