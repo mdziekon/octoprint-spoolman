@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 
 import requests
+from requests.adapters import HTTPAdapter, Retry
 
 class SpoolmanConnector():
     def __init__(self, instanceUrl, logger):
@@ -98,11 +99,17 @@ class SpoolmanConnector():
         self._logSpoolmanCall(endpointUrl)
 
         try:
-            response = requests.put(
+            session = requests.Session()
+            retries = Retry(total = 3, backoff_factor = 1, status_forcelist = [ 500, 502, 503, 504 ])
+
+            session.mount(self.instanceUrl, HTTPAdapter(max_retries=retries))
+
+            response = session.put(
                 url = endpointUrl,
                 json = {
                     'use_length': spoolUsedLength,
-                }
+                },
+                timeout = 1
             )
         except Exception as caughtException:
             return self._handleSpoolmanConnectionError(caughtException)
