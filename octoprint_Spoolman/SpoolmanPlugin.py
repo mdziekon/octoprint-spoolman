@@ -119,4 +119,5 @@ class SpoolmanPlugin(
         return [
             PluginEvents.SPOOL_SELECTED,
             PluginEvents.SPOOL_USAGE_COMITTED,
+            PluginEvents.SPOOL_USAGE_ERROR,
         ]
