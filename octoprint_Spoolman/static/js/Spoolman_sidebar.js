@@ -150,7 +150,7 @@ $(() => {
             if (eventType === "plugin_Spoolman_spool_selected") {
                 return;
             }
-            if (eventType === "plugin_Spoolman_spool_usage_comitted") {
+            if (eventType === "plugin_Spoolman_spool_usage_committed") {
                 return await handleForceRefresh();
             }
             if (eventType === "plugin_Spoolman_spool_usage_error") {

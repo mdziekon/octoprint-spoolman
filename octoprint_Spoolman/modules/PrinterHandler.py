@@ -91,7 +91,7 @@ class PrinterHandler():
                 return
 
             self.triggerPluginEvent(
-                Events.PLUGIN_SPOOLMAN_SPOOL_USAGE_COMITTED,
+                Events.PLUGIN_SPOOLMAN_SPOOL_USAGE_COMMITTED,
                 {
                     'toolIdx': toolIdx,
                     'spoolId': selectedSpoolId,
