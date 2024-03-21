@@ -35,6 +35,15 @@ class SpoolmanConnector():
 
         return None
 
+    def _handleSpoolmanConnectionError(self, caughtException):
+        self._logger.error("[Spoolman API] connection failed with %s" % caughtException)
+
+        return {
+            "error": {
+                "code": "spoolman_api__connection_failed",
+            },
+            "exception": caughtException,
+        }
     def _handleSpoolmanError(self, response, customError = None):
         self._logSpoolmanError(response)
 
@@ -88,12 +97,15 @@ class SpoolmanConnector():
 
         self._logSpoolmanCall(endpointUrl)
 
-        response = requests.put(
-            url = endpointUrl,
-            json = {
-                'use_length': spoolUsedLength,
-            }
-        )
+        try:
+            response = requests.put(
+                url = endpointUrl,
+                json = {
+                    'use_length': spoolUsedLength,
+                }
+            )
+        except Exception as caughtException:
+            return self._handleSpoolmanConnectionError(caughtException)
 
         if response.status_code == 404:
             return self._handleSpoolmanError(
