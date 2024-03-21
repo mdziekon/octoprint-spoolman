@@ -68,7 +68,10 @@ class PrinterHandler():
             except:
                 self._logger.info("Extruder '%s', spool id: none", toolIdx)
 
-            if not selectedSpool:
+            if (
+                not selectedSpool or
+                selectedSpool.get('spoolId', None) == None
+            ):
                 continue
 
             selectedSpoolId = selectedSpool['spoolId']
