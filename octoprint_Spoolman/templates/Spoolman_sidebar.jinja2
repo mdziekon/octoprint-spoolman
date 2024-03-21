@@ -46,12 +46,26 @@
                     </div>
                 <!-- /ko -->
 
-                <!-- ko ifnot: $data -->
+                <!-- ko ifnot: $data.spoolId && $data.spoolData -->
                     <div class="spool-label">
-                        <i>No spool selected</i>
+                        <!-- ko if: $data.spoolId -->
+                            <i class="text-error">Unknown spool selected</i>
+                        <!-- /ko -->
+                        <!-- ko ifnot: $data.spoolId -->
+                            <i class="muted">No spool selected</i>
+                        <!-- /ko -->
                     </div>
                     <div>
                         <div class="btn-group">
+                            <!-- ko if: $data.spoolId -->
+                                <button
+                                    class="btn btn-mini"
+                                    data-bind="click: $parent.templateApi.handleDeselectSpool.bind($data, $index())"
+                                    title="Deselect Spool"
+                                >
+                                    <span class="icon-remove"></span>
+                                </button>
+                            <!-- /ko -->
                             <button
                                 class="btn btn-mini"
                                 data-bind="click: $parent.templateApi.handleOpenSpoolSelector.bind($data, $index())"
@@ -63,23 +77,23 @@
                     </div>
                 <!-- /ko -->
 
-                <!-- ko if: $data -->
+                <!-- ko if: $data.spoolData -->
                     <div>
                         <span
                             class="color-preview"
-                            data-bind="style: { 'background-color': '#' + filament.color_hex }, attr: { title: filament.name }"
+                            data-bind="style: { 'background-color': '#' + spoolData.filament.color_hex }, attr: { title: spoolData.filament.name }"
                         ></span>
                     </div>
                     <div class="spool-label">
-                        <!-- ko if: filament.material -->
-                        <span>[<span data-bind="text: filament.material"></span>]</span>
+                        <!-- ko if: spoolData.filament.material -->
+                        <span>[<span data-bind="text: spoolData.filament.material"></span>]</span>
                         <!-- /ko -->
-                        <span data-bind="text: filament.name"></span>
-                        <!-- ko if: filament.vendor.name -->
-                        <span>(<span data-bind="text: filament.vendor.name"></span>)</span>
+                        <span data-bind="text: spoolData.filament.name"></span>
+                        <!-- ko if: spoolData.filament.vendor.name -->
+                        <span>(<span data-bind="text: spoolData.filament.vendor.name"></span>)</span>
                         <!-- /ko -->
                         <span><span
-                            data-bind="text: (remaining_weight ?? 0).toFixed(1)"
+                            data-bind="text: (spoolData.remaining_weight ?? 0).toFixed(1)"
                             title="Remaining weight"
                         ></span><span data-bind="text: $root.constants.weight_unit"></span></span>
                     </div>
@@ -108,7 +122,7 @@
         <div class="tool-list-controls">
             <button
                 class="btn btn-mini btn-default"
-                data-bind="click: templateApi.handleForceRefresh.bind($data)"
+                data-bind="click: templateApi.handleForceRefresh.bind(null)"
             >
                 <i class="fa fa-sm fa-refresh"></i>
                 Refresh

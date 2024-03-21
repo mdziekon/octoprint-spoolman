@@ -35,8 +35,13 @@ class SpoolmanConnector():
 
         return None
 
-    def _handleSpoolmanError(self, response):
+    def _handleSpoolmanError(self, response, customError = None):
         self._logSpoolmanError(response)
+
+        if customError != None:
+            return {
+                "error": customError
+            }
 
         return {
             "error": {
@@ -78,7 +83,8 @@ class SpoolmanConnector():
         if precheckResult and precheckResult.get('error', False):
             return precheckResult
 
-        endpointUrl = self._createSpoolmanEndpointUrl("/spool/" + str(spoolId) + "/use")
+        spoolIdStr = str(spoolId)
+        endpointUrl = self._createSpoolmanEndpointUrl("/spool/" + spoolIdStr + "/use")
 
         self._logSpoolmanCall(endpointUrl)
 
@@ -88,6 +94,21 @@ class SpoolmanConnector():
                 'use_length': spoolUsedLength,
             }
         )
+
+        if response.status_code == 404:
+            return self._handleSpoolmanError(
+                response,
+                {
+                    "code": "spoolman_api__spool_not_found",
+                    "spoolman_api": {
+                        "status_code": response.status_code,
+                    },
+                    "data": {
+                        "spoolId": spoolIdStr,
+                        "usedLength": spoolUsedLength,
+                    },
+                }
+            )
 
         if response.status_code != 200:
             return self._handleSpoolmanError(response)

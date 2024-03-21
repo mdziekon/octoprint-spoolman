@@ -69,6 +69,7 @@ $(() => {
                 return String(spool.id) === toolSpoolId;
             });
 
+            self.templateData.toolCurrentSpoolId(toolSpoolId);
             self.templateData.toolCurrentSpool(toolSpool);
             self.templateData.tableItemsOnCurrentPage(spoolmanSpools);
 
@@ -128,6 +129,7 @@ $(() => {
             loadingError: ko.observable(undefined),
 
             toolIdx: ko.observable(undefined),
+            toolCurrentSpoolId: ko.observable(undefined),
             toolCurrentSpool: ko.observable(undefined),
 
             tableAttributeVisibility: {

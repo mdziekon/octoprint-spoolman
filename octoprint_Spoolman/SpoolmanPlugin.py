@@ -118,5 +118,6 @@ class SpoolmanPlugin(
     def register_custom_events(*args, **kwargs):
         return [
             PluginEvents.SPOOL_SELECTED,
-            PluginEvents.SPOOL_USAGE_COMITTED,
+            PluginEvents.SPOOL_USAGE_COMMITTED,
+            PluginEvents.SPOOL_USAGE_ERROR,
         ]
