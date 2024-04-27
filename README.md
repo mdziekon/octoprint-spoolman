@@ -13,8 +13,9 @@ An OctoPrint plugin integrating with [Spoolman](https://github.com/Donkie/Spoolm
 ## Features
 
 - [x] Basic Spoolman integration
-    - [x] Connect to configured Spoolman
+    - [x] Connect to configured Spoolman instance
     - [x] Display available spools
+        - By default, `archived` spools are not presented for selection
     - [x] Select & deselect spools for specified tools / extruders
     - [x] Commit spools usage to Spoolman
 - [ ] Spools filtering
