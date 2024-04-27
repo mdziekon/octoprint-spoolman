@@ -119,56 +119,75 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody data-bind="foreach: templateData.tableItemsOnCurrentPage">
-                        <tr
-                            style="cursor: pointer;"
-                            data-bind="
-                                click: function() {
-                                    $component.templateApi.handleSelectSpoolForTool($component.templateData.toolIdx(), $data.id);
-                                },
-                                attr: {
-                                    class: (
-                                        $component.templateData.toolCurrentSpool() &&
-                                        String($component.templateData.toolCurrentSpool().id) === String($data.id)
-                                    )
-                                        ? 'success'
-                                        : ''
-                                    }
-                            "
-                            title="Click to select spool"
-                        >
-                            <td data-bind="visible: $component.templateData.tableAttributeVisibility.id">
-                                <span data-bind="text: id, attr: { title: id }"></span>
-                            </td>
-                            <td data-bind="visible: $component.templateData.tableAttributeVisibility.spoolName">
-                                <div style="display: flex;">
-                                    <div>
-                                        <span
-                                            class="color-preview"
-                                            data-bind="style: { 'background-color': '#' + filament.color_hex }, attr: { title: filament.name }"
-                                        ></span>
-                                    </div>
-                                    <div>
-                                        <span data-bind="text: filament.name, attr: { title: filament.name }"></span>
-                                        <br>
-                                        <i>
-                                            <span data-bind="text: filament.vendor.name, attr: { title: filament.vendor.name }"></span>
-                                        </i>
-                                    </div>
-                                </div>
-                            </td>
-                            <td data-bind="visible: $component.templateData.tableAttributeVisibility.material">
-                                <span data-bind="text: filament.material, attr: { title: filament.material }"></span>
-                            </td>
-                            <td
-                                data-bind="visible: $component.templateData.tableAttributeVisibility.weight" style="text-align: right;"
+
+                    <!-- ko if: (templateData.tableItemsOnCurrentPage().length > 0) -->
+                        <tbody data-bind="foreach: templateData.tableItemsOnCurrentPage">
+                            <tr
+                                style="cursor: pointer;"
+                                data-bind="
+                                    click: function() {
+                                        $component.templateApi.handleSelectSpoolForTool($component.templateData.toolIdx(), $data.id);
+                                    },
+                                    attr: {
+                                        class: (
+                                            $component.templateData.toolCurrentSpool() &&
+                                            String($component.templateData.toolCurrentSpool().id) === String($data.id)
+                                        )
+                                            ? 'success'
+                                            : ''
+                                        }
+                                "
+                                title="Click to select spool"
                             >
-                                <span data-bind="text: (remaining_weight ?? 0).toFixed(1), attr: {title: 'Remaining weight'}"></span><span data-bind="text: $component.constants.weight_unit"></span>
-                                <br>
-                                <span data-bind="text: used_weight.toFixed(1), attr: {title: 'Used weight'}"></span><span data-bind="text: $component.constants.weight_unit"></span>
-                            </td>
-                        </tr>
-                    </tbody>
+                                <td data-bind="visible: $component.templateData.tableAttributeVisibility.id">
+                                    <span data-bind="text: id, attr: { title: id }"></span>
+                                </td>
+                                <td data-bind="visible: $component.templateData.tableAttributeVisibility.spoolName">
+                                    <div style="display: flex;">
+                                        <div>
+                                            <span
+                                                class="color-preview"
+                                                data-bind="style: { 'background-color': '#' + filament.color_hex }, attr: { title: filament.name }"
+                                            ></span>
+                                        </div>
+                                        <div>
+                                            <span data-bind="text: filament.name, attr: { title: filament.name }"></span>
+                                            <br>
+                                            <i>
+                                                <span data-bind="text: filament.vendor.name, attr: { title: filament.vendor.name }"></span>
+                                            </i>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td data-bind="visible: $component.templateData.tableAttributeVisibility.material">
+                                    <span data-bind="text: filament.material, attr: { title: filament.material }"></span>
+                                </td>
+                                <td
+                                    data-bind="visible: $component.templateData.tableAttributeVisibility.weight" style="text-align: right;"
+                                >
+                                    <span data-bind="text: (remaining_weight ?? 0).toFixed(1), attr: {title: 'Remaining weight'}"></span><span data-bind="text: $component.constants.weight_unit"></span>
+                                    <br>
+                                    <span class="muted">
+                                        <span data-bind="text: used_weight.toFixed(1), attr: {title: 'Used weight'}"></span><span data-bind="text: $component.constants.weight_unit"></span>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    <!-- /ko -->
+                    <!-- ko if: (templateData.tableItemsOnCurrentPage().length === 0) -->
+                        <tbody>
+                            <tr>
+                                <td
+                                    colspan="4"
+                                    style="text-align: center;"
+                                >
+                                    <i class="muted">
+                                        No spools available
+                                    </i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    <!-- /ko -->
                 </table>
             </div>
         </div>
