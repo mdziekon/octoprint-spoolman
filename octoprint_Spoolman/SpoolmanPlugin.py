@@ -22,7 +22,7 @@ class SpoolmanPlugin(
         self._isInitialized = True
 
     # TODO: Investigate caching again in the future.
-    # Currently re-instatiating is fine, as there's nothing "heavy" in the ctor,
+    # Currently re-instantiating is fine, as there's nothing "heavy" in the ctor,
     # nor there's any useful persistence in the class itself.
     def getSpoolmanConnector(self):
         spoolmanInstanceUrl = self._settings.get([ SettingsKeys.SPOOLMAN_URL ])

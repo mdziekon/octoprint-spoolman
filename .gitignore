@@ -1,3 +1,16 @@
+*.pyc
+*.swp
+.idea
+*.iml
+build
+dist
+*.egg*
+.DS_Store
+*.zip
+
+# Docker volumes used during development
 docker-data/
+
+# Debugging stuff that might appear during development
 __pycache__
 octoprint_Spoolman/octoprint
