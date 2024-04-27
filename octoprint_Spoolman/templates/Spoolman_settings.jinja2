@@ -4,8 +4,8 @@
     class="form-horizontal"
 >
     <h3>
-        Spoolman 
-        <small>{{ _('Version') }}: 
+        Spoolman
+        <small>{{ _('Version') }}:
             <span data-bind="text: pluginSettings.installed_version"></span>
         </small>
     </h3>
@@ -20,14 +20,6 @@
                     data-toggle="tab"
                 >
                     General
-                </a>
-            </li>
-            <li>
-                <a
-                    href="#tab-spoolman-Debugging"
-                    data-toggle="tab"
-                >
-                    Debugging
                 </a>
             </li>
         </ul>
@@ -49,31 +41,6 @@
                             data-bind="textInput: pluginSettings.spoolmanUrl"
                             placeholder="http://192.168.1.100:7912"
                         >
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tab: Debugging -->
-            <div
-                id="tab-spoolman-Debugging"
-                class="tab-pane"
-            >
-                <div class="control-group">
-                    <label class="control-label">
-                        Logging enabled
-                    </label>
-                    <div class="controls">
-                        <div>
-                            <input
-                                type="checkbox"
-                                data-bind="checked: pluginSettings.logginIsEnabled"
-                            >
-                        </div>
-                        <div>
-                            <span class="help-inline">
-                                Hint: You need to restart your server after you changed the checkbox value.
-                            </span>
-                        </div>
                     </div>
                 </div>
             </div>
