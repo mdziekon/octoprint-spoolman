@@ -1,0 +1,5 @@
+include README.md
+include LICENSE
+recursive-include octoprint_Spoolman/templates *
+recursive-include octoprint_Spoolman/translations *
+recursive-include octoprint_Spoolman/static *
