@@ -103,7 +103,6 @@ class SpoolmanPlugin(
         settings = {
             SettingsKeys.INSTALLED_VERSION: self._plugin_version,
             SettingsKeys.SPOOLMAN_URL: "",
-            SettingsKeys.LOGGING_IS_ENABLED: False,
             SettingsKeys.SELECTED_SPOOL_IDS: {},
         }
 
