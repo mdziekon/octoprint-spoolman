@@ -32,6 +32,12 @@ or manually using this URL:
 
     https://github.com/mdziekon/octoprint-spoolman/archive/master.zip
 
+After installing the plugin, you have to set it up, by:
+- Providing your Spoolman's instance address.
+    - This should be either hostname or IP address (whatever works in your network) followed by the port (eg. 7912).
+    - Remember, your Spoolman's instance **has to be reachable in your local network**, otherwise the plugin won't work.
+    - For reference, see [Screenshots - Spoolman's setup](#spoolmans-setup)
+
 ## Screenshots
 
 ### Selected spools list
@@ -41,6 +47,10 @@ or manually using this URL:
 ### Spools' list
 
 ![Showcase - Spools' list](./extras/screenshots/showcase__spools_list.png)
+
+### Spoolman's setup
+
+![Showcase - Spoolman's setup](./extras/screenshots/showcase__spoolman_setup.png)
 
 ## Development
 
