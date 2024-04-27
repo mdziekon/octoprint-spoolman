@@ -167,7 +167,9 @@
                                 >
                                     <span data-bind="text: (remaining_weight ?? 0).toFixed(1), attr: {title: 'Remaining weight'}"></span><span data-bind="text: $component.constants.weight_unit"></span>
                                     <br>
-                                    <span data-bind="text: used_weight.toFixed(1), attr: {title: 'Used weight'}"></span><span data-bind="text: $component.constants.weight_unit"></span>
+                                    <span class="muted">
+                                        <span data-bind="text: used_weight.toFixed(1), attr: {title: 'Used weight'}"></span><span data-bind="text: $component.constants.weight_unit"></span>
+                                    </span>
                                 </td>
                             </tr>
                         </tbody>
