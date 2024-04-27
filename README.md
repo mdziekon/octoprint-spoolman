@@ -34,7 +34,7 @@ or manually using this URL:
 
 After installing the plugin, you have to set it up, by:
 - Providing your Spoolman's instance address.
-    - This should be either hostname or IP address (whatever works in your network) followed by the port (eg. 7912).
+    - This should be either hostname or IP address (whatever works in your network) followed by the port (eg. 7912). Ideally, you should use secure connection (HTTPS) to connect your Octoprint with Spoolman.
     - Remember, your Spoolman's instance **has to be reachable in your local network**, otherwise the plugin won't work.
     - For reference, see [Screenshots - Spoolman's setup](#spoolmans-setup)
 
