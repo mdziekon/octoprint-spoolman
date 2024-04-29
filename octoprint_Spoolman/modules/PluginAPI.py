@@ -7,6 +7,7 @@ import flask
 import http
 
 from ..common.settings import SettingsKeys
+from .PrinterUtils import PrinterUtils
 
 class PluginAPI(octoprint.plugin.BlueprintPlugin):
     def is_blueprint_csrf_protected(self):
@@ -82,4 +83,58 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
 
         return flask.jsonify({
             "data": {}
+        })
+
+    @octoprint.plugin.BlueprintPlugin.route("/self/current-job-requirements", methods=["GET"])
+    def handleGetCurrentJobRequirements(self):
+        self._logger.debug("API: GET /self/current-job-requirements")
+
+        # TODO: Ideally, this should be pulled from cache
+        getSpoolsAvailableResult = self.getSpoolmanConnector().handleGetSpoolsAvailable()
+
+        if getSpoolsAvailableResult.get('error', False):
+            response = flask.jsonify(getSpoolsAvailableResult)
+            response.status = http.HTTPStatus.BAD_REQUEST
+
+            return response
+
+        spoolsAvailable = getSpoolsAvailableResult["data"]["spools"]
+
+        jobFilamentUsage = self.getCurrentJobFilamentUsage()
+
+        # TODO: Handle no length data from getCurrentJobFilamentUsage()
+
+        selectedSpools = self._settings.get([SettingsKeys.SELECTED_SPOOL_IDS])
+
+        result = {
+            "tools": {}
+        }
+
+        for toolIdx, toolExtrusionLength in enumerate(jobFilamentUsage['jobFilamentLengthsPerTool']):
+            toolSpoolId = selectedSpools[str(toolIdx)]["spoolId"]
+
+            toolSpool = next(
+                (spool for spool in spoolsAvailable if str(spool["id"]) == toolSpoolId),
+                None
+            )
+
+            # TODO: Handle non-existent filament
+
+            filamentDensity = toolSpool["filament"]["density"]
+            filamentDiameter = toolSpool["filament"]["diameter"]
+
+            toolExtrusionWeight = PrinterUtils.getFilamentWeight(
+                length = toolExtrusionLength,
+                density = filamentDensity,
+                diameter = filamentDiameter,
+            )
+
+            result["tools"][str(toolIdx)] = {
+                "spoolId": toolSpool["id"],
+                "filamentLength": toolExtrusionLength,
+                "filamentWeight": toolExtrusionWeight,
+            }
+
+        return flask.jsonify({
+            "data": result,
         })
