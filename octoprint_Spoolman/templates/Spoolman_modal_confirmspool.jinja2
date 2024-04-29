@@ -47,9 +47,25 @@
         <!-- /ko -->
 
         <div data-bind="visible: (!templateData.isLoadingData() && !templateData.loadingError())">
-            <div class="alert alert-block alert-info">
-                Please verify the spools selection for the print job.
-            </div>
+            <!-- ko if: (templateData.detectedProblems().length === 0) -->
+                <div class="alert alert-block alert-info">
+                    Please verify the spools selection for the print job.
+                </div>
+            <!-- /ko -->
+            <!-- ko if: (templateData.detectedProblems().length !== 0) -->
+                <div class="alert alert-block alert-danger">
+                    <div>
+                        Spoolman integration has detected potential problems with selected spools. Please verify these problem before proceeding with print job.
+                    </div>
+                    <div>
+                        <ul style="margin-bottom: 0; margin-top: 0.5em;">
+                            <!-- ko if: (templateData.detectedProblems().includes(constants.filament_problems.NOT_ENOUGH_FILAMENT)) -->
+                                <li>One of the selected spools does not have enough filament.</li>
+                            <!-- /ko -->
+                        </ul>
+                    </div>
+                </div>
+            <!-- /ko -->
 
             <div data-bind="foreach: templateData.selectedSpoolsByToolIdx">
                 <div class="tool-row">
@@ -91,19 +107,23 @@
                             <div class="text-right">
                                 <span>
                                     Required:
-                                    <span
-                                        data-bind="text: ($data.required_weight ?? 0).toFixed(1)"
-                                        title="Required weight"
-                                    ></span><span data-bind="text: $root.constants.weight_unit"></span>
+                                    <strong data-bind="class: ($data.filamentUsage?.isEnough ?? false) ? 'text-success' : 'text-error'">
+                                        <span
+                                            data-bind="text: ($data.filamentUsage?.weight ?? 0).toFixed(1)"
+                                            title="Required weight"
+                                        ></span><span data-bind="text: $root.constants.weight_unit"></span>
+                                    </strong>
                                 </span>
                             </div>
                             <div class="text-right">
                                 <span>
                                     Remaining on spool:
-                                    <span
-                                        data-bind="text: (spoolData.remaining_weight ?? 0).toFixed(1)"
-                                        title="Remaining weight"
-                                    ></span><span data-bind="text: $root.constants.weight_unit"></span>
+                                    <strong>
+                                        <span
+                                            data-bind="text: (spoolData.remaining_weight ?? 0).toFixed(1)"
+                                            title="Remaining weight"
+                                        ></span><span data-bind="text: $root.constants.weight_unit"></span>
+                                    </strong>
                                 </span>
                             </div>
                         </div>

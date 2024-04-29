@@ -3,6 +3,7 @@ from octoprint.events import Events
 
 from .modules.PluginAPI import PluginAPI
 from .modules.PrinterHandler import PrinterHandler
+from .modules.PrinterUtils import PrinterUtils
 from .modules.SpoolmanConnector import SpoolmanConnector
 from .common.settings import SettingsKeys
 from .common.events import PluginEvents
@@ -15,6 +16,7 @@ class SpoolmanPlugin(
     octoprint.plugin.EventHandlerPlugin,
     PluginAPI,
     PrinterHandler,
+    PrinterUtils,
 ):
     _isInitialized = False
 

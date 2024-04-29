@@ -54,17 +54,28 @@ $(() => {
 
             refreshModalLayout();
 
-            const spoolmanSpoolsResult = await pluginSpoolmanApi.getSpoolmanSpools();
+            const [
+                currentJobRequirementsResult,
+                spoolmanSpoolsResult,
+            ] = await Promise.all([
+                pluginSpoolmanApi.getCurrentJobRequirements(),
+                pluginSpoolmanApi.getSpoolmanSpools(),
+            ]);
 
             self.templateData.isLoadingData(false);
 
-            if (!spoolmanSpoolsResult.isSuccess) {
-                self.templateData.loadingError(spoolmanSpoolsResult.error.response.error)
+            if (
+                !currentJobRequirementsResult.isSuccess ||
+                !spoolmanSpoolsResult.isSuccess
+            ) {
+                // TODO: Decide which error should be displayed
+                self.templateData.loadingError(spoolmanSpoolsResult.error.response.error);
 
                 return;
             }
 
             const spoolmanSpools = spoolmanSpoolsResult.payload.response.data.spools;
+            const currentJobRequirements = currentJobRequirementsResult.payload.response.data;
 
             const currentProfileData = self.settingsViewModel().printerProfiles.currentProfileData();
             const currentExtrudersCount = (
@@ -82,12 +93,35 @@ $(() => {
                 const spoolId = selectedSpoolIds[extruderIdx]?.spoolId();
 
                 const spoolData = spoolmanSpools.find((spool) => String(spool.id) === spoolId);
+                // TODO: Handle cases where this is missing
+                const toolFilamentUsage = currentJobRequirements.tools[extruderIdx];
+
+                const isEnoughFilamentAvailable = toolFilamentUsage.filamentWeight <= spoolData.remaining_weight;
 
                 return {
                     spoolId,
                     spoolData,
+                    filamentUsage: {
+                        length: toolFilamentUsage.filamentLength,
+                        weight: toolFilamentUsage.filamentWeight,
+                        isEnough: isEnoughFilamentAvailable,
+                    },
                 };
             });
+
+            const detectedProblems = [
+                (
+                    selectedSpools.some((spool) => !spool.filamentUsage.isEnough)
+                        ? self.constants.filament_problems.NOT_ENOUGH_FILAMENT
+                        : undefined
+                ),
+                // TODO: Detect tool without spool selected
+                // TODO: Detect missing extruders?
+                // TODO: Detect missing spool data
+            ].filter((value) => Boolean(value));
+
+            self.templateData.detectedProblems(detectedProblems);
+            self.templateData.detectedProblems.valueHasMutated();
 
             self.templateData.selectedSpoolsByToolIdx(selectedSpools);
             self.templateData.selectedSpoolsByToolIdx.valueHasMutated();
@@ -119,6 +153,10 @@ $(() => {
         /** Bindings for the template */
         self.constants = {
             weight_unit: 'g',
+
+            filament_problems: {
+                NOT_ENOUGH_FILAMENT: 'NOT_ENOUGH_FILAMENT',
+            },
         };
         self.templateApi = {
             handleStartPrint,
@@ -129,6 +167,7 @@ $(() => {
             isLoadingData: ko.observable(true),
             loadingError: ko.observable(undefined),
 
+            detectedProblems: ko.observable([]),
             selectedSpoolsByToolIdx: ko.observable([]),
         };
         /** -- end of bindings -- */
