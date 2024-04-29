@@ -1,0 +1,141 @@
+<template id="spoolman-modal-confirmSpool-template">
+<div
+    id="spoolman_modal_confirmspool"
+    class="modal hide fade-in"
+>
+    <div class="modal-header">
+        <a
+            href="#"
+            class="close"
+            data-dismiss="modal"
+            aria-hidden="true"
+            title="Cancel"
+        >
+            &times;
+        </a>
+        <h3>Confirm spool selection</h3>
+    </div>
+    <div class="modal-body">
+        <div
+            data-bind="visible: templateData.isLoadingData()"
+            style="margin: 16px; text-align: center;"
+        >
+            <i class='fa fa-2xl fa-spinner fa-spin' ></i>
+        </div>
+
+        <!-- ko if: (!templateData.isLoadingData() && templateData.loadingError()) -->
+            <div>
+                <!-- ko if: (templateData.loadingError().code === 'spoolman_api__instance_url_empty') -->
+                    <div class="alert alert-block alert-info">
+                        Spoolman plugin has not been configured yet
+                    </div>
+                <!-- /ko -->
+                <!-- ko if: (templateData.loadingError().code ?? 'unknown') === 'unknown' -->
+                    <div class="alert alert-block alert-error margin-bottom-mini">
+                        Unknown error
+                    </div>
+                    <div>
+                        <button
+                            class="btn btn-mini btn-block btn-warning"
+                            data-bind="click: templateApi.handleTryAgainOnError.bind($data)"
+                        >
+                            Try again
+                        </button>
+                    </div>
+                <!-- /ko -->
+            </div>
+        <!-- /ko -->
+
+        <div data-bind="visible: (!templateData.isLoadingData() && !templateData.loadingError())">
+            <div class="alert alert-block alert-info">
+                Please verify the spools selection for the print job.
+            </div>
+
+            <div data-bind="foreach: templateData.selectedSpoolsByToolIdx">
+                <div class="tool-row">
+                    <!-- ko ifnot: $data.spoolId && $data.spoolData -->
+                        <div class="spool-label">
+                            <!-- ko if: $data.spoolId -->
+                                <i class="text-error">Unknown spool selected</i>
+                            <!-- /ko -->
+                            <!-- ko ifnot: $data.spoolId -->
+                                <i class="muted">No spool selected</i>
+                            <!-- /ko -->
+                        </div>
+                    <!-- /ko -->
+
+                    <!-- ko if: $data.spoolData -->
+                        <div style="display: flex;">
+                            <!-- ko if: $parent.templateData.selectedSpoolsByToolIdx().length > 1 -->
+                                <div class="tool-idx" style="margin-right: 0.25em;">
+                                    <b>Tool #<span data-bind="text: $index()"></span>:</b>
+                                </div>
+                            <!-- /ko -->
+
+                            <span
+                                class="color-preview"
+                                style="flex-shrink: 0;"
+                                data-bind="style: { 'background-color': '#' + spoolData.filament.color_hex }, attr: { title: spoolData.filament.name }"
+                            ></span>
+                            <div class="spool-label">
+                                <!-- ko if: spoolData.filament.material -->
+                                <span>[<span data-bind="text: spoolData.filament.material"></span>]</span>
+                                <!-- /ko -->
+                                <span data-bind="text: spoolData.filament.name"></span>
+                                <!-- ko if: spoolData.filament.vendor.name -->
+                                <span>(<span data-bind="text: spoolData.filament.vendor.name"></span>)</span>
+                                <!-- /ko -->
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; flex-shrink: 0;">
+                            <div class="text-right">
+                                <span>
+                                    Required:
+                                    <span
+                                        data-bind="text: ($data.required_weight ?? 0).toFixed(1)"
+                                        title="Required weight"
+                                    ></span><span data-bind="text: $root.constants.weight_unit"></span>
+                                </span>
+                            </div>
+                            <div class="text-right">
+                                <span>
+                                    Remaining on spool:
+                                    <span
+                                        data-bind="text: (spoolData.remaining_weight ?? 0).toFixed(1)"
+                                        title="Remaining weight"
+                                    ></span><span data-bind="text: $root.constants.weight_unit"></span>
+                                </span>
+                            </div>
+                        </div>
+                    <!-- /ko -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div class="control-group" style="margin-bottom: 0">
+            <div class="controls row-fluid">
+                <span class="span4 text-left">
+                </span>
+                <span class="span8 text-right">
+                    <a
+                        href="#"
+                        class="btn"
+                        data-dismiss="modal"
+                        aria-hidden="true"
+                    >
+                        Cancel
+                    </a>
+
+                    <button
+                        class="btn btn-danger"
+                        data-bind="click: templateApi.handleStartPrint"
+                    >
+                        Start print
+                    </button>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+</template>

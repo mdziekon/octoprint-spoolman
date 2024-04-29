@@ -10,9 +10,11 @@ $(() => {
         };
 
         self.settingsViewModel = params[0];
+        self.printerStateViewModel = params[1];
 
         self.modals = {
             selectSpool: () => $(SpoolmanModalSelectSpoolComponent.modalSelector),
+            confirmSpool: () => $(SpoolmanModalConfirmSpoolComponent.modalSelector),
         };
 
         const getPluginSettings = () => {
@@ -90,6 +92,10 @@ $(() => {
             self.templateData.modals.selectSpool.toolIdx(toolIdx);
 
             self.modals.selectSpool().modal("show");
+        };
+
+        const handleOpenSpoolConfirmation = async () => {
+            self.modals.confirmSpool().modal("show");
         };
 
         /**
@@ -198,12 +204,41 @@ $(() => {
                     toolIdx: ko.observable(undefined),
                     eventsSink: ko.observable(),
                 },
+                confirmSpool: {
+                    eventsSink: ko.observable(),
+                },
             },
         };
         /** -- end of bindings -- */
 
+        const monkeypatchOctoprintUI = () => {
+            const origStartPrintFunction = self.printerStateViewModel.print;
+
+            const newStartPrintFunction = async function confirmSpoolsBeforeStartPrint() {
+                // TODO: Allow users to change this flag in plugin's settings
+                const shouldConfirmSpoolsSelection = true;
+
+                if (!shouldConfirmSpoolsSelection) {
+                    return origStartPrintFunction();
+                }
+
+                handleOpenSpoolConfirmation();
+
+                const subscription = self.templateData.modals.confirmSpool.eventsSink.subscribe((newEvent) => {
+                    if (newEvent.type === 'onConfirm') {
+                        origStartPrintFunction();
+                    }
+
+                    subscription.dispose();
+                });
+            };
+
+            self.printerStateViewModel.print = newStartPrintFunction;
+        };
+
         self.onBeforeBinding = () => {
             SpoolmanModalSelectSpoolComponent.registerComponent();
+            SpoolmanModalConfirmSpoolComponent.registerComponent();
 
             self.templateData.modals.selectSpool.eventsSink.subscribe((newEvent) => {
                 if (newEvent.type === 'onSelectSpoolForTool') {
@@ -216,6 +251,7 @@ $(() => {
 
             initView();
             initSocket();
+            monkeypatchOctoprintUI();
 
             previousSettings.spoolmanUrl = getPluginSettings().spoolmanUrl();
 
@@ -255,7 +291,8 @@ $(() => {
     OCTOPRINT_VIEWMODELS.push({
         construct: SpoolmanSidebarViewModel,
         dependencies: [
-            "settingsViewModel"
+            "settingsViewModel",
+            "printerStateViewModel",
         ],
         elements: [
             document.querySelector("#sidebar_spoolman"),
