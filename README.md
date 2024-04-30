@@ -51,6 +51,12 @@ After installing the plugin, you have to set it up, by:
 
 ![Showcase - Spools' list](./extras/screenshots/showcase__spools_list.png)
 
+### Spools verification
+
+![Showcase - Spools verification (success, multi-tool)](./extras/screenshots/showcase__verification_success_multitool.png)
+
+![Showcase - Spools verification (error, single-tool)](./extras/screenshots/showcase__verification_error.png)
+
 ### Spoolman's setup
 
 ![Showcase - Spoolman's setup](./extras/screenshots/showcase__spoolman_setup.png)
