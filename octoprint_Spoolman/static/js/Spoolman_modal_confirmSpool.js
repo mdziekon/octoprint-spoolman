@@ -127,7 +127,7 @@ $(() => {
                 }
 
                 const isToolMissingSelection = !toolFilamentUsage.spoolId;
-                const isEnoughFilamentAvailable = isToolMissingSelection
+                const isEnoughFilamentAvailable = isToolMissingSelection || !spoolData
                     ? undefined
                     : toolFilamentUsage.filamentWeight <= spoolData.remaining_weight;
 
@@ -166,7 +166,6 @@ $(() => {
                         ? self.constants.filament_problems.TOOLS_COUNT_MISMATCH
                         : undefined
                 ),
-                // TODO: Detect missing spool data
             ].filter((value) => Boolean(value));
 
             self.templateData.detectedProblems(detectedProblems);
