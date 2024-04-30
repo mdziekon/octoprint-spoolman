@@ -46,9 +46,6 @@ $(() => {
                 return;
             }
 
-            // TODO: Add filament requirements fetcher
-            // TODO: Add error handling for modal
-
             self.templateData.loadingError(undefined);
             self.templateData.isLoadingData(true);
 
@@ -68,8 +65,14 @@ $(() => {
                 !currentJobRequirementsResult.isSuccess ||
                 !spoolmanSpoolsResult.isSuccess
             ) {
+                const error = (
+                    !currentJobRequirementsResult.isSuccess
+                        ? currentJobRequirementsResult.error.response.error
+                        : spoolmanSpoolsResult.error.response.error
+                );
+
                 // TODO: Decide which error should be displayed
-                self.templateData.loadingError(spoolmanSpoolsResult.error.response.error);
+                self.templateData.loadingError(error);
 
                 return;
             }
@@ -96,11 +99,20 @@ $(() => {
                 // TODO: Handle cases where this is missing
                 const toolFilamentUsage = currentJobRequirements.tools[extruderIdx];
 
-                const isEnoughFilamentAvailable = toolFilamentUsage.filamentWeight <= spoolData.remaining_weight;
+                const isToolInUse = Boolean(toolFilamentUsage);
+
+                const isToolMissingSelection = isToolInUse && !toolFilamentUsage.spoolId;
+                const isEnoughFilamentAvailable = (!isToolInUse || !toolFilamentUsage.spoolId)
+                    ? undefined
+                    : toolFilamentUsage.filamentWeight <= spoolData.remaining_weight;
 
                 return {
                     spoolId,
                     spoolData,
+                    toolInfo: {
+                        isToolInUse,
+                        isToolMissingSelection,
+                    },
                     filamentUsage: {
                         length: toolFilamentUsage.filamentLength,
                         weight: toolFilamentUsage.filamentWeight,
@@ -111,11 +123,15 @@ $(() => {
 
             const detectedProblems = [
                 (
-                    selectedSpools.some((spool) => !spool.filamentUsage.isEnough)
+                    selectedSpools.some((spool) => spool.filamentUsage.isEnough === false)
                         ? self.constants.filament_problems.NOT_ENOUGH_FILAMENT
                         : undefined
                 ),
-                // TODO: Detect tool without spool selected
+                (
+                    selectedSpools.some((spool) => spool.toolInfo.isToolMissingSelection === true)
+                        ? self.constants.filament_problems.MISSING_SPOOL_SELECTION
+                        : undefined
+                ),
                 // TODO: Detect missing extruders?
                 // TODO: Detect missing spool data
             ].filter((value) => Boolean(value));
@@ -146,6 +162,7 @@ $(() => {
         const handleForceRefresh = async () => {
             pluginSpoolmanApi.getSpoolmanSpools.invalidate();
         };
+
         const handleTryAgainOnError = async () => {
             await handleForceRefresh();
         };
@@ -153,9 +170,11 @@ $(() => {
         /** Bindings for the template */
         self.constants = {
             weight_unit: 'g',
+            length_unit: 'mm',
 
             filament_problems: {
                 NOT_ENOUGH_FILAMENT: 'NOT_ENOUGH_FILAMENT',
+                MISSING_SPOOL_SELECTION: 'MISSING_SPOOL_SELECTION',
             },
         };
         self.templateApi = {
@@ -175,6 +194,12 @@ $(() => {
         $(document).on("shown", SpoolmanModalConfirmSpoolComponent.modalSelector, async () => {
             self._isVisible = true;
 
+            /**
+             * getCurrentJobRequirements() always fetches latest spool data,
+             * so to keep in sync, we should invalidate cached spools.
+             * TODO: improve this to prevent cache invalidation.
+             */
+            void handleForceRefresh();
             await handleDisplayModal();
         });
         $(document).on("hidden", SpoolmanModalConfirmSpoolComponent.modalSelector, async () => {

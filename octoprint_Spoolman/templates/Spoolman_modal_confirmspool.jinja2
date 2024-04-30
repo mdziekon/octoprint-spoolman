@@ -62,6 +62,9 @@
                             <!-- ko if: (templateData.detectedProblems().includes(constants.filament_problems.NOT_ENOUGH_FILAMENT)) -->
                                 <li>One of the selected spools does not have enough filament.</li>
                             <!-- /ko -->
+                            <!-- ko if: (templateData.detectedProblems().includes(constants.filament_problems.MISSING_SPOOL_SELECTION)) -->
+                                <li>One of the tools is missing spool selection.</li>
+                            <!-- /ko -->
                         </ul>
                     </div>
                 </div>
@@ -70,13 +73,44 @@
             <div data-bind="foreach: templateData.selectedSpoolsByToolIdx">
                 <div class="tool-row">
                     <!-- ko ifnot: $data.spoolId && $data.spoolData -->
-                        <div class="spool-label">
-                            <!-- ko if: $data.spoolId -->
-                                <i class="text-error">Unknown spool selected</i>
+                        <div style="display: flex;">
+                            <!-- ko if: $parent.templateData.selectedSpoolsByToolIdx().length > 1 -->
+                                <div class="tool-idx" style="margin-right: 0.25em;">
+                                    <b>Tool #<span data-bind="text: $index()"></span>:</b>
+                                </div>
                             <!-- /ko -->
-                            <!-- ko ifnot: $data.spoolId -->
-                                <i class="muted">No spool selected</i>
-                            <!-- /ko -->
+
+                            <div class="spool-label">
+                                <!-- ko if: $data.spoolId -->
+                                    <i class="text-error">Unknown spool selected</i>
+                                <!-- /ko -->
+                                <!-- ko ifnot: $data.spoolId -->
+                                    <i class="muted">No spool selected</i>
+                                <!-- /ko -->
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; flex-shrink: 0;">
+                            <div class="text-right">
+                                <span>
+                                    Required:
+                                    <!-- ko if: ($data.filamentUsage?.isEnough !== undefined) -->
+                                        <strong data-bind="class: ($data.filamentUsage?.isEnough ?? false) ? 'text-success' : 'text-error'">
+                                            <span
+                                                data-bind="text: ($data.filamentUsage?.weight ?? 0).toFixed(1)"
+                                                title="Required weight"
+                                            ></span><span data-bind="text: $root.constants.weight_unit"></span>
+                                        </strong>
+                                    <!-- /ko -->
+                                    <!-- ko if: ($data.filamentUsage?.isEnough === undefined) -->
+                                        <strong class="text-error">
+                                            <span
+                                                data-bind="text: ($data.filamentUsage?.length ?? 0).toFixed(1)"
+                                                title="Required length"
+                                            ></span><span data-bind="text: $root.constants.length_unit"></span>
+                                        </strong>
+                                    <!-- /ko -->
+                                </span>
+                            </div>
                         </div>
                     <!-- /ko -->
 

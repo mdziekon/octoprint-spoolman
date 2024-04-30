@@ -118,7 +118,14 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
                 None
             )
 
-            # TODO: Handle non-existent filament
+            if not toolSpool:
+                result["tools"][str(toolIdx)] = {
+                    "spoolId": None,
+                    "filamentLength": toolExtrusionLength,
+                    "filamentWeight": None,
+                }
+
+                continue
 
             filamentDensity = toolSpool["filament"]["density"]
             filamentDiameter = toolSpool["filament"]["diameter"]
