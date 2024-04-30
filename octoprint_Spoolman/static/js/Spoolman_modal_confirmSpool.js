@@ -132,7 +132,11 @@ $(() => {
                         ? self.constants.filament_problems.MISSING_SPOOL_SELECTION
                         : undefined
                 ),
-                // TODO: Detect missing extruders?
+                (
+                    Object.values(currentJobRequirements.tools).length > selectedSpools.length
+                        ? self.constants.filament_problems.TOOLS_COUNT_MISMATCH
+                        : undefined
+                ),
                 // TODO: Detect missing spool data
             ].filter((value) => Boolean(value));
 
@@ -175,6 +179,7 @@ $(() => {
             filament_problems: {
                 NOT_ENOUGH_FILAMENT: 'NOT_ENOUGH_FILAMENT',
                 MISSING_SPOOL_SELECTION: 'MISSING_SPOOL_SELECTION',
+                TOOLS_COUNT_MISMATCH: 'TOOLS_COUNT_MISMATCH',
             },
         };
         self.templateApi = {

@@ -65,6 +65,9 @@
                             <!-- ko if: (templateData.detectedProblems().includes(constants.filament_problems.MISSING_SPOOL_SELECTION)) -->
                                 <li>One of the tools is missing spool selection.</li>
                             <!-- /ko -->
+                            <!-- ko if: (templateData.detectedProblems().includes(constants.filament_problems.TOOLS_COUNT_MISMATCH)) -->
+                                <li>Selected print job uses different count of extruders than configured for current printer profile.</li>
+                            <!-- /ko -->
                         </ul>
                     </div>
                 </div>
