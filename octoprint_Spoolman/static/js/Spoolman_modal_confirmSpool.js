@@ -28,6 +28,7 @@ $(() => {
         self.eventsSink = params.eventsSink;
 
         self._isVisible = false;
+        self._isSelfInvalidatingCache = false;
 
         self.modals = {
             confirmSpool: $(SpoolmanModalConfirmSpoolComponent.modalSelector),
@@ -228,16 +229,28 @@ $(() => {
         $(document).on("shown", SpoolmanModalConfirmSpoolComponent.modalSelector, async () => {
             self._isVisible = true;
 
-            /**
-             * getCurrentJobRequirements() always fetches latest spool data,
-             * so to keep in sync, we should invalidate cached spools.
-             * TODO: improve this to prevent cache invalidation.
-             */
-            void handleForceRefresh();
+            self._isSelfInvalidatingCache = true;
+
+            try {
+                /**
+                 * getCurrentJobRequirements() always fetches latest spool data,
+                 * so to keep in sync, we should invalidate cached spools.
+                 * TODO: improve this to prevent cache invalidation.
+                 */
+                await handleForceRefresh();
+            } finally {
+                self._isSelfInvalidatingCache = false;
+            }
+
             await handleDisplayModal();
         });
         $(document).on("hidden", SpoolmanModalConfirmSpoolComponent.modalSelector, async () => {
             self._isVisible = false;
+
+            self.templateData.detectedProblems([]);
+            self.templateData.selectedSpoolsByToolIdx([]);
+            self.templateData.loadingError(undefined);
+            self.templateData.isLoadingData(true);
 
             self.eventsSink({
                 type: 'onHidden',
@@ -246,6 +259,10 @@ $(() => {
 
         const init = () => {
             pluginSpoolmanApi.cache.onResourcesInvalidated([ "getSpoolmanSpools" ], () => {
+                if (self._isSelfInvalidatingCache) {
+                    return;
+                }
+
                 void refreshView();
             });
         };
