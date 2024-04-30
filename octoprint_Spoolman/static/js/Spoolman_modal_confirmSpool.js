@@ -46,6 +46,8 @@ $(() => {
                 return;
             }
 
+            self.templateData.detectedProblems([]);
+            self.templateData.selectedSpoolsByToolIdx([]);
             self.templateData.loadingError(undefined);
             self.templateData.isLoadingData(true);
 
@@ -79,6 +81,17 @@ $(() => {
 
             const spoolmanSpools = spoolmanSpoolsResult.payload.response.data.spools;
             const currentJobRequirements = currentJobRequirementsResult.payload.response.data;
+
+            if (!currentJobRequirements.isFilamentUsageAvailable) {
+                const detectedProblems = [ self.constants.filament_problems.NO_FILAMENT_USAGE_DATA ];
+
+                self.templateData.detectedProblems(detectedProblems);
+                self.templateData.detectedProblems.valueHasMutated();
+
+                refreshModalLayout();
+
+                return;
+            }
 
             const currentProfileData = self.settingsViewModel().printerProfiles.currentProfileData();
             const currentExtrudersCount = (
@@ -192,6 +205,7 @@ $(() => {
             length_unit: 'mm',
 
             filament_problems: {
+                NO_FILAMENT_USAGE_DATA: 'NO_FILAMENT_USAGE_DATA',
                 NOT_ENOUGH_FILAMENT: 'NOT_ENOUGH_FILAMENT',
                 MISSING_SPOOL_SELECTION: 'MISSING_SPOOL_SELECTION',
                 TOOLS_COUNT_MISMATCH: 'TOOLS_COUNT_MISMATCH',

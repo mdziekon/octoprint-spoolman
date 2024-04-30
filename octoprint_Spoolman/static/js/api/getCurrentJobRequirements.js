@@ -6,6 +6,7 @@
  *
  * @typedef {Object} GetCurrentJobRequirementsResponse
  * @property {Object} data
+ * @property {boolean} data.isFilamentUsageAvailable
  * @property {Record<string, ToolData>} data.tools
  */
 

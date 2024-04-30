@@ -102,14 +102,21 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
 
         jobFilamentUsage = self.getCurrentJobFilamentUsage()
 
-        # TODO: Handle no length data from getCurrentJobFilamentUsage()
+        result = {
+            "isFilamentUsageAvailable": False,
+            "tools": {},
+        }
+
+        if not jobFilamentUsage["jobHasFilamentLengthData"]:
+            return flask.jsonify({
+                "data": result,
+            })
+
+        result["isFilamentUsageAvailable"] = True
 
         selectedSpools = self._settings.get([SettingsKeys.SELECTED_SPOOL_IDS])
 
         # TODO: Move the code below to separate util
-        result = {
-            "tools": {}
-        }
 
         for toolIdx, toolExtrusionLength in enumerate(jobFilamentUsage['jobFilamentLengthsPerTool']):
             # In cases where tool has no spool selection (eg. new tool or print job tools mismatch)

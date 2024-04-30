@@ -53,24 +53,44 @@
                 </div>
             <!-- /ko -->
             <!-- ko if: (templateData.detectedProblems().length !== 0) -->
-                <div class="alert alert-block alert-danger">
-                    <div>
-                        Spoolman integration has detected potential problems with selected spools. Please verify these problems before proceeding with print job.
+                <!-- ko if: (templateData.detectedProblems().includes(constants.filament_problems.NO_FILAMENT_USAGE_DATA)) -->
+                    <div class="alert alert-block alert-danger">
+                        <div>
+                            Octoprint could not provide filament usage information for this print job.
+                        </div>
+                        <div>
+                            This either means that Octoprint did not finish the metadata analysis yet, or the print job file is unsupported by Octoprint's analysis tools.
+                        </div>
+                        <div style="margin-top: 1em;">
+                            <strong>Proceed with caution - Spoolman integration might still try to commit usage data!</strong>
+                        </div>
                     </div>
-                    <div>
-                        <ul style="margin-bottom: 0; margin-top: 0.5em;">
-                            <!-- ko if: (templateData.detectedProblems().includes(constants.filament_problems.NOT_ENOUGH_FILAMENT)) -->
-                                <li>One of the selected spools does not have enough filament.</li>
-                            <!-- /ko -->
-                            <!-- ko if: (templateData.detectedProblems().includes(constants.filament_problems.MISSING_SPOOL_SELECTION)) -->
-                                <li>One of the tools is missing spool selection.</li>
-                            <!-- /ko -->
-                            <!-- ko if: (templateData.detectedProblems().includes(constants.filament_problems.TOOLS_COUNT_MISMATCH)) -->
-                                <li>Selected print job uses different count of extruders than configured for current printer profile.</li>
-                            <!-- /ko -->
-                        </ul>
+                    <div class="alert alert-block alert-warning">
+                        <div>
+                            For unsupported files, it is recommended to deselect all spools to prevent incorrect data being committed to Spoolman.
+                        </div>
                     </div>
-                </div>
+                <!-- /ko -->
+                <!-- ko if: (!templateData.detectedProblems().includes(constants.filament_problems.NO_FILAMENT_USAGE_DATA)) -->
+                    <div class="alert alert-block alert-danger">
+                        <div>
+                            Spoolman integration has detected potential problems with selected spools. Please verify these problems before proceeding with print job.
+                        </div>
+                        <div>
+                            <ul style="margin-bottom: 0; margin-top: 0.5em;">
+                                <!-- ko if: (templateData.detectedProblems().includes(constants.filament_problems.NOT_ENOUGH_FILAMENT)) -->
+                                    <li>One of the selected spools does not have enough filament.</li>
+                                <!-- /ko -->
+                                <!-- ko if: (templateData.detectedProblems().includes(constants.filament_problems.MISSING_SPOOL_SELECTION)) -->
+                                    <li>One of the tools is missing spool selection.</li>
+                                <!-- /ko -->
+                                <!-- ko if: (templateData.detectedProblems().includes(constants.filament_problems.TOOLS_COUNT_MISMATCH)) -->
+                                    <li>Selected print job uses different count of extruders than configured for current printer profile.</li>
+                                <!-- /ko -->
+                            </ul>
+                        </div>
+                    </div>
+                <!-- /ko -->
             <!-- /ko -->
 
             <div data-bind="foreach: templateData.selectedSpoolsByToolIdx">
