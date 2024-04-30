@@ -99,7 +99,10 @@ $(() => {
                 // TODO: Handle cases where this is missing
                 const toolFilamentUsage = currentJobRequirements.tools[extruderIdx];
 
-                if (!toolFilamentUsage) {
+                if (
+                    !toolFilamentUsage ||
+                    toolFilamentUsage.filamentLength === 0
+                ) {
                     return {
                         spoolId,
                         spoolData,

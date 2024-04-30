@@ -33,6 +33,7 @@ class PrinterUtils:
         if ("analysis" not in metadata or "filament" not in metadata["analysis"]):
             return result
 
+        # Unused tools (eg. with 3 tools, only 1 & 3 are used) are still present on the list
         for toolName, toolData in metadata["analysis"]["filament"].items():
             toolIndex = int(toolName[4:])
 
