@@ -94,7 +94,7 @@
                         </div>
                         <div style="display: flex; flex-direction: column; flex-shrink: 0;">
                             <div class="text-right">
-                                <!-- ko if: ($data.toolInfo.isToolInUse) -->
+                                <!-- ko if: ($data.isToolInUse) -->
                                     <span>
                                         Required:
                                         <!-- ko if: ($data.filamentUsage.isEnough !== undefined) -->
@@ -115,7 +115,7 @@
                                         <!-- /ko -->
                                     </span>
                                 <!-- /ko -->
-                                <!-- ko if: (!$data.toolInfo.isToolInUse) -->
+                                <!-- ko if: (!$data.isToolInUse) -->
                                     <i class="muted">
                                         Unused
                                     </i>
@@ -148,7 +148,7 @@
                             </div>
                         </div>
                         <div style="display: flex; flex-direction: column; flex-shrink: 0;">
-                            <!-- ko if: ($data.toolInfo.isToolInUse) -->
+                            <!-- ko if: ($data.isToolInUse) -->
                                 <div class="text-right">
                                     <span>
                                         Required:
@@ -172,7 +172,7 @@
                                     </span>
                                 </div>
                                 <!-- /ko -->
-                                <!-- ko if: (!$data.toolInfo.isToolInUse) -->
+                                <!-- ko if: (!$data.isToolInUse) -->
                                     <i class="muted">
                                         Unused
                                     </i>

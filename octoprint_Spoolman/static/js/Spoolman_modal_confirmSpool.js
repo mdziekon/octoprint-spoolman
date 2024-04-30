@@ -106,11 +106,9 @@ $(() => {
                     return {
                         spoolId,
                         spoolData,
-                        toolInfo: {
-                            /** @type false */
-                            isToolInUse: false,
-                            isToolMissingSelection: undefined,
-                        },
+                        /** @type false */
+                        isToolInUse: false,
+                        isToolMissingSelection: undefined,
                         filamentUsage: undefined,
                     };
                 }
@@ -123,11 +121,9 @@ $(() => {
                 return {
                     spoolId,
                     spoolData,
-                    toolInfo: {
-                        /** @type true */
-                        isToolInUse: true,
-                        isToolMissingSelection,
-                    },
+                    /** @type true */
+                    isToolInUse: true,
+                    isToolMissingSelection,
                     filamentUsage: {
                         length: toolFilamentUsage.filamentLength,
                         weight: toolFilamentUsage.filamentWeight,
@@ -140,7 +136,7 @@ $(() => {
                 (
                     selectedSpools.some((spool) => {
                         return (
-                            spool.toolInfo.isToolInUse &&
+                            spool.isToolInUse &&
                             spool.filamentUsage.isEnough === false
                         );
                     })
@@ -148,7 +144,7 @@ $(() => {
                         : undefined
                 ),
                 (
-                    selectedSpools.some((spool) => spool.toolInfo.isToolMissingSelection === true)
+                    selectedSpools.some((spool) => spool.isToolMissingSelection === true)
                         ? self.constants.filament_problems.MISSING_SPOOL_SELECTION
                         : undefined
                 ),
