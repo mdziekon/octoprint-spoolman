@@ -19,10 +19,13 @@ An OctoPrint plugin integrating with [Spoolman](https://github.com/Donkie/Spoolm
     - [x] Select & deselect spools for specified tools / extruders
     - [x] Commit spools usage to Spoolman
 - [ ] Spools filtering
-- [ ] Check spools before starting a print
-    - [ ] Ask the user if the selected spool is correct
-    - [ ] Warn when no spool is selected
-    - [ ] Warn when selected spool does not have enough material
+- [x] Check spools before starting a print
+    - [x] Ask the user if the selected spool is correct
+    - [x] Warn when no spool is selected
+    - [x] Warn when selected spool does not have enough material
+    - [x] Warn on tools mismatach (multi-tool setups)
+- [ ] Advanced spools verification
+    - [ ] Configurable "safety buffer" (Bowden setups)
     - [ ] Warn when wrong spool material has been selected (PrusaSlicer / OrcaSlicer gcodes)
 
 ## Setup
