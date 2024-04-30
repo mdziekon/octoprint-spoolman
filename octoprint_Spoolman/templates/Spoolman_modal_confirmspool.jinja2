@@ -94,25 +94,32 @@
                         </div>
                         <div style="display: flex; flex-direction: column; flex-shrink: 0;">
                             <div class="text-right">
-                                <span>
-                                    Required:
-                                    <!-- ko if: ($data.filamentUsage?.isEnough !== undefined) -->
-                                        <strong data-bind="class: ($data.filamentUsage?.isEnough ?? false) ? 'text-success' : 'text-error'">
-                                            <span
-                                                data-bind="text: ($data.filamentUsage?.weight ?? 0).toFixed(1)"
-                                                title="Required weight"
-                                            ></span><span data-bind="text: $root.constants.weight_unit"></span>
-                                        </strong>
-                                    <!-- /ko -->
-                                    <!-- ko if: ($data.filamentUsage?.isEnough === undefined) -->
-                                        <strong class="text-error">
-                                            <span
-                                                data-bind="text: ($data.filamentUsage?.length ?? 0).toFixed(1)"
-                                                title="Required length"
-                                            ></span><span data-bind="text: $root.constants.length_unit"></span>
-                                        </strong>
-                                    <!-- /ko -->
-                                </span>
+                                <!-- ko if: ($data.toolInfo.isToolInUse) -->
+                                    <span>
+                                        Required:
+                                        <!-- ko if: ($data.filamentUsage.isEnough !== undefined) -->
+                                            <strong data-bind="class: ($data.filamentUsage.isEnough ?? false) ? 'text-success' : 'text-error'">
+                                                <span
+                                                    data-bind="text: ($data.filamentUsage.weight ?? 0).toFixed(1)"
+                                                    title="Required weight"
+                                                ></span><span data-bind="text: $root.constants.weight_unit"></span>
+                                            </strong>
+                                        <!-- /ko -->
+                                        <!-- ko if: ($data.filamentUsage.isEnough === undefined) -->
+                                            <strong class="text-error">
+                                                <span
+                                                    data-bind="text: ($data.filamentUsage.length ?? 0).toFixed(1)"
+                                                    title="Required length"
+                                                ></span><span data-bind="text: $root.constants.length_unit"></span>
+                                            </strong>
+                                        <!-- /ko -->
+                                    </span>
+                                <!-- /ko -->
+                                <!-- ko if: (!$data.toolInfo.isToolInUse) -->
+                                    <i class="muted">
+                                        Unused
+                                    </i>
+                                <!-- /ko -->
                             </div>
                         </div>
                     <!-- /ko -->
@@ -141,28 +148,35 @@
                             </div>
                         </div>
                         <div style="display: flex; flex-direction: column; flex-shrink: 0;">
-                            <div class="text-right">
-                                <span>
-                                    Required:
-                                    <strong data-bind="class: ($data.filamentUsage?.isEnough ?? false) ? 'text-success' : 'text-error'">
-                                        <span
-                                            data-bind="text: ($data.filamentUsage?.weight ?? 0).toFixed(1)"
-                                            title="Required weight"
-                                        ></span><span data-bind="text: $root.constants.weight_unit"></span>
-                                    </strong>
-                                </span>
-                            </div>
-                            <div class="text-right">
-                                <span>
-                                    Remaining on spool:
-                                    <strong>
-                                        <span
-                                            data-bind="text: (spoolData.remaining_weight ?? 0).toFixed(1)"
-                                            title="Remaining weight"
-                                        ></span><span data-bind="text: $root.constants.weight_unit"></span>
-                                    </strong>
-                                </span>
-                            </div>
+                            <!-- ko if: ($data.toolInfo.isToolInUse) -->
+                                <div class="text-right">
+                                    <span>
+                                        Required:
+                                        <strong data-bind="class: ($data.filamentUsage?.isEnough ?? false) ? 'text-success' : 'text-error'">
+                                            <span
+                                                data-bind="text: ($data.filamentUsage?.weight ?? 0).toFixed(1)"
+                                                title="Required weight"
+                                            ></span><span data-bind="text: $root.constants.weight_unit"></span>
+                                        </strong>
+                                    </span>
+                                </div>
+                                <div class="text-right">
+                                    <span>
+                                        Remaining on spool:
+                                        <strong>
+                                            <span
+                                                data-bind="text: (spoolData.remaining_weight ?? 0).toFixed(1)"
+                                                title="Remaining weight"
+                                            ></span><span data-bind="text: $root.constants.weight_unit"></span>
+                                        </strong>
+                                    </span>
+                                </div>
+                                <!-- /ko -->
+                                <!-- ko if: (!$data.toolInfo.isToolInUse) -->
+                                    <i class="muted">
+                                        Unused
+                                    </i>
+                                <!-- /ko -->
                         </div>
                     <!-- /ko -->
                 </div>

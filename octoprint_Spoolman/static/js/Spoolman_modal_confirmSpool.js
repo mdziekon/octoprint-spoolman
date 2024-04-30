@@ -99,10 +99,21 @@ $(() => {
                 // TODO: Handle cases where this is missing
                 const toolFilamentUsage = currentJobRequirements.tools[extruderIdx];
 
-                const isToolInUse = Boolean(toolFilamentUsage);
+                if (!toolFilamentUsage) {
+                    return {
+                        spoolId,
+                        spoolData,
+                        toolInfo: {
+                            /** @type false */
+                            isToolInUse: false,
+                            isToolMissingSelection: undefined,
+                        },
+                        filamentUsage: undefined,
+                    };
+                }
 
-                const isToolMissingSelection = isToolInUse && !toolFilamentUsage.spoolId;
-                const isEnoughFilamentAvailable = (!isToolInUse || !toolFilamentUsage.spoolId)
+                const isToolMissingSelection = !toolFilamentUsage.spoolId;
+                const isEnoughFilamentAvailable = isToolMissingSelection
                     ? undefined
                     : toolFilamentUsage.filamentWeight <= spoolData.remaining_weight;
 
@@ -110,7 +121,8 @@ $(() => {
                     spoolId,
                     spoolData,
                     toolInfo: {
-                        isToolInUse,
+                        /** @type true */
+                        isToolInUse: true,
                         isToolMissingSelection,
                     },
                     filamentUsage: {
@@ -123,7 +135,12 @@ $(() => {
 
             const detectedProblems = [
                 (
-                    selectedSpools.some((spool) => spool.filamentUsage.isEnough === false)
+                    selectedSpools.some((spool) => {
+                        return (
+                            spool.toolInfo.isToolInUse &&
+                            spool.filamentUsage.isEnough === false
+                        );
+                    })
                         ? self.constants.filament_problems.NOT_ENOUGH_FILAMENT
                         : undefined
                 ),
