@@ -108,6 +108,7 @@ class SpoolmanPlugin(
             SettingsKeys.INSTALLED_VERSION: self._plugin_version,
             SettingsKeys.SPOOLMAN_URL: "",
             SettingsKeys.SELECTED_SPOOL_IDS: {},
+            SettingsKeys.IS_PREPRINT_SPOOL_VERIFY_ENABLED: True,
         }
 
         return settings

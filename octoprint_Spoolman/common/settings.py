@@ -5,3 +5,4 @@ class SettingsKeys():
 	INSTALLED_VERSION = "installed_version"
 	SPOOLMAN_URL = "spoolmanUrl"
 	SELECTED_SPOOL_IDS = "selectedSpoolIds"
+	IS_PREPRINT_SPOOL_VERIFY_ENABLED = "isPreprintSpoolVerifyEnabled"

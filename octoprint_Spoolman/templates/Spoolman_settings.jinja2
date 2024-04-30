@@ -31,16 +31,46 @@
                 class="tab-pane active"
             >
                 <div class="control-group">
-                    <label class="control-label">
+                    <label
+                        class="control-label"
+                        for="settings-spoolman-general-spoolmanUrl"
+                    >
                         Spoolman instance URL
                     </label>
                     <div class="controls">
                         <input
+                            id="settings-spoolman-general-spoolmanUrl"
                             type="text"
                             class="input-xlarge text-left"
                             data-bind="textInput: pluginSettings.spoolmanUrl"
                             placeholder="https://192.168.1.100:7912"
                         >
+                    </div>
+                </div>
+                <div>
+                    <hr/>
+                </div>
+                <div class="control-group">
+                    <label
+                        class="control-label"
+                        for="settings-spoolman-general-isPreprintSpoolVerifyEnabled"
+                    >
+                        Verify spools before print
+                    </label>
+                    <div class="controls">
+                        <div>
+                            <input
+                                id="settings-spoolman-general-isPreprintSpoolVerifyEnabled"
+                                type="checkbox"
+                                class="text-left"
+                                data-bind="checked: pluginSettings.isPreprintSpoolVerifyEnabled"
+                            >
+                        </div>
+                        <div style="margin-top: 0.25em">
+                            <small>
+                                Spools verification displays a modal after clicking the 'Print' button, which presents all necessary info & warnings before the actual print job starts. It allows the user to either confirm (and start the print) or cancel the job. Verification consists of: checking remaining filament, checking spool selection, detecting tools count mismatch (multi-tool printers).
+                            </small>
+                        </div>
                     </div>
                 </div>
             </div>

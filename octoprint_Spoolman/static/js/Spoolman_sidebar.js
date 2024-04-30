@@ -215,8 +215,7 @@ $(() => {
             const origStartPrintFunction = self.printerStateViewModel.print;
 
             const newStartPrintFunction = async function confirmSpoolsBeforeStartPrint() {
-                // TODO: Allow users to change this flag in plugin's settings
-                const shouldConfirmSpoolsSelection = true;
+                const shouldConfirmSpoolsSelection = Boolean(getPluginSettings().isPreprintSpoolVerifyEnabled());
 
                 if (!shouldConfirmSpoolsSelection) {
                     return origStartPrintFunction();
