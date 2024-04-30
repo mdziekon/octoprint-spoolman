@@ -106,17 +106,24 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
 
         selectedSpools = self._settings.get([SettingsKeys.SELECTED_SPOOL_IDS])
 
+        # TODO: Move the code below to separate util
         result = {
             "tools": {}
         }
 
         for toolIdx, toolExtrusionLength in enumerate(jobFilamentUsage['jobFilamentLengthsPerTool']):
-            toolSpoolId = selectedSpools[str(toolIdx)]["spoolId"]
+            # In cases where tool has no spool selection (eg. new tool or print job tools mismatch)
+            # default to "spoolId = None"
+            toolSelectedSpoolData = selectedSpools.get(str(toolIdx), {})
+            toolSpoolId = toolSelectedSpoolData.get("spoolId", None)
 
-            toolSpool = next(
-                (spool for spool in spoolsAvailable if str(spool["id"]) == toolSpoolId),
-                None
-            )
+            toolSpool = None
+
+            if toolSpoolId != None:
+                toolSpool = next(
+                    (spool for spool in spoolsAvailable if str(spool["id"]) == toolSpoolId),
+                    None
+                )
 
             if not toolSpool:
                 result["tools"][str(toolIdx)] = {

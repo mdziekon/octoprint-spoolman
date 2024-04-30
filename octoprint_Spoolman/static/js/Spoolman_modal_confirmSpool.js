@@ -96,7 +96,6 @@ $(() => {
                 const spoolId = selectedSpoolIds[extruderIdx]?.spoolId();
 
                 const spoolData = spoolmanSpools.find((spool) => String(spool.id) === spoolId);
-                // TODO: Handle cases where this is missing
                 const toolFilamentUsage = currentJobRequirements.tools[extruderIdx];
 
                 if (
