@@ -102,60 +102,25 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
 
         jobFilamentUsage = self.getCurrentJobFilamentUsage()
 
-        result = {
-            "isFilamentUsageAvailable": False,
-            "tools": {},
-        }
-
         if not jobFilamentUsage["jobHasFilamentLengthData"]:
             return flask.jsonify({
-                "data": result,
+                "data": {
+                    "isFilamentUsageAvailable": False,
+                    "tools": {},
+                },
             })
-
-        result["isFilamentUsageAvailable"] = True
 
         selectedSpools = self._settings.get([SettingsKeys.SELECTED_SPOOL_IDS])
 
-        # TODO: Move the code below to separate util
-
-        for toolIdx, toolExtrusionLength in enumerate(jobFilamentUsage['jobFilamentLengthsPerTool']):
-            # In cases where tool has no spool selection (eg. new tool or print job tools mismatch)
-            # default to "spoolId = None"
-            toolSelectedSpoolData = selectedSpools.get(str(toolIdx), {})
-            toolSpoolId = toolSelectedSpoolData.get("spoolId", None)
-
-            toolSpool = None
-
-            if toolSpoolId != None:
-                toolSpool = next(
-                    (spool for spool in spoolsAvailable if str(spool["id"]) == toolSpoolId),
-                    None
-                )
-
-            if not toolSpool:
-                result["tools"][str(toolIdx)] = {
-                    "spoolId": None,
-                    "filamentLength": toolExtrusionLength,
-                    "filamentWeight": None,
-                }
-
-                continue
-
-            filamentDensity = toolSpool["filament"]["density"]
-            filamentDiameter = toolSpool["filament"]["diameter"]
-
-            toolExtrusionWeight = PrinterUtils.getFilamentWeight(
-                length = toolExtrusionLength,
-                density = filamentDensity,
-                diameter = filamentDiameter,
-            )
-
-            result["tools"][str(toolIdx)] = {
-                "spoolId": toolSpool["id"],
-                "filamentLength": toolExtrusionLength,
-                "filamentWeight": toolExtrusionWeight,
-            }
+        filamentUsageDataPerTool = PrinterUtils.getFilamentUsageDataPerTool(
+            filamentLengthPerTool = jobFilamentUsage['jobFilamentLengthsPerTool'],
+            selectedSpoolsPerTool = selectedSpools,
+            spoolsAvailable = spoolsAvailable,
+        )
 
         return flask.jsonify({
-            "data": result,
+            "data": {
+                "isFilamentUsageAvailable": True,
+                "tools": filamentUsageDataPerTool,
+            },
         })

@@ -74,7 +74,6 @@ $(() => {
                         : spoolmanSpoolsResult.error.response.error
                 );
 
-                // TODO: Decide which error should be displayed
                 self.templateData.loadingError(error);
 
                 return;
@@ -182,7 +181,7 @@ $(() => {
         };
 
         const handleStartPrint = async () => {
-            // TODO: Perform any pre-checks if necessary
+            // TODO (Feature): apply temperature overrides
 
             self.eventsSink({
                 type: 'onConfirm',

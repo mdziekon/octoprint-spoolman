@@ -45,6 +45,52 @@ class PrinterUtils:
         return result
 
     @staticmethod
+    def getFilamentUsageDataPerTool(filamentLengthPerTool, selectedSpoolsPerTool, spoolsAvailable):
+        usageDataPerTool = {}
+
+        for toolIdx, toolExtrusionLength in enumerate(filamentLengthPerTool):
+            toolIdxStr = str(toolIdx)
+
+            # In cases where tool has no spool selection (eg. new tool or print job tools mismatch)
+            # default to "spoolId = None"
+            toolSelectedSpoolData = selectedSpoolsPerTool.get(toolIdxStr, {})
+            toolSpoolId = toolSelectedSpoolData.get("spoolId", None)
+
+            toolSpool = None
+
+            if toolSpoolId != None:
+                toolSpool = next(
+                    (spool for spool in spoolsAvailable if str(spool["id"]) == toolSpoolId),
+                    None
+                )
+
+            if not toolSpool:
+                usageDataPerTool[toolIdxStr] = {
+                    "spoolId": None,
+                    "filamentLength": toolExtrusionLength,
+                    "filamentWeight": None,
+                }
+
+                continue
+
+            filamentDensity = toolSpool["filament"]["density"]
+            filamentDiameter = toolSpool["filament"]["diameter"]
+
+            toolExtrusionWeight = PrinterUtils.getFilamentWeight(
+                length = toolExtrusionLength,
+                density = filamentDensity,
+                diameter = filamentDiameter,
+            )
+
+            usageDataPerTool[toolIdxStr] = {
+                "spoolId": toolSpool["id"],
+                "filamentLength": toolExtrusionLength,
+                "filamentWeight": toolExtrusionWeight,
+            }
+
+        return usageDataPerTool
+
+    @staticmethod
     def getFilamentWeight(length, density, diameter):
         radius = diameter / 2.0;
         volume = length * math.pi * (radius * radius) / 1000
