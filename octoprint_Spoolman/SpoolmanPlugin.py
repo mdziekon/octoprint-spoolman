@@ -29,9 +29,23 @@ class SpoolmanPlugin(
     def getSpoolmanConnector(self):
         spoolmanInstanceUrl = self._settings.get([ SettingsKeys.SPOOLMAN_URL ])
 
+        verifyConfig = None
+
+        isSpoolmanCertVerifyEnabled = self._settings.get([ SettingsKeys.IS_SPOOLMAN_CERT_VERIFY_ENABLED ])
+        spoolmanCertPemPath = self._settings.get([ SettingsKeys.SPOOLMAN_CERT_PEM_PATH ])
+
+        if isSpoolmanCertVerifyEnabled:
+            if spoolmanCertPemPath:
+                verifyConfig = spoolmanCertPemPath
+            else:
+                verifyConfig = True
+        else:
+            verifyConfig = False
+
         return SpoolmanConnector(
             instanceUrl = spoolmanInstanceUrl,
-            logger = self._logger
+            logger = self._logger,
+            verifyConfig = verifyConfig,
         )
 
     def triggerPluginEvent(self, eventType, eventPayload = {}):
@@ -107,6 +121,8 @@ class SpoolmanPlugin(
         settings = {
             SettingsKeys.INSTALLED_VERSION: self._plugin_version,
             SettingsKeys.SPOOLMAN_URL: "",
+            SettingsKeys.IS_SPOOLMAN_CERT_VERIFY_ENABLED: True,
+            SettingsKeys.SPOOLMAN_CERT_PEM_PATH: "",
             SettingsKeys.SELECTED_SPOOL_IDS: {},
             SettingsKeys.IS_PREPRINT_SPOOL_VERIFY_ENABLED: True,
         }
