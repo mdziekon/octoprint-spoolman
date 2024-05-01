@@ -135,5 +135,18 @@ class SpoolmanPlugin(
 
                 # update method: pip
                 "pip": "https://github.com/mdziekon/octoprint-spoolman/archive/{target_version}.zip",
+
+                "stable_branch": {
+                    "name": "Stable",
+                    "branch": "stable",
+                    "comittish": ["stable"],
+                },
+                "prerelease_branches": [
+                    {
+                        "name": "Release candidate",
+                        "branch": "rc",
+                        "comittish": ["rc", "stable"],
+                    },
+                ]
             }
         }
