@@ -44,11 +44,15 @@ class SpoolmanConnector():
     def _handleSpoolmanConnectionError(self, caughtException):
         self._logger.error("[Spoolman API] connection failed with %s" % caughtException)
 
+        if isinstance(caughtException, requests.exceptions.SSLError):
+            code = "spoolman_api__ssl_error"
+        else:
+            code = "spoolman_api__connection_failed"
+
         return {
             "error": {
-                "code": "spoolman_api__connection_failed",
+                "code": code,
             },
-            "exception": caughtException,
         }
     def _handleSpoolmanError(self, response, customError = None):
         self._logSpoolmanError(response)
