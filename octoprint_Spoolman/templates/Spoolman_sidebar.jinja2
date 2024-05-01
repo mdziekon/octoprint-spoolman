@@ -14,9 +14,34 @@
 
     <!-- ko if: (!templateData.isLoadingData() && templateData.loadingError()) -->
         <div>
-            <!-- ko if: (templateData.loadingError().code === 'spoolman_api__instance_url_empty') -->
+            <!-- ko if: (templateData.loadingError().code === constants.knownErrors.SPOOLMAN_API__INSTANCE_URL_EMPTY) -->
                 <div class="alert alert-block alert-info">
                     Spoolman plugin has not been configured yet
+                </div>
+            <!-- /ko -->
+            <!-- ko if: (
+                templateData.loadingError().code === constants.knownErrors.SPOOLMAN_API__CONNECTION_TIMEOUT ||
+                templateData.loadingError().code === constants.knownErrors.SPOOLMAN_API__CONNECTION_FAILED ||
+                templateData.loadingError().code === constants.knownErrors.SPOOLMAN_API__SSL_ERROR
+            ) -->
+                <div class="alert alert-block alert-error margin-bottom-mini">
+                    <!-- ko if: (templateData.loadingError().code === constants.knownErrors.SPOOLMAN_API__CONNECTION_TIMEOUT) -->
+                        Connection to Spoolman has timed out
+                    <!-- /ko -->
+                    <!-- ko if: (templateData.loadingError().code === constants.knownErrors.SPOOLMAN_API__CONNECTION_FAILED) -->
+                        Could not connect to Spoolman
+                    <!-- /ko -->
+                    <!-- ko if: (templateData.loadingError().code === constants.knownErrors.SPOOLMAN_API__SSL_ERROR) -->
+                        SSL error occurred when connecting to Spoolman
+                    <!-- /ko -->
+                </div>
+                <div>
+                    <button
+                        class="btn btn-mini btn-block btn-warning"
+                        data-bind="click: templateApi.handleTryAgainOnError.bind($data)"
+                    >
+                        Try again
+                    </button>
                 </div>
             <!-- /ko -->
             <!-- ko if: (templateData.loadingError().code ?? 'unknown') === 'unknown' -->

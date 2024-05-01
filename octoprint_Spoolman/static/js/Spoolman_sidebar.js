@@ -49,7 +49,15 @@ $(() => {
             self.templateData.isLoadingData(false);
 
             if (!spoolmanSpoolsResult.isSuccess) {
-                self.templateData.loadingError(spoolmanSpoolsResult.error.response.error)
+                const responseError = spoolmanSpoolsResult.error.response.error;
+
+                const code = Object.values(self.constants.knownErrors).includes(responseError?.code)
+                    ? responseError?.code
+                    : undefined;
+
+                self.templateData.loadingError({
+                    code,
+                })
 
                 return;
             }
@@ -184,6 +192,13 @@ $(() => {
         self.constants = {
             weight_unit: 'g',
             length_unit: 'mm',
+
+            knownErrors: {
+                SPOOLMAN_API__INSTANCE_URL_EMPTY: 'spoolman_api__instance_url_empty',
+                SPOOLMAN_API__CONNECTION_TIMEOUT: 'spoolman_api__connection_timeout',
+                SPOOLMAN_API__CONNECTION_FAILED: 'spoolman_api__connection_failed',
+                SPOOLMAN_API__SSL_ERROR: 'spoolman_api__ssl_error',
+            },
         };
         self.templateApi = {
             handleOpenSpoolSelector,
