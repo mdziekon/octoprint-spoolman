@@ -1,4 +1,5 @@
 {% include "Spoolman_sidebar_modal_selectspool.jinja2" %}
+{% include "Spoolman_modal_confirmspool.jinja2" %}
 
 <div
     id="sidebar_spoolman"
@@ -148,4 +149,9 @@
         eventsSink: templateData.modals.selectSpool.eventsSink,
         "
     ></spoolman-modal-select-spool>
+    <spoolman-modal-confirm-spool params="
+        settingsViewModel: templateData.settingsViewModel,
+        eventsSink: templateData.modals.confirmSpool.eventsSink,
+        "
+    ></spoolman-modal-confirm-spool>
 </span>

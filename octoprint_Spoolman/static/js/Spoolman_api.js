@@ -16,6 +16,15 @@ $(() => {
             return request;
         },
     });
+    const sharedGetCurrentJobRequirements = async () => {
+        const request = await getCurrentJobRequirements(apiClient);
+
+        if (!request.isSuccess) {
+            console.error("Request error", request.error);
+        }
+
+        return request;
+    };
     const sharedUpdateActiveSpool = async ({ toolIdx, spoolId }) => {
         const request = await updateActiveSpool(apiClient, { toolIdx, spoolId });
 
@@ -34,6 +43,7 @@ $(() => {
         cache,
 
         getSpoolmanSpools: cacheGetSpoolmanSpoolsResult.getter,
+        getCurrentJobRequirements: sharedGetCurrentJobRequirements,
         updateActiveSpool: sharedUpdateActiveSpool,
     };
 });

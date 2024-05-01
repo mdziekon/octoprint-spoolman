@@ -3,6 +3,7 @@ from octoprint.events import Events
 
 from .modules.PluginAPI import PluginAPI
 from .modules.PrinterHandler import PrinterHandler
+from .modules.PrinterUtils import PrinterUtils
 from .modules.SpoolmanConnector import SpoolmanConnector
 from .common.settings import SettingsKeys
 from .common.events import PluginEvents
@@ -15,6 +16,7 @@ class SpoolmanPlugin(
     octoprint.plugin.EventHandlerPlugin,
     PluginAPI,
     PrinterHandler,
+    PrinterUtils,
 ):
     _isInitialized = False
 
@@ -73,11 +75,13 @@ class SpoolmanPlugin(
                 "js/common/promiseCache.js",
                 "js/common/octoprint.js",
                 "js/api/getSpoolmanSpools.js",
+                "js/api/getCurrentJobRequirements.js",
                 "js/api/updateActiveSpool.js",
                 "js/Spoolman_api.js",
                 "js/Spoolman_sidebar.js",
                 "js/Spoolman_settings.js",
                 "js/Spoolman_modal_selectSpool.js",
+                "js/Spoolman_modal_confirmSpool.js",
             ],
             "css": [
                 "css/Spoolman.css",
@@ -104,6 +108,7 @@ class SpoolmanPlugin(
             SettingsKeys.INSTALLED_VERSION: self._plugin_version,
             SettingsKeys.SPOOLMAN_URL: "",
             SettingsKeys.SELECTED_SPOOL_IDS: {},
+            SettingsKeys.IS_PREPRINT_SPOOL_VERIFY_ENABLED: True,
         }
 
         return settings
