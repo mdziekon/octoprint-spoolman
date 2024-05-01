@@ -195,6 +195,7 @@ $(() => {
 
             knownErrors: {
                 SPOOLMAN_API__INSTANCE_URL_EMPTY: 'spoolman_api__instance_url_empty',
+                SPOOLMAN_API__CONNECTION_TIMEOUT: 'spoolman_api__connection_timeout',
                 SPOOLMAN_API__CONNECTION_FAILED: 'spoolman_api__connection_failed',
                 SPOOLMAN_API__SSL_ERROR: 'spoolman_api__ssl_error',
             },

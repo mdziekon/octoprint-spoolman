@@ -46,8 +46,12 @@ class SpoolmanConnector():
 
         if isinstance(caughtException, requests.exceptions.SSLError):
             code = "spoolman_api__ssl_error"
-        else:
+        elif isinstance(caughtException, requests.exceptions.Timeout):
+            code = "spoolman_api__connection_timeout"
+        elif isinstance(caughtException, requests.exceptions.RequestException):
             code = "spoolman_api__connection_failed"
+        else:
+            code = "spoolman_api__unknown"
 
         return {
             "error": {
@@ -83,10 +87,8 @@ class SpoolmanConnector():
 
         try:
             response = requests.get(endpointUrl, verify = self.verifyConfig)
-        except requests.exceptions.SSLError as err:
-            return self._handleSpoolmanConnectionError(err)
-        except requests.exceptions.RequestException as err:
-            return self._handleSpoolmanConnectionError(err)
+        except Exception as caughtException:
+            return self._handleSpoolmanConnectionError(caughtException)
 
         if response.status_code != 200:
             return self._handleSpoolmanError(response)
