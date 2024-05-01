@@ -6,9 +6,17 @@ from requests.adapters import HTTPAdapter, Retry
 
 class SpoolmanConnector():
     def __init__(self, instanceUrl, logger, verifyConfig):
-        self.instanceUrl = instanceUrl
+        self.instanceUrl = self._cleanupInstanceUrl(instanceUrl)
         self._logger = logger
         self.verifyConfig = verifyConfig
+
+    def _cleanupInstanceUrl(self, value):
+        trailingSlash = "/"
+
+        if value.endswith(trailingSlash):
+            value = value[:-len(trailingSlash)]
+
+        return value
 
     def _createSpoolmanApiUrl(self):
         apiPath = "/api/v1"
