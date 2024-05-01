@@ -47,6 +47,48 @@
                         >
                     </div>
                 </div>
+                <div class="control-group">
+                    <label
+                        class="control-label"
+                        for="settings-spoolman-general-isSpoolmanCertVerifyEnabled"
+                    >
+                        Verify SSL certificate (if applicable)
+                    </label>
+                    <div class="controls">
+                        <div>
+                            <input
+                                id="settings-spoolman-general-isSpoolmanCertVerifyEnabled"
+                                type="checkbox"
+                                class="text-left"
+                                data-bind="checked: pluginSettings.isSpoolmanCertVerifyEnabled"
+                            >
+                        </div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label
+                        class="control-label"
+                        for="settings-spoolman-general-spoolmanCertPemPath"
+                    >
+                        SSL certificate <code>.pem</code> path
+                    </label>
+                    <div class="controls">
+                        <div>
+                            <input
+                                id="settings-spoolman-general-spoolmanCertPemPath"
+                                type="text"
+                                class="input-xlarge text-left"
+                                data-bind="textInput: pluginSettings.spoolmanCertPemPath"
+                                placeholder="/path/to/cert.pem"
+                            >
+                        </div>
+                        <div style="margin-top: 0.25em">
+                            <small>
+                                In case your Spoolman instance is using an SSL certificate which is unavailable to your Octoprint instance (eg. self-signed certificate), you can provide a path to custom certificate chain file. This allows the plugin to establish secure connection without disabling certificate verification. The file must be located on Octoprint's machine, and should be readable for Octoprint.
+                            </small>
+                        </div>
+                    </div>
+                </div>
                 <div>
                     <hr/>
                 </div>

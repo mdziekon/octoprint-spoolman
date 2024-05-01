@@ -21,7 +21,12 @@ class SpoolmanConnector():
         self._logger.debug("[Spoolman API] calling endpoint %s" % endpointUrl)
 
     def _logSpoolmanError(self, response):
-        self._logger.error("[Spoolman API] request failed with status %s" % response.status_code)
+        if not response:
+            statusCode = -1
+        else:
+            statusCode = response.status_code
+
+        self._logger.error("[Spoolman API] request failed with status %s" % statusCode)
 
     def _logSpoolmanSuccess(self, response):
         self._logger.debug("[Spoolman API] request succeeded with status %s" % response.status_code)
@@ -39,11 +44,19 @@ class SpoolmanConnector():
     def _handleSpoolmanConnectionError(self, caughtException):
         self._logger.error("[Spoolman API] connection failed with %s" % caughtException)
 
+        if isinstance(caughtException, requests.exceptions.SSLError):
+            code = "spoolman_api__ssl_error"
+        elif isinstance(caughtException, requests.exceptions.Timeout):
+            code = "spoolman_api__connection_timeout"
+        elif isinstance(caughtException, requests.exceptions.RequestException):
+            code = "spoolman_api__connection_failed"
+        else:
+            code = "spoolman_api__unknown"
+
         return {
             "error": {
-                "code": "spoolman_api__connection_failed",
+                "code": code,
             },
-            "exception": caughtException,
         }
     def _handleSpoolmanError(self, response, customError = None):
         self._logSpoolmanError(response)
@@ -72,7 +85,10 @@ class SpoolmanConnector():
 
         self._logSpoolmanCall(endpointUrl)
 
-        response = requests.get(endpointUrl)
+        try:
+            response = requests.get(endpointUrl, verify = self.verifyConfig)
+        except Exception as caughtException:
+            return self._handleSpoolmanConnectionError(caughtException)
 
         if response.status_code != 200:
             return self._handleSpoolmanError(response)
@@ -100,6 +116,7 @@ class SpoolmanConnector():
 
         try:
             session = requests.Session()
+            session.verify = self.verifyConfig
             retries = Retry(total = 3, backoff_factor = 1, status_forcelist = [ 500, 502, 503, 504 ])
 
             session.mount(self.instanceUrl, HTTPAdapter(max_retries=retries))
