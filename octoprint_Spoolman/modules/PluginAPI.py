@@ -7,6 +7,7 @@ import flask
 import http
 
 from ..common.settings import SettingsKeys
+from .PrinterUtils import PrinterUtils
 
 class PluginAPI(octoprint.plugin.BlueprintPlugin):
     def is_blueprint_csrf_protected(self):
@@ -82,4 +83,44 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
 
         return flask.jsonify({
             "data": {}
+        })
+
+    @octoprint.plugin.BlueprintPlugin.route("/self/current-job-requirements", methods=["GET"])
+    def handleGetCurrentJobRequirements(self):
+        self._logger.debug("API: GET /self/current-job-requirements")
+
+        # TODO: Ideally, this should be pulled from cache
+        getSpoolsAvailableResult = self.getSpoolmanConnector().handleGetSpoolsAvailable()
+
+        if getSpoolsAvailableResult.get('error', False):
+            response = flask.jsonify(getSpoolsAvailableResult)
+            response.status = http.HTTPStatus.BAD_REQUEST
+
+            return response
+
+        spoolsAvailable = getSpoolsAvailableResult["data"]["spools"]
+
+        jobFilamentUsage = self.getCurrentJobFilamentUsage()
+
+        if not jobFilamentUsage["jobHasFilamentLengthData"]:
+            return flask.jsonify({
+                "data": {
+                    "isFilamentUsageAvailable": False,
+                    "tools": {},
+                },
+            })
+
+        selectedSpools = self._settings.get([SettingsKeys.SELECTED_SPOOL_IDS])
+
+        filamentUsageDataPerTool = PrinterUtils.getFilamentUsageDataPerTool(
+            filamentLengthPerTool = jobFilamentUsage['jobFilamentLengthsPerTool'],
+            selectedSpoolsPerTool = selectedSpools,
+            spoolsAvailable = spoolsAvailable,
+        )
+
+        return flask.jsonify({
+            "data": {
+                "isFilamentUsageAvailable": True,
+                "tools": filamentUsageDataPerTool,
+            },
         })
