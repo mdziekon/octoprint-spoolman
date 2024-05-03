@@ -36,7 +36,10 @@ async function getSpoolmanSpools(apiClient) {
         return request;
     }
     if (!request.payload.response) {
-        return /** @type Success<{ response: undefined }> */ (request);
+        return /** @type Failure<undefined> */ ({
+            isSuccess: false,
+            error: undefined,
+        });
     }
 
     return /** @type Success<{ response: GetSpoolsResponse }> */ (request);
