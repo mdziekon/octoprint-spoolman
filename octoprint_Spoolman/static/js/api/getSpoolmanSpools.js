@@ -9,20 +9,19 @@
  * @property {string} registered
  * @property {number} used_length
  * @property {number} used_weight
- * @property {number} remaining_length
- * @property {number} remaining_weight
- * @property {boolean} archived
+ * @property {number | undefined} remaining_length
+ * @property {number | undefined} remaining_weight
  * @property {Object} filament
  * @property {number} filament.id
+ * @property {string} filament.registered
  * @property {number} filament.diameter
  * @property {number} filament.density
- * @property {number} filament.weight
- * @property {number} filament.spool_weight
- * @property {string} filament.material
- * @property {string} filament.name
- * @property {string} filament.registered
- * @property {string} filament.color_hex
- * @property {Object} filament.vendor
+ * @property {number | undefined} filament.weight
+ * @property {number | undefined} filament.spool_weight
+ * @property {string | undefined} filament.material
+ * @property {string | undefined} filament.name
+ * @property {string | undefined} filament.color_hex
+ * @property {Object | undefined} filament.vendor
  * @property {number} filament.vendor.id
  * @property {string} filament.vendor.name
  */
