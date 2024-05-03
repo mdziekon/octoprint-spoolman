@@ -84,6 +84,7 @@ $(() => {
                 return {
                     spoolId,
                     spoolData,
+                    spoolDisplayData: spoolData && toSpoolForDisplay(spoolData, { constants: self.constants }),
                 };
             });
 
