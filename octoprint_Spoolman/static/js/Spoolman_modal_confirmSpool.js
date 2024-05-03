@@ -20,6 +20,8 @@ $(() => {
      * Events:
      * - onConfirm
      * - onHidden
+     *
+     * @param {*} params
      */
     function SpoolmanModalConfirmSpoolViewModel(params) {
         const self = this;
@@ -109,6 +111,8 @@ $(() => {
                 const spoolId = selectedSpoolIds[extruderIdx]?.spoolId();
 
                 const spoolData = spoolmanSpools.find((spool) => String(spool.id) === spoolId);
+                const safeSpool = spoolData && toSafeSpool(spoolData);
+                const spoolDisplayData = spoolData && toSpoolForDisplay(spoolData, { constants: self.constants });
                 const toolFilamentUsage = currentJobRequirements.tools[extruderIdx];
 
                 if (
@@ -118,6 +122,8 @@ $(() => {
                     return {
                         spoolId,
                         spoolData,
+                        spoolDisplayData,
+                        isSpoolValid: safeSpool?.isSpoolValid,
                         /** @type false */
                         isToolInUse: false,
                         isToolMissingSelection: undefined,
@@ -126,13 +132,20 @@ $(() => {
                 }
 
                 const isToolMissingSelection = !toolFilamentUsage.spoolId;
-                const isEnoughFilamentAvailable = isToolMissingSelection || !spoolData
-                    ? undefined
-                    : toolFilamentUsage.filamentWeight <= spoolData.remaining_weight;
+
+                const isEnoughFilamentAvailable = (
+                    !isToolMissingSelection &&
+                    safeSpool &&
+                    safeSpool.isSpoolValid
+                )
+                    ? toolFilamentUsage.filamentWeight <= safeSpool.spoolData.remaining_weight
+                    : undefined;
 
                 return {
                     spoolId,
-                    spoolData,
+                    spoolData: safeSpool && safeSpool.spoolData,
+                    spoolDisplayData,
+                    isSpoolValid: safeSpool?.isSpoolValid,
                     /** @type true */
                     isToolInUse: true,
                     isToolMissingSelection,
@@ -153,6 +166,16 @@ $(() => {
                         );
                     })
                         ? self.constants.filament_problems.NOT_ENOUGH_FILAMENT
+                        : undefined
+                ),
+                (
+                    selectedSpools.some((spool) => {
+                        return (
+                            spool.isToolInUse &&
+                            spool.isSpoolValid === false
+                        );
+                    })
+                        ? self.constants.filament_problems.INVALID_SPOOL
                         : undefined
                 ),
                 (
@@ -204,6 +227,7 @@ $(() => {
             length_unit: 'mm',
 
             filament_problems: {
+                INVALID_SPOOL: 'INVALID_SPOOL',
                 NO_FILAMENT_USAGE_DATA: 'NO_FILAMENT_USAGE_DATA',
                 NOT_ENOUGH_FILAMENT: 'NOT_ENOUGH_FILAMENT',
                 MISSING_SPOOL_SELECTION: 'MISSING_SPOOL_SELECTION',

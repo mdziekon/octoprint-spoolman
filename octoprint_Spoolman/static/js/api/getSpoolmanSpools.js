@@ -3,28 +3,29 @@
  * @property {Object} data
  * @property {Array<Spool>} data.spools
  *
+ * @typedef {Object} FilamentVendor
+ * @property {number} id
+ * @property {string} name
+ *
  * @typedef {Object} Spool
  * @property {number} id
  * @property {boolean} archived
  * @property {string} registered
  * @property {number} used_length
  * @property {number} used_weight
- * @property {number} remaining_length
- * @property {number} remaining_weight
- * @property {boolean} archived
+ * @property {number | undefined} remaining_length
+ * @property {number | undefined} remaining_weight
  * @property {Object} filament
  * @property {number} filament.id
+ * @property {string} filament.registered
  * @property {number} filament.diameter
  * @property {number} filament.density
- * @property {number} filament.weight
- * @property {number} filament.spool_weight
- * @property {string} filament.material
- * @property {string} filament.name
- * @property {string} filament.registered
- * @property {string} filament.color_hex
- * @property {Object} filament.vendor
- * @property {number} filament.vendor.id
- * @property {string} filament.vendor.name
+ * @property {number | undefined} filament.weight
+ * @property {number | undefined} filament.spool_weight
+ * @property {string | undefined} filament.material
+ * @property {string | undefined} filament.name
+ * @property {string | undefined} filament.color_hex
+ * @property {FilamentVendor | undefined} filament.vendor
  */
 
 /**
@@ -37,8 +38,44 @@ async function getSpoolmanSpools(apiClient) {
         return request;
     }
     if (!request.payload.response) {
-        return /** @type Success<{ response: undefined }> */ (request);
+        return /** @type Failure<undefined> */ ({
+            isSuccess: false,
+            error: undefined,
+        });
     }
 
     return /** @type Success<{ response: GetSpoolsResponse }> */ (request);
 }
+
+/**
+ * Checks whether spool has "complete-enough" data, so that the plugin
+ * can function properly.
+ *
+ * @type {(spool: Spool) => spool is Spool & { remaining_weight: number }}
+ */
+const isSpoolValid = (spool) => {
+    return (
+        spool.remaining_weight !== undefined
+    );
+};
+
+/**
+ * @param {Spool} spool
+ */
+const toSafeSpool = (spool) => {
+    if (isSpoolValid(spool)) {
+        return {
+            spoolId: spool.id,
+            /** @type true */
+            isSpoolValid: true,
+            spoolData: spool,
+        };
+    }
+
+    return {
+        spoolId: spool.id,
+        /** @type false */
+        isSpoolValid: false,
+        spoolData: spool,
+    };
+};

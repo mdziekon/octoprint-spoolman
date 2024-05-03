@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "checkJs": true,
+        "strict": true,
+        "typeRoots": [
+            "./octoprint_Spoolman/static/js/types",
+        ],
+        "target": "es2020",
+    },
+    "include": [
+        "./octoprint_Spoolman/static/js/**/*"
+    ],
+}

@@ -25,24 +25,29 @@
                     <span
                         class="color-preview"
                         style="margin-bottom: -5px;"
-                        data-bind="style: { 'background-color': '#' + templateData.toolCurrentSpool().filament.color_hex },
-                                    attr: { title: templateData.toolCurrentSpool().filament.name }"
+                        data-bind="
+                                    style: { [templateData.toolCurrentSpool().displayData.filament.color.cssProperty]: templateData.toolCurrentSpool().displayData.filament.color.cssValue },
+                                    attr: { title: templateData.toolCurrentSpool().displayData.filament.name.displayValue }
+                                "
                     ></span>
                     <span>
-                        <!-- ko if: templateData.toolCurrentSpool().filament.material -->
-                            <span data-bind="text: templateData.toolCurrentSpool().filament.material"></span> -
-                        <!-- /ko -->
-
-                        <span data-bind="text: templateData.toolCurrentSpool().filament.name"></span>
-
-                        <!-- ko if: templateData.toolCurrentSpool().filament.vendor.name -->
-                            (<span data-bind="text: templateData.toolCurrentSpool().filament.vendor.name"></span>)
-                        <!-- /ko -->
-
-                        <span
-                            data-bind="text: (templateData.toolCurrentSpool().remaining_weight ?? 0).toFixed(1)"
-                            title="Remaining weight"
-                        ></span><span data-bind="text: $component.constants.weight_unit"></span>
+                        <span>[<span data-bind="
+                            text: templateData.toolCurrentSpool().displayData.filament.material.displayShort,
+                            attr: { title: templateData.toolCurrentSpool().displayData.filament.material.displayValue }
+                        "></span>]</span>
+                        <span data-bind="
+                            text: templateData.toolCurrentSpool().displayData.filament.name.displayValue,
+                            attr: { title: templateData.toolCurrentSpool().displayData.filament.name.displayValue }
+                        "></span>
+                        <i>(<span data-bind="
+                            text: templateData.toolCurrentSpool().displayData.filament.vendor.name.displayValue,
+                            attr: { title: templateData.toolCurrentSpool().displayData.filament.vendor.name.displayValue }
+                        "></span>)</i>
+                        <span><span data-bind="
+                            text: templateData.toolCurrentSpool().displayData.remaining_weight.displayValue,
+                            attr: {title: 'Remaining weight'},
+                            class: (templateData.toolCurrentSpool().displayData.remaining_weight.isValid) ? '' : 'text-error'
+                        "></span></span>
                     </span>
                 <!-- /ko -->
                 <!-- ko ifnot: templateData.toolCurrentSpool() -->
@@ -127,49 +132,61 @@
                                 style="cursor: pointer;"
                                 data-bind="
                                     click: function() {
-                                        $component.templateApi.handleSelectSpoolForTool($component.templateData.toolIdx(), $data.id);
+                                        if (!$data.isSpoolValid) { return; }
+
+                                        $component.templateApi.handleSelectSpoolForTool($component.templateData.toolIdx(), $data.spoolId);
                                     },
                                     attr: {
                                         class: (
                                             $component.templateData.toolCurrentSpool() &&
-                                            String($component.templateData.toolCurrentSpool().id) === String($data.id)
+                                            String($component.templateData.toolCurrentSpool().spoolId) === String($data.spoolId)
                                         )
                                             ? 'success'
-                                            : ''
-                                        }
+                                            : '',
+                                        style: [
+                                            `cursor: ${$data.isSpoolValid ? 'pointer' : 'not-allowed'}`
+                                        ].join(' '),
+                                        title: $data.isSpoolValid
+                                            ? 'Click to select spool'
+                                            : 'Invalid spool, not available for selection'
+                                    }
                                 "
-                                title="Click to select spool"
                             >
                                 <td data-bind="visible: $component.templateData.tableAttributeVisibility.id">
-                                    <span data-bind="text: id, attr: { title: id }"></span>
+                                    <span data-bind="text: $data.spoolId, attr: { title: $data.spoolId }"></span>
                                 </td>
                                 <td data-bind="visible: $component.templateData.tableAttributeVisibility.spoolName">
                                     <div style="display: flex;">
                                         <div>
                                             <span
                                                 class="color-preview"
-                                                data-bind="style: { 'background-color': '#' + filament.color_hex }, attr: { title: filament.name }"
+                                                data-bind="
+                                                    style: { [$data.displayData.filament.color.cssProperty]: $data.displayData.filament.color.cssValue },
+                                                    attr: { title: $data.displayData.filament.name.displayValue }
+                                                "
                                             ></span>
                                         </div>
                                         <div>
-                                            <span data-bind="text: filament.name, attr: { title: filament.name }"></span>
+                                            <span data-bind="text: $data.displayData.filament.name.displayValue, attr: { title: $data.displayData.filament.name.displayValue }"></span>
                                             <br>
                                             <i>
-                                                <span data-bind="text: filament.vendor.name, attr: { title: filament.vendor.name }"></span>
+                                                <span data-bind="text: $data.displayData.filament.vendor.name.displayValue, attr: { title: $data.displayData.filament.vendor.name.displayValue }"></span>
                                             </i>
                                         </div>
                                     </div>
                                 </td>
                                 <td data-bind="visible: $component.templateData.tableAttributeVisibility.material">
-                                    <span data-bind="text: filament.material, attr: { title: filament.material }"></span>
+                                    <span data-bind="text: $data.displayData.filament.material.displayValue, attr: { title: $data.displayData.filament.material.displayValue }"></span>
                                 </td>
                                 <td
                                     data-bind="visible: $component.templateData.tableAttributeVisibility.weight" style="text-align: right;"
                                 >
-                                    <span data-bind="text: (remaining_weight ?? 0).toFixed(1), attr: {title: 'Remaining weight'}"></span><span data-bind="text: $component.constants.weight_unit"></span>
+                                    <span data-bind="class: ($data.displayData.remaining_weight.isValid) ? '' : 'text-error'">
+                                        <span data-bind="text: $data.displayData.remaining_weight.displayValue, attr: {title: 'Remaining weight'}"></span>
+                                    </span>
                                     <br>
                                     <span class="muted">
-                                        <span data-bind="text: used_weight.toFixed(1), attr: {title: 'Used weight'}"></span><span data-bind="text: $component.constants.weight_unit"></span>
+                                        <span data-bind="text: $data.displayData.used_weight.displayValue, attr: {title: 'Used weight'}"></span><span data-bind="text: $component.constants.weight_unit"></span>
                                     </span>
                                 </td>
                             </tr>

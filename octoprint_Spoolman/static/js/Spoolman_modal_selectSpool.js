@@ -69,9 +69,23 @@ $(() => {
                 return String(spool.id) === toolSpoolId;
             });
 
+            const spoolmanSafeSpools = spoolmanSpools.map((spool) => {
+                return {
+                    ...toSafeSpool(spool),
+                    displayData: toSpoolForDisplay(spool, { constants: self.constants }),
+                };
+            });
+
             self.templateData.toolCurrentSpoolId(toolSpoolId);
-            self.templateData.toolCurrentSpool(toolSpool);
-            self.templateData.tableItemsOnCurrentPage(spoolmanSpools);
+            self.templateData.toolCurrentSpool(
+                toolSpool
+                    ? {
+                        ...toSafeSpool(toolSpool),
+                        displayData: toSpoolForDisplay(toolSpool, { constants: self.constants }),
+                    }
+                    : undefined
+            );
+            self.templateData.tableItemsOnCurrentPage(spoolmanSafeSpools);
 
             self.templateData.spoolmanUrl(getPluginSettings().spoolmanUrl());
 

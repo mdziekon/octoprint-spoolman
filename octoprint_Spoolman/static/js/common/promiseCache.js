@@ -1,9 +1,15 @@
+/**
+ * @typedef {(...args: unknown[]) => Promise<unknown>} GetterFn
+
+* @typedef {GetterFn & { invalidate: () => void }} CachedGetterFn
+ */
+
 class PromiseCache {
     constructor() {
         /**
          * @type {Record<string, {
-         *  getter: (...args: unknown[]) => Promise<unknown>,
-         *  cachedGetter: ((...args: unknown[]) => Promise<unknown>) & { invalidate: () => void },
+         *  getter: GetterFn,
+         *  cachedGetter: CachedGetterFn,
          *  resourceState:
          *      | {
          *          isCached: false,
@@ -16,10 +22,19 @@ class PromiseCache {
          */
         this.resourcesByKey = {};
 
+        /**
+         * @type {Record<string, Array<() => void>>}
+        */
         this.invalidationHandlersByKey = {};
     }
 
+    /**
+     * @param {string} resourceKey
+     */
     _createCachedGetter(resourceKey) {
+        /**
+         * @param {...unknown} args
+         */
         const getter = async (...args) => {
             const resourceCache = this.resourcesByKey[resourceKey];
 
@@ -42,6 +57,9 @@ class PromiseCache {
         return getter;
     }
 
+    /**
+     * @param {string[]} resourceKeys
+     */
     _triggerInvalidationHandlersFor(resourceKeys) {
         const handlersToRun = new Set();
 
@@ -58,9 +76,14 @@ class PromiseCache {
         });
     }
 
+    /**
+     * @param {string} resourceKey
+     * @param {{ getter: GetterFn }} params
+     */
     registerResource(resourceKey, params) {
         if (this.resourcesByKey[resourceKey]) {
             return {
+                /** @type false */
                 isSuccess: false,
                 error: {
                     resourceAlreadyExists: true,
@@ -77,11 +100,16 @@ class PromiseCache {
         };
 
         return {
+            /** @type true */
             isSuccess: true,
             getter: this.resourcesByKey[resourceKey].cachedGetter,
         };
     }
 
+    /**
+     * @param {string} resourceKey
+     * @param {{ preventHandlersTrigger?: boolean }} options
+     */
     invalidateResource(resourceKey, options = {}) {
         const resource = this.resourcesByKey[resourceKey];
 
@@ -108,6 +136,10 @@ class PromiseCache {
         };
     }
 
+    /**
+     * @param {string[]} resourceKeys
+     * @param {{ preventHandlersTrigger?: boolean }} options
+     */
     invalidateResources(resourceKeys, options = {}) {
         resourceKeys.forEach((resourceKey) => {
             this.invalidateResource(resourceKey, { preventHandlersTrigger: true });
@@ -125,6 +157,9 @@ class PromiseCache {
      *
      * Note: does not properly support async handlers, in a sense that
      * each executed handler will be executed synchronously, not awaiting the resulting promise.
+     *
+     * @param {string[]} resourceKeys
+     * @param {() => void} handler
      */
     onResourcesInvalidated(resourceKeys, handler) {
         resourceKeys.forEach((resourceKey) => {
