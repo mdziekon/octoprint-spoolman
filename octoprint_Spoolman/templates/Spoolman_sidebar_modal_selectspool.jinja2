@@ -25,24 +25,29 @@
                     <span
                         class="color-preview"
                         style="margin-bottom: -5px;"
-                        data-bind="style: { 'background-color': '#' + templateData.toolCurrentSpool().spoolData.filament.color_hex },
-                                    attr: { title: templateData.toolCurrentSpool().spoolData.filament.name }"
+                        data-bind="
+                                    style: { [templateData.toolCurrentSpool().displayData.filament.color.cssProperty]: templateData.toolCurrentSpool().displayData.filament.color.cssValue },
+                                    attr: { title: templateData.toolCurrentSpool().displayData.filament.name.displayValue }
+                                "
                     ></span>
                     <span>
-                        <!-- ko if: templateData.toolCurrentSpool().spoolData.filament.material -->
-                            <span data-bind="text: templateData.toolCurrentSpool().spoolData.filament.material"></span> -
-                        <!-- /ko -->
-
-                        <span data-bind="text: templateData.toolCurrentSpool().spoolData.filament.name"></span>
-
-                        <!-- ko if: templateData.toolCurrentSpool().spoolData.filament.vendor.name -->
-                            (<span data-bind="text: templateData.toolCurrentSpool().spoolData.filament.vendor.name"></span>)
-                        <!-- /ko -->
-
-                        <span
-                            data-bind="text: (templateData.toolCurrentSpool().spoolData.remaining_weight ?? 0).toFixed(1)"
-                            title="Remaining weight"
-                        ></span><span data-bind="text: $component.constants.weight_unit"></span>
+                        <span>[<span data-bind="
+                            text: templateData.toolCurrentSpool().displayData.filament.material.displayShort,
+                            attr: { title: templateData.toolCurrentSpool().displayData.filament.material.displayValue }
+                        "></span>]</span>
+                        <span data-bind="
+                            text: templateData.toolCurrentSpool().displayData.filament.name.displayValue,
+                            attr: { title: templateData.toolCurrentSpool().displayData.filament.name.displayValue }
+                        "></span>
+                        <i>(<span data-bind="
+                            text: templateData.toolCurrentSpool().displayData.filament.vendor.name.displayValue,
+                            attr: { title: templateData.toolCurrentSpool().displayData.filament.vendor.name.displayValue }
+                        "></span>)</i>
+                        <span><span data-bind="
+                            text: templateData.toolCurrentSpool().displayData.remaining_weight.displayValue,
+                            attr: {title: 'Remaining weight'},
+                            class: (templateData.toolCurrentSpool().displayData.remaining_weight.isValid) ? '' : 'text-error'
+                        "></span></span>
                     </span>
                 <!-- /ko -->
                 <!-- ko ifnot: templateData.toolCurrentSpool() -->

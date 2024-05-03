@@ -79,7 +79,10 @@ $(() => {
             self.templateData.toolCurrentSpoolId(toolSpoolId);
             self.templateData.toolCurrentSpool(
                 toolSpool
-                    ? toSafeSpool(toolSpool)
+                    ? {
+                        ...toSafeSpool(toolSpool),
+                        displayData: toSpoolForDisplay(toolSpool, { constants: self.constants }),
+                    }
                     : undefined
             );
             self.templateData.tableItemsOnCurrentPage(spoolmanSafeSpools);
