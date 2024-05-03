@@ -76,6 +76,9 @@ const methodsWithBody = [
  * @param {string} baseUrl
  */
 function APIClient(pluginId, baseUrl) {
+    /**
+     * @param {string | Record<string, string>} data
+     */
     const _buildRequestQuery = function (data) {
         if (typeof (data) === 'string') {
             return data;
@@ -92,10 +95,20 @@ function APIClient(pluginId, baseUrl) {
             .join('&');
     };
 
+    /**
+     * @param {string} url
+     */
     const buildApiUrl = (url) => {
         return `${baseUrl}plugin/${pluginId}/${url}`;
     };
 
+    /**
+     * @param {{
+     *  method?: string;
+     *  headers?: Record<string, string>;
+     *  body?: string;
+     * }} options
+     */
     const buildFetchOptions = (options) => {
         const requestMethod = (options.method ?? "GET").toUpperCase();
 
@@ -120,7 +133,7 @@ function APIClient(pluginId, baseUrl) {
 
     /**
      * @param {string} url
-     * @param {Object} options
+     * @param {Parameters<typeof buildFetchOptions>[0]} options
      */
     const callApi = async (url, options) => {
         const endpointUrl = buildApiUrl(url);

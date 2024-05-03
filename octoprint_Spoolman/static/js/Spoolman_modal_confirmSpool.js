@@ -20,6 +20,8 @@ $(() => {
      * Events:
      * - onConfirm
      * - onHidden
+     *
+     * @param {*} params
      */
     function SpoolmanModalConfirmSpoolViewModel(params) {
         const self = this;
