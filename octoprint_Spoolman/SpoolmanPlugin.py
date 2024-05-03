@@ -88,6 +88,7 @@ class SpoolmanPlugin(
                 "js/common/api.js",
                 "js/common/promiseCache.js",
                 "js/common/octoprint.js",
+                "js/common/formatting.js",
                 "js/api/getSpoolmanSpools.js",
                 "js/api/getCurrentJobRequirements.js",
                 "js/api/updateActiveSpool.js",
