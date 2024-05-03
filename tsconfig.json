@@ -8,6 +8,6 @@
         "target": "es2020",
     },
     "include": [
-        "./octoprint_Spoolman/static/js/*"
+        "./octoprint_Spoolman/static/js/**/*"
     ],
 }
