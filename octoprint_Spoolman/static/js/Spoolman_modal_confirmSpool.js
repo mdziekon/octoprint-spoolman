@@ -128,13 +128,19 @@ $(() => {
                 }
 
                 const isToolMissingSelection = !toolFilamentUsage.spoolId;
-                const isEnoughFilamentAvailable = isToolMissingSelection || !spoolData
-                    ? undefined
-                    : toolFilamentUsage.filamentWeight <= spoolData.remaining_weight;
+                const safeSpool = spoolData && toSafeSpool(spoolData);
+
+                const isEnoughFilamentAvailable = (
+                    !isToolMissingSelection &&
+                    safeSpool &&
+                    safeSpool.isSpoolValid
+                )
+                    ? toolFilamentUsage.filamentWeight <= safeSpool.spoolData.remaining_weight
+                    : undefined;
 
                 return {
                     spoolId,
-                    spoolData,
+                    spoolData: safeSpool && safeSpool.spoolData,
                     /** @type true */
                     isToolInUse: true,
                     isToolMissingSelection,

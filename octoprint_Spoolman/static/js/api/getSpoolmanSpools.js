@@ -41,3 +41,33 @@ async function getSpoolmanSpools(apiClient) {
 
     return /** @type Success<{ response: GetSpoolsResponse }> */ (request);
 }
+
+/**
+ * @type {(spool: Spool) => spool is Spool & { remaining_weight: number }}
+ */
+const isSpoolValid = (spool) => {
+    return (
+        spool.remaining_weight !== undefined
+    );
+};
+
+/**
+ * @param {Spool} spool
+ */
+const toSafeSpool = (spool) => {
+    if (isSpoolValid(spool)) {
+        return {
+            spoolId: spool.id,
+            /** @type true */
+            isSpoolValid: true,
+            spoolData: spool,
+        };
+    }
+
+    return {
+        spoolId: spool.id,
+        /** @type false */
+        isSpoolValid: false,
+        spoolData: spool,
+    };
+};

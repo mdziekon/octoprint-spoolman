@@ -69,9 +69,15 @@ $(() => {
                 return String(spool.id) === toolSpoolId;
             });
 
+            const spoolmanSafeSpools = spoolmanSpools.map(toSafeSpool);
+
             self.templateData.toolCurrentSpoolId(toolSpoolId);
-            self.templateData.toolCurrentSpool(toolSpool);
-            self.templateData.tableItemsOnCurrentPage(spoolmanSpools);
+            self.templateData.toolCurrentSpool(
+                toolSpool
+                    ? toSafeSpool(toolSpool)
+                    : undefined
+            );
+            self.templateData.tableItemsOnCurrentPage(spoolmanSafeSpools);
 
             self.templateData.spoolmanUrl(getPluginSettings().spoolmanUrl());
 
