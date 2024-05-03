@@ -3,6 +3,10 @@
  * @property {Object} data
  * @property {Array<Spool>} data.spools
  *
+ * @typedef {Object} FilamentVendor
+ * @property {number} id
+ * @property {string} name
+ *
  * @typedef {Object} Spool
  * @property {number} id
  * @property {boolean} archived
@@ -21,9 +25,7 @@
  * @property {string | undefined} filament.material
  * @property {string | undefined} filament.name
  * @property {string | undefined} filament.color_hex
- * @property {Object | undefined} filament.vendor
- * @property {number} filament.vendor.id
- * @property {string} filament.vendor.name
+ * @property {FilamentVendor | undefined} filament.vendor
  */
 
 /**
