@@ -127,6 +127,8 @@
                                 style="cursor: pointer;"
                                 data-bind="
                                     click: function() {
+                                        if (!$data.isSpoolValid) { return; }
+
                                         $component.templateApi.handleSelectSpoolForTool($component.templateData.toolIdx(), $data.spoolId);
                                     },
                                     attr: {
@@ -135,10 +137,15 @@
                                             String($component.templateData.toolCurrentSpool().spoolId) === String($data.spoolId)
                                         )
                                             ? 'success'
-                                            : ''
-                                        }
+                                            : '',
+                                        style: [
+                                            `cursor: ${$data.isSpoolValid ? 'pointer' : 'not-allowed'}`
+                                        ].join(' '),
+                                        title: $data.isSpoolValid
+                                            ? 'Click to select spool'
+                                            : 'Invalid spool, not available for selection'
+                                    }
                                 "
-                                title="Click to select spool"
                             >
                                 <td data-bind="visible: $component.templateData.tableAttributeVisibility.id">
                                     <span data-bind="text: $data.spoolId, attr: { title: $data.spoolId }"></span>
