@@ -69,7 +69,12 @@ $(() => {
                 return String(spool.id) === toolSpoolId;
             });
 
-            const spoolmanSafeSpools = spoolmanSpools.map(toSafeSpool);
+            const spoolmanSafeSpools = spoolmanSpools.map((spool) => {
+                return {
+                    ...toSafeSpool(spool),
+                    displayData: toSpoolForDisplay(spool, { constants: self.constants }),
+                };
+            });
 
             self.templateData.toolCurrentSpoolId(toolSpoolId);
             self.templateData.toolCurrentSpool(
