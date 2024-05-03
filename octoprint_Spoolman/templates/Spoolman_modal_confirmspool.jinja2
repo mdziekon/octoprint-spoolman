@@ -81,6 +81,9 @@
                                 <!-- ko if: (templateData.detectedProblems().includes(constants.filament_problems.NOT_ENOUGH_FILAMENT)) -->
                                     <li>One of the selected spools does not have enough filament.</li>
                                 <!-- /ko -->
+                                <!-- ko if: (templateData.detectedProblems().includes(constants.filament_problems.INVALID_SPOOL)) -->
+                                    <li>One of the selected spools does not include all necessary information.</li>
+                                <!-- /ko -->
                                 <!-- ko if: (templateData.detectedProblems().includes(constants.filament_problems.MISSING_SPOOL_SELECTION)) -->
                                     <li>One of the tools is missing spool selection.</li>
                                 <!-- /ko -->
