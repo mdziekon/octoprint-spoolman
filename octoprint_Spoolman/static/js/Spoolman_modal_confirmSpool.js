@@ -111,6 +111,8 @@ $(() => {
                 const spoolId = selectedSpoolIds[extruderIdx]?.spoolId();
 
                 const spoolData = spoolmanSpools.find((spool) => String(spool.id) === spoolId);
+                const safeSpool = spoolData && toSafeSpool(spoolData);
+                const spoolDisplayData = spoolData && toSpoolForDisplay(spoolData, { constants: self.constants });
                 const toolFilamentUsage = currentJobRequirements.tools[extruderIdx];
 
                 if (
@@ -120,6 +122,8 @@ $(() => {
                     return {
                         spoolId,
                         spoolData,
+                        spoolDisplayData,
+                        isSpoolValid: safeSpool?.isSpoolValid,
                         /** @type false */
                         isToolInUse: false,
                         isToolMissingSelection: undefined,
@@ -128,7 +132,6 @@ $(() => {
                 }
 
                 const isToolMissingSelection = !toolFilamentUsage.spoolId;
-                const safeSpool = spoolData && toSafeSpool(spoolData);
 
                 const isEnoughFilamentAvailable = (
                     !isToolMissingSelection &&
@@ -141,6 +144,8 @@ $(() => {
                 return {
                     spoolId,
                     spoolData: safeSpool && safeSpool.spoolData,
+                    spoolDisplayData,
+                    isSpoolValid: safeSpool?.isSpoolValid,
                     /** @type true */
                     isToolInUse: true,
                     isToolMissingSelection,

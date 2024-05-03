@@ -48,6 +48,9 @@ async function getSpoolmanSpools(apiClient) {
 }
 
 /**
+ * Checks whether spool has "complete-enough" data, so that the plugin
+ * can function properly.
+ *
  * @type {(spool: Spool) => spool is Spool & { remaining_weight: number }}
  */
 const isSpoolValid = (spool) => {

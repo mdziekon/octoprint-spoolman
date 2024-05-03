@@ -95,7 +95,7 @@
 
             <div data-bind="foreach: templateData.selectedSpoolsByToolIdx">
                 <div class="tool-row">
-                    <!-- ko ifnot: $data.spoolId && $data.spoolData -->
+                    <!-- ko ifnot: $data.spoolId && $data.spoolData && $data.spoolDisplayData -->
                         <div style="display: flex;">
                             <!-- ko if: $parent.templateData.selectedSpoolsByToolIdx().length > 1 -->
                                 <div class="tool-idx" style="margin-right: 0.25em;">
@@ -126,7 +126,7 @@
                                             </strong>
                                         <!-- /ko -->
                                         <!-- ko if: ($data.filamentUsage.isEnough === undefined) -->
-                                            <strong class="text-error">
+                                            <strong class="text-warning">
                                                 <span
                                                     data-bind="text: ($data.filamentUsage.length ?? 0).toFixed(1)"
                                                     title="Required length"
@@ -144,7 +144,7 @@
                         </div>
                     <!-- /ko -->
 
-                    <!-- ko if: $data.spoolData -->
+                    <!-- ko if: $data.spoolData && $data.spoolDisplayData -->
                         <div style="display: flex;">
                             <!-- ko if: $parent.templateData.selectedSpoolsByToolIdx().length > 1 -->
                                 <div class="tool-idx" style="margin-right: 0.25em;">
@@ -155,16 +155,24 @@
                             <span
                                 class="color-preview"
                                 style="flex-shrink: 0;"
-                                data-bind="style: { 'background-color': '#' + spoolData.filament.color_hex }, attr: { title: spoolData.filament.name }"
+                                data-bind="
+                                    style: { [$data.spoolDisplayData.filament.color.cssProperty]: $data.spoolDisplayData.filament.color.cssValue },
+                                    attr: { title: $data.spoolDisplayData.filament.name.displayValue }
+                                "
                             ></span>
                             <div class="spool-label">
-                                <!-- ko if: spoolData.filament.material -->
-                                <span>[<span data-bind="text: spoolData.filament.material"></span>]</span>
-                                <!-- /ko -->
-                                <span data-bind="text: spoolData.filament.name"></span>
-                                <!-- ko if: spoolData.filament.vendor.name -->
-                                <span>(<span data-bind="text: spoolData.filament.vendor.name"></span>)</span>
-                                <!-- /ko -->
+                                <span>[<span data-bind="
+                                    text: $data.spoolDisplayData.filament.material.displayShort,
+                                    attr: { title: $data.spoolDisplayData.filament.material.displayValue }
+                                "></span>]</span>
+                                <span data-bind="
+                                    text: $data.spoolDisplayData.filament.name.displayValue,
+                                    attr: { title: $data.spoolDisplayData.filament.name.displayValue }
+                                "></span>
+                                <i>(<span data-bind="
+                                    text: $data.spoolDisplayData.filament.vendor.name.displayValue,
+                                    attr: { title: $data.spoolDisplayData.filament.vendor.name.displayValue }
+                                "></span>)</i>
                             </div>
                         </div>
                         <div style="display: flex; flex-direction: column; flex-shrink: 0;">
@@ -172,7 +180,17 @@
                                 <div class="text-right">
                                     <span>
                                         Required:
-                                        <strong data-bind="class: ($data.filamentUsage?.isEnough ?? false) ? 'text-success' : 'text-error'">
+                                        <strong data-bind="
+                                            class: (
+                                                $data.filamentUsage?.isEnough === undefined
+                                                    ? 'text-warning'
+                                                    : (
+                                                        $data.filamentUsage?.isEnough === true
+                                                        ? 'text-success'
+                                                        : 'text-error'
+                                                    )
+                                            )
+                                        ">
                                             <span
                                                 data-bind="text: ($data.filamentUsage?.weight ?? 0).toFixed(1)"
                                                 title="Required weight"
@@ -183,11 +201,8 @@
                                 <div class="text-right">
                                     <span>
                                         Remaining on spool:
-                                        <strong>
-                                            <span
-                                                data-bind="text: (spoolData.remaining_weight ?? 0).toFixed(1)"
-                                                title="Remaining weight"
-                                            ></span><span data-bind="text: $root.constants.weight_unit"></span>
+                                        <strong data-bind="class: ($data.spoolDisplayData.remaining_weight.isValid) ? '' : 'text-error'">
+                                            <span data-bind="text: $data.spoolDisplayData.remaining_weight.displayValue, attr: {title: 'Remaining weight'}"></span>
                                         </strong>
                                     </span>
                                 </div>
