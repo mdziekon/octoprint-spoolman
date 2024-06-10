@@ -289,7 +289,34 @@ $(() => {
 
             self.printerStateViewModel.print = newStartPrintFunction;
             self.filesViewModel.loadFile = newLoadAndPrintFunction;
+
+            self.printerStateViewModel.formatFilamentWithWeight = function(filament) {
+                if (!filament) {
+                    return "-";
+                };
+                console.log(filament);
+                return "a lot of filament"
+            }
         };
+
+        // lifted straight from filamentmanager
+        self.replaceFilamentView = function replaceFilamentViewInSidebar() {
+            $('#state').find('.accordion-inner').contents().each((index, item) => {
+                if (item.nodeType === Node.COMMENT_NODE) {
+                    if (item.nodeValue === ' ko foreach: filament ') {
+                        item.nodeValue = ' ko foreach: [] '; // eslint-disable-line no-param-reassign
+                        const element = '<!-- ko foreach: filament --> <span data-bind="text: \'Filament (\' + name() + \'): \', title: \'Filament usage for \' + name()"></span><strong data-bind="text: $root.formatFilamentWithWeight(data())"></strong><br> <!-- /ko -->';
+                        $(element).insertBefore(item);
+                        return false; // exit loop
+                    }
+                }
+                return true;
+            });
+        };
+
+        self.onStartup = () => {
+            self.replaceFilamentView();
+        }
 
         self.onBeforeBinding = () => {
             SpoolmanModalSelectSpoolComponent.registerComponent();
