@@ -13,6 +13,8 @@ $(() => {
         self.printerStateViewModel = params[1];
         self.filesViewModel = params[2];
 
+        self.printerStateViewModel.filamentWithWeight = ko.observableArray([]);
+
         self.modals = {
             selectSpool: () => $(SpoolmanModalSelectSpoolComponent.modalSelector),
             confirmSpool: () => $(SpoolmanModalConfirmSpoolComponent.modalSelector),
@@ -294,8 +296,10 @@ $(() => {
                 if (!filament) {
                     return "-";
                 };
-                console.log(filament);
-                return "a lot of filament"
+                if (filament.weight === undefined) {
+                    return `${filament.length.toFixed(1)}mm`
+                }
+                return `${filament.length.toFixed(1)}mm / ${filament.weight.toFixed(1)}g`
             }
         };
 
@@ -305,7 +309,7 @@ $(() => {
                 if (item.nodeType === Node.COMMENT_NODE) {
                     if (item.nodeValue === ' ko foreach: filament ') {
                         item.nodeValue = ' ko foreach: [] '; // eslint-disable-line no-param-reassign
-                        const element = '<!-- ko foreach: filament --> <span data-bind="text: \'Filament (\' + name() + \'): \', title: \'Filament usage for \' + name()"></span><strong data-bind="text: $root.formatFilamentWithWeight(data())"></strong><br> <!-- /ko -->';
+                        const element = '<!-- ko foreach: filamentWithWeight --> <span data-bind="text: \'Filament (\' + name() + \'): \', title: \'Filament usage for \' + name()"></span><strong data-bind="text: $root.formatFilamentWithWeight(data())"></strong><br> <!-- /ko -->';
                         $(element).insertBefore(item);
                         return false; // exit loop
                     }
@@ -318,6 +322,62 @@ $(() => {
             self.replaceFilamentView();
         }
 
+        let filename;
+
+        const updateFilament = function updateFilamentWeightAndCheckRemainingFilament() {
+            const calculateWeight = function calculateFilamentWeight(length, diameter, density) {
+                const radius = diameter / 2;
+                const volume = (length * Math.PI * radius * radius) / 1000;
+                return volume * density;
+            };
+    
+            // const showWarning = function showWarningIfRequiredFilamentExceedsRemaining(required, remaining) { if (required < remaining) return false;
+    
+            //     if (warning) {
+            //         // fade out notification if one is still shown
+            //         warning.options.delay = 1000;
+            //         warning.queueRemove();
+            //     }
+    
+            //     warning = new PNotify({
+            //         title: gettext('Insufficient filament'),
+            //         text: gettext("The current print job needs more material than what's left on the selected spool."),
+            //         type: 'warning',
+            //         hide: false,
+            //     });
+    
+            //     return true;
+            // };
+    
+            const filament = self.printerStateViewModel.filament();
+
+            const filamentWithWeight = [];
+            for (let i = 0; i < filament.length; i++) {
+                const spool = self.templateData.selectedSpoolsByToolIdx()[i]
+                const fil = filament[i]
+                let weight;
+                const length = fil.data().length;
+                if(spool && spool.spoolData) {
+                    weight = calculateWeight(length, spool.spoolData.filament.diameter, spool.spoolData.filament.density);
+                }
+                // fil.data({...fil.data(), weight})
+                const newFilament = {
+                    name: fil.name,
+                    data: ko.observable({
+                        ...fil.data(),
+                        weight,
+                    })
+                }
+                
+                filamentWithWeight.push(newFilament)
+            }
+    
+            filename = self.printerStateViewModel.filename();
+            self.printerStateViewModel.filamentWithWeight(filamentWithWeight);
+        };
+
+        let waitForFilamentData = false;
+
         self.onBeforeBinding = () => {
             SpoolmanModalSelectSpoolComponent.registerComponent();
             SpoolmanModalConfirmSpoolComponent.registerComponent();
@@ -325,6 +385,26 @@ $(() => {
             self.templateData.modals.selectSpool.eventsSink.subscribe((newEvent) => {
                 if (newEvent.type === 'onSelectSpoolForTool') {
                     updateSelectedSpools();
+                }
+            });
+            self.templateData.selectedSpoolsByToolIdx.subscribe(updateFilament);
+            self.printerStateViewModel.filament.subscribe((data) => {
+                // updateFilament();
+                // console.log(data[0].data())
+                // OctoPrint constantly updates the filament observable, to prevent invoking the warning message
+                // on every update we only call the updateFilament() method if the selected file has changed
+
+                if (filename !== self.printerStateViewModel.filename()) {
+                    if (self.printerStateViewModel.filename() !== undefined && self.printerStateViewModel.filament().length < 1) {
+                        // file selected, but no filament data found, probably because it's still in analysis queue
+                        waitForFilamentData = true;
+                    } else {
+                        waitForFilamentData = false;
+                        updateFilament();
+                    }
+                } else if (waitForFilamentData && self.printerStateViewModel.filament().length > 0) {
+                    waitForFilamentData = false;
+                    updateFilament();
                 }
             });
         };
