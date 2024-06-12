@@ -291,24 +291,6 @@ $(() => {
                 return volume * density;
             };
     
-            // const showWarning = function showWarningIfRequiredFilamentExceedsRemaining(required, remaining) { if (required < remaining) return false;
-    
-            //     if (warning) {
-            //         // fade out notification if one is still shown
-            //         warning.options.delay = 1000;
-            //         warning.queueRemove();
-            //     }
-    
-            //     warning = new PNotify({
-            //         title: gettext('Insufficient filament'),
-            //         text: gettext("The current print job needs more material than what's left on the selected spool."),
-            //         type: 'warning',
-            //         hide: false,
-            //     });
-    
-            //     return true;
-            // };
-    
             const filament = self.printerStateViewModel.filament();
 
             const filamentWithWeight = [];
@@ -320,7 +302,6 @@ $(() => {
                 if(spool && spool.spoolData) {
                     weight = calculateWeight(length, spool.spoolData.filament.diameter, spool.spoolData.filament.density);
                 }
-                // fil.data({...fil.data(), weight})
                 const newFilament = {
                     name: fil.name,
                     data: ko.observable({
@@ -328,7 +309,6 @@ $(() => {
                         weight,
                     })
                 }
-                
                 filamentWithWeight.push(newFilament)
             }
     
@@ -348,12 +328,10 @@ $(() => {
                 }
             });
             self.templateData.selectedSpoolsByToolIdx.subscribe(updateFilament);
-            self.printerStateViewModel.filament.subscribe((data) => {
-                // updateFilament();
-                // console.log(data[0].data())
+            self.printerStateViewModel.filament.subscribe(() => {
+
                 // OctoPrint constantly updates the filament observable, to prevent invoking the warning message
                 // on every update we only call the updateFilament() method if the selected file has changed
-
                 if (filename !== self.printerStateViewModel.filename()) {
                     if (self.printerStateViewModel.filename() !== undefined && self.printerStateViewModel.filament().length < 1) {
                         // file selected, but no filament data found, probably because it's still in analysis queue
@@ -368,6 +346,7 @@ $(() => {
                 }
             });
         };
+
         self.onAfterBinding = () => {
             self.templateData.settingsViewModel(self.settingsViewModel);
 
