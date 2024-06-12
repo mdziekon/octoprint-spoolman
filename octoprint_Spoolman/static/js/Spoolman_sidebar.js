@@ -284,18 +284,19 @@ $(() => {
 
         let filename;
 
-        const updateFilament = function updateFilamentWeightAndCheckRemainingFilament() {
-            const calculateWeight = function calculateFilamentWeight(length, diameter, density) {
-                const radius = diameter / 2;
-                const volume = (length * Math.PI * radius * radius) / 1000;
-                return volume * density;
-            };
+        const calculateWeight = function calculateFilamentWeight(length, diameter, density) {
+            const radius = diameter / 2;
+            const volume = (length * Math.PI * radius * radius) / 1000;
+            return volume * density;
+        };
+        self.printerStateViewModel.filamentWithWeight = ko.computed(function updateFilamentWeightAndCheckRemainingFilament() {
     
             const filament = self.printerStateViewModel.filament();
+            const spools = self.templateData.selectedSpoolsByToolIdx()
 
             const filamentWithWeight = [];
             for (let i = 0; i < filament.length; i++) {
-                const spool = self.templateData.selectedSpoolsByToolIdx()[i]
+                const spool = spools[i]
                 const fil = filament[i]
                 let weight;
                 const length = fil.data().length;
@@ -311,12 +312,9 @@ $(() => {
                 }
                 filamentWithWeight.push(newFilament)
             }
-    
-            filename = self.printerStateViewModel.filename();
-            self.printerStateViewModel.filamentWithWeight(filamentWithWeight);
-        };
 
-        let waitForFilamentData = false;
+            return filamentWithWeight;
+        });
 
         self.onBeforeBinding = () => {
             SpoolmanModalSelectSpoolComponent.registerComponent();
@@ -325,24 +323,6 @@ $(() => {
             self.templateData.modals.selectSpool.eventsSink.subscribe((newEvent) => {
                 if (newEvent.type === 'onSelectSpoolForTool') {
                     updateSelectedSpools();
-                }
-            });
-            self.templateData.selectedSpoolsByToolIdx.subscribe(updateFilament);
-            self.printerStateViewModel.filament.subscribe(() => {
-
-                // OctoPrint constantly updates the filament observable, to prevent invoking the warning message
-                // on every update we only call the updateFilament() method if the selected file has changed
-                if (filename !== self.printerStateViewModel.filename()) {
-                    if (self.printerStateViewModel.filename() !== undefined && self.printerStateViewModel.filament().length < 1) {
-                        // file selected, but no filament data found, probably because it's still in analysis queue
-                        waitForFilamentData = true;
-                    } else {
-                        waitForFilamentData = false;
-                        updateFilament();
-                    }
-                } else if (waitForFilamentData && self.printerStateViewModel.filament().length > 0) {
-                    waitForFilamentData = false;
-                    updateFilament();
                 }
             });
         };
