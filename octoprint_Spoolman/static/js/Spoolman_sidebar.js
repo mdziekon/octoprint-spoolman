@@ -11,6 +11,7 @@ $(() => {
 
         self.settingsViewModel = params[0];
         self.printerStateViewModel = params[1];
+        self.filesViewModel = params[2];
 
         self.modals = {
             selectSpool: () => $(SpoolmanModalSelectSpoolComponent.modalSelector),
@@ -229,11 +230,17 @@ $(() => {
 
         const monkeypatchOctoprintUI = () => {
             const origStartPrintFunction = self.printerStateViewModel.print;
+            const origLoadAndPrintFunction = self.filesViewModel.loadFile;
 
-            const newStartPrintFunction = async function confirmSpoolsBeforeStartPrint() {
+            let suppressStartPrintConfirmSpoolsSelection = false;
+
+            const newStartPrintFunction = function confirmSpoolsBeforeStartPrint() {
                 const shouldConfirmSpoolsSelection = Boolean(getPluginSettings().isPreprintSpoolVerifyEnabled());
 
-                if (!shouldConfirmSpoolsSelection) {
+                if (
+                    !shouldConfirmSpoolsSelection ||
+                    suppressStartPrintConfirmSpoolsSelection
+                ) {
                     return origStartPrintFunction();
                 }
 
@@ -247,8 +254,41 @@ $(() => {
                     subscription.dispose();
                 });
             };
+            /**
+             * Note: this implementation always pre-selects the file, even though the outcome
+             * of the confirmation modal might be "negative" (user cancels the print intent).
+             *
+             * This is a trade-off between using the default load&print implementation "as-is"
+             * or reimplementing it here.
+             */
+            const newLoadAndPrintFunction = function confirmSpoolsBeforeLoadAndPrint(...args) {
+                const [ data, printAfterLoad, ...restArgs ] = args;
+
+                const shouldConfirmSpoolsSelection = Boolean(getPluginSettings().isPreprintSpoolVerifyEnabled());
+
+                if (!shouldConfirmSpoolsSelection || !printAfterLoad) {
+                    return origLoadAndPrintFunction(...args);
+                }
+
+                origLoadAndPrintFunction(data, false, ...restArgs);
+
+                handleOpenSpoolConfirmation();
+
+                const subscription = self.templateData.modals.confirmSpool.eventsSink.subscribe((newEvent) => {
+                    if (newEvent.type === 'onConfirm') {
+                        suppressStartPrintConfirmSpoolsSelection = true;
+
+                        origLoadAndPrintFunction(...args);
+                    }
+
+                    suppressStartPrintConfirmSpoolsSelection = false;
+
+                    subscription.dispose();
+                });
+            };
 
             self.printerStateViewModel.print = newStartPrintFunction;
+            self.filesViewModel.loadFile = newLoadAndPrintFunction;
         };
 
         self.onBeforeBinding = () => {
@@ -308,6 +348,7 @@ $(() => {
         dependencies: [
             "settingsViewModel",
             "printerStateViewModel",
+            "filesViewModel",
         ],
         elements: [
             document.querySelector("#sidebar_spoolman"),
