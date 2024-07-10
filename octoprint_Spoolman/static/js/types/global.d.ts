@@ -2,7 +2,12 @@ declare global {
     // Plugin global definitions
     const pluginSpoolmanApi: PluginSpoolmanApiType;
 
-    // Octoprint related definitions
+    /**
+     * Octoprint related definitions.
+     *
+     * Accessible via `window.OctoPrint` instance exposed by OctoPrint itself
+     * @see https://github.com/OctoPrint/OctoPrint/blob/1.10.0/src/octoprint/static/js/app/main.js#L2
+     */
     const OctoPrint: {
         socket: {
             onMessage: (
@@ -15,10 +20,6 @@ declare global {
                 }) => void
             ) => void;
         };
-    };
-    const OctoPrintClient: {
-        new(params: unknown): typeof OctoPrintClient;
-
         getCookie: (name: string) => string;
     };
     const OCTOPRINT_VIEWMODELS: {

@@ -117,13 +117,9 @@ function APIClient(pluginId, baseUrl) {
         };
 
         if (methodsWithBody.includes(requestMethod)) {
-            const stockClient = new OctoPrintClient({
-                baseurl: "/",
-            });
-
             fetchOptions.headers = {
                 'Content-Type': "application/json; charset=UTF-8",
-                'X-CSRF-Token': stockClient.getCookie("csrf_token"),
+                'X-CSRF-Token': OctoPrint.getCookie("csrf_token"),
                 ...(fetchOptions.headers ?? {}),
             };
         }
