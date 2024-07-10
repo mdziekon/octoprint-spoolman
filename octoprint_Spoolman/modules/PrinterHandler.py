@@ -63,6 +63,8 @@ class PrinterHandler():
         selectedSpoolIds = self._settings.get([SettingsKeys.SELECTED_SPOOL_IDS])
 
         for toolIdx, toolExtrusionLength in enumerate(current_extrusion_stats['extrusionAmount']):
+            selectedSpool = None
+
             try:
                 selectedSpool = selectedSpoolIds[str(toolIdx)]
             except:
