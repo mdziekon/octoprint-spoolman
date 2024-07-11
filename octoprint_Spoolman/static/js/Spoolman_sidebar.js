@@ -13,6 +13,8 @@ $(() => {
         self.printerStateViewModel = params[1];
         self.filesViewModel = params[2];
 
+        self.printerStateViewModel.filamentWithWeight = ko.observableArray([]);
+
         self.modals = {
             selectSpool: () => $(SpoolmanModalSelectSpoolComponent.modalSelector),
             confirmSpool: () => $(SpoolmanModalConfirmSpoolComponent.modalSelector),
@@ -289,7 +291,68 @@ $(() => {
 
             self.printerStateViewModel.print = newStartPrintFunction;
             self.filesViewModel.loadFile = newLoadAndPrintFunction;
+
+            self.printerStateViewModel.formatFilamentWithWeight = function(filament) {
+                if (!filament) {
+                    return "-";
+                };
+                if (filament.weight === undefined) {
+                    return `${filament.length.toFixed(1)}mm`
+                }
+                return `${filament.length.toFixed(1)}mm / ${filament.weight.toFixed(1)}g`
+            }
         };
+
+        // lifted straight from filamentmanager
+        self.replaceFilamentView = function replaceFilamentViewInSidebar() {
+            $('#state').find('.accordion-inner').contents().each((index, item) => {
+                if (item.nodeType === Node.COMMENT_NODE) {
+                    if (item.nodeValue === ' ko foreach: filament ') {
+                        item.nodeValue = ' ko foreach: [] '; // eslint-disable-line no-param-reassign
+                        const element = '<!-- ko foreach: filamentWithWeight --> <span data-bind="text: \'Filament (\' + name() + \'): \', title: \'Filament usage for \' + name()"></span><strong data-bind="text: $root.formatFilamentWithWeight(data())"></strong><br> <!-- /ko -->';
+                        $(element).insertBefore(item);
+                        return false; // exit loop
+                    }
+                }
+                return true;
+            });
+        };
+
+        self.onStartup = () => {
+            self.replaceFilamentView();
+        }
+
+        const calculateWeight = function calculateFilamentWeight(length, diameter, density) {
+            const radius = diameter / 2;
+            const volume = (length * Math.PI * radius * radius) / 1000;
+            return volume * density;
+        };
+        self.printerStateViewModel.filamentWithWeight = ko.computed(function updateFilamentWeightAndCheckRemainingFilament() {
+    
+            const filament = self.printerStateViewModel.filament();
+            const spools = self.templateData.selectedSpoolsByToolIdx()
+
+            const filamentWithWeight = [];
+            for (let i = 0; i < filament.length; i++) {
+                const spool = spools[i]
+                const fil = filament[i]
+                let weight;
+                const length = fil.data().length;
+                if(spool && spool.spoolData) {
+                    weight = calculateWeight(length, spool.spoolData.filament.diameter, spool.spoolData.filament.density);
+                }
+                const newFilament = {
+                    name: fil.name,
+                    data: ko.observable({
+                        ...fil.data(),
+                        weight,
+                    })
+                }
+                filamentWithWeight.push(newFilament)
+            }
+
+            return filamentWithWeight;
+        });
 
         self.onBeforeBinding = () => {
             SpoolmanModalSelectSpoolComponent.registerComponent();
@@ -301,6 +364,7 @@ $(() => {
                 }
             });
         };
+
         self.onAfterBinding = () => {
             self.templateData.settingsViewModel(self.settingsViewModel);
 
