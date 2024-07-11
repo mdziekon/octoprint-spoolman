@@ -322,8 +322,6 @@ $(() => {
             self.replaceFilamentView();
         }
 
-        let filename;
-
         const calculateWeight = function calculateFilamentWeight(length, diameter, density) {
             const radius = diameter / 2;
             const volume = (length * Math.PI * radius * radius) / 1000;
