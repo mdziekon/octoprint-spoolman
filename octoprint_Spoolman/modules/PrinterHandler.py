@@ -44,9 +44,15 @@ class PrinterHandler():
             self.lastPrintOdometer = None
             self.lastPrintOdometerLoad = None
             
-            self._settings.set([SettingsKeys.DATA_SAVE], None)
+    def resetSaveStatus(self,eventType):
+        if (
+            eventType == Events.PRINT_DONE or
+            eventType == Events.PRINT_FAILED or
+            eventType == Events.PRINT_CANCELLED
+        ):
+            self._settings.set([SettingsKeys.BACKUP_DATA], None)
             self._settings.save()
-
+            
     def handlePrintingGCode(self, command):
         if (
             not hasattr(self, "lastPrintOdometerLoad") or
@@ -105,8 +111,8 @@ class PrinterHandler():
                 }
             )
 
-    def save_Printing_Status_Change(self):
-        data_save = {}
+    def savePrintingStatusChange(self):
+        backup_save = {}
         peek_stats_helpers = self.lastPrintOdometerLoad.send(False)
         current_extrusion_stats = copy.deepcopy(peek_stats_helpers['get_current_extrusion_stats']())
 
@@ -116,33 +122,28 @@ class PrinterHandler():
             try:
                 selectedSpool = selectedSpoolIds[str(toolIdx)]
             except:
-                self._logger.info("Extruder '%s', spool id: none", toolIdx)
+                self._logger.info("Extruder Saved '%s', spool id: none", toolIdx)
 
             if not selectedSpool or selectedSpool.get('spoolId', None) == None:
                 continue
 
             selectedSpoolId = selectedSpool['spoolId']
             
-            data_save[str(toolIdx)] = {
+            backup_save[str(toolIdx)] = {
                 'toolIdx': toolIdx,
                 'spoolId': selectedSpoolId,
                 'extrusionLength': toolExtrusionLength
             }
-            
-            self.triggerPluginEvent(
-                Events.PLUGIN_SPOOLMAN_SPOOL_USAGE_UPDATE,
-                {
-                'toolIdx': toolIdx,
-                'spoolId': selectedSpoolId,
-                'extrusionLength': toolExtrusionLength            
-                }
-            )            
-        self._settings.set([SettingsKeys.DATA_SAVE], data_save)
-        self._settings.save()
-
+        
+        if backup_save:
+            self.eventSpoolUsageUpdated(backup_save)        
+            self._settings.set([SettingsKeys.BACKUP_DATA], backup_save)
+            self._settings.save()
+                
     def load_Save_SpoolUsage(self):
-        if self._settings.get([SettingsKeys.DATA_SAVE]):
-            for toolIdx, spool_data in self._settings.get([SettingsKeys.DATA_SAVE]).items():
+        self._logger.info("Loading saved spool usage")
+        if self._settings.get([SettingsKeys.BACKUP_DATA]):
+            for toolIdx, spool_data in self._settings.get([SettingsKeys.BACKUP_DATA]).items():
                 selectedSpoolId = spool_data.get('spoolId')
                 toolExtrusionLength = spool_data.get('extrusionLength')
 
@@ -174,3 +175,20 @@ class PrinterHandler():
                         'extrusionLength': toolExtrusionLength,
                     }
                 )
+        self._settings.set([SettingsKeys.BACKUP_DATA], None)
+        self._settings.save()
+        
+    def eventSpoolUsageUpdated(self, data):
+        extruders_data = []
+
+        for toolIdx, spool_info in data.items():
+            extruders_data.append({
+                'toolIdx': spool_info['toolIdx'],
+                'spoolId': spool_info['spoolId'],
+                'extrusionLength': spool_info['extrusionLength']
+            })
+
+        self.triggerPluginEvent(
+            Events.PLUGIN_SPOOLMAN_SPOOL_USAGE_UPDATE,
+            {'extruders': extruders_data}
+        )

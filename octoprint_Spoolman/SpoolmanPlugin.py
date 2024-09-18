@@ -57,7 +57,8 @@ class SpoolmanPlugin(
 
     def on_after_startup(self):
         self._logger.info("[Spoolman][init] Plugin activated")
-        self.load_Save_SpoolUsage()
+        if self._settings.get_boolean([SettingsKeys.STATUS_BACKUP]):
+            self.load_Save_SpoolUsage()
         
     # Printing events handlers
     def on_event(self, event, payload):
@@ -69,8 +70,13 @@ class SpoolmanPlugin(
             event == Events.PRINT_CANCELLED
         ):
             self.handlePrintingStatusChange(event)
-        elif event == Events.Z_CHANGE:
-            self.save_Printing_Status_Change()
+            
+            if self._settings.get_boolean([SettingsKeys.STATUS_BACKUP]):
+                self.resetSaveStatus(event)
+            
+        if event == Events.Z_CHANGE:
+            if self._printer.is_printing() and self._settings.get_boolean([SettingsKeys.STATUS_BACKUP]):
+                self.savePrintingStatusChange()
         pass
 
     def on_sentGCodeHook(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
@@ -128,6 +134,8 @@ class SpoolmanPlugin(
             SettingsKeys.SPOOLMAN_CERT_PEM_PATH: "",
             SettingsKeys.SELECTED_SPOOL_IDS: {},
             SettingsKeys.IS_PREPRINT_SPOOL_VERIFY_ENABLED: True,
+            SettingsKeys.STATUS_BACKUP: False,
+            SettingsKeys.BACKUP_DATA: None
         }
 
         return settings

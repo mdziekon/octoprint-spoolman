@@ -8,4 +8,5 @@ class SettingsKeys():
 	SPOOLMAN_CERT_PEM_PATH = "spoolmanCertPemPath"
 	SELECTED_SPOOL_IDS = "selectedSpoolIds"
 	IS_PREPRINT_SPOOL_VERIFY_ENABLED = "isPreprintSpoolVerifyEnabled"
-	DATA_SAVE = "dataSave"
+	BACKUP_DATA = "Backupdata"
+	STATUS_BACKUP = "isstatusBackupEnabled"
