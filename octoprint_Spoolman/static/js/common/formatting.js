@@ -1,3 +1,14 @@
+
+/**
+ * @param {number} weight
+ * @param {{
+*  constants: Record<string, unknown>
+* }} params
+*/
+const toWeight = (weight, params) => {
+    return `${weight.toFixed(1)}${params.constants['weight_unit']}`;
+};
+
 /**
  * @param {Spool} spool
  * @param {{
@@ -55,11 +66,27 @@ const toSpoolForDisplay = (spool, params) => {
             spool.remaining_weight !== undefined
                 ? {
                     isValid: true,
-                    displayValue: `${spool.remaining_weight.toFixed(1)}${params.constants['weight_unit']}`,
+                    displayValue: toWeight(spool.remaining_weight, params),
                 } : {
                     isValid: false,
                     displayValue: "Unavailable",
                 }
         ),
     };
+};
+
+/**
+ * @param {number} length
+ *  Filament path length, in `mm`
+ * @param {number} diameter
+ *  Filament diameter, in `mm`
+ * @param {number} density
+ *  Filament density, in `g/cm^3`
+ * @returns number
+ */
+const calculateWeight = (length, diameter, density) => {
+    const radius = diameter / 2;
+    const volume = length * Math.PI * (radius * radius) / 1000;
+
+    return volume * density;
 };

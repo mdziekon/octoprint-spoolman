@@ -40,6 +40,13 @@ declare global {
         }): void
     };
 
+    /**
+     * OctoPrint's filament formatter helper.
+     *
+     * @see https://github.com/OctoPrint/OctoPrint/blob/a8fff3930e3c3901bd560ca77656c281959134b3/src/octoprint/static/js/app/helpers.js#L639
+     */
+    const formatFilament: (filamentData: unknown) => string;
+
     const BASEURL: string;
 
     // Knockout
