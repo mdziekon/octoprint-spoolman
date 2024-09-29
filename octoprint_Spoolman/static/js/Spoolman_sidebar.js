@@ -228,6 +228,91 @@ $(() => {
         };
         /** -- end of bindings -- */
 
+        const monkeypatchOctoprintPrinterState = () => {
+            const printerStateViewModel = self.printerStateViewModel;
+
+            const koFilamentCommentNode = [ ...(document.querySelector("#state .accordion-inner")?.childNodes || []) ].find((node) => {
+                return node.nodeType === Node.COMMENT_NODE && node.nodeValue === ' ko foreach: filament ';
+            });
+
+            // Could not find filaments iterator, abort
+            if (!koFilamentCommentNode) {
+                return;
+            }
+
+            printerStateViewModel.formatEnhancedFilament = (filament) => {
+                if (!filament) {
+                    return "-";
+                }
+
+                const originalFilamentDisplay = formatFilament(filament);
+
+                if (filament.weight === undefined) {
+                    return originalFilamentDisplay
+                }
+
+                return [
+                    toWeight(filament.weight, { constants: self.constants }),
+                    originalFilamentDisplay,
+                ]
+                    .filter((value) => Boolean(value))
+                    .join(' / ');
+            };
+
+            printerStateViewModel.enhancedFilaments = ko.computed(() => {
+                const modelFilaments = self.printerStateViewModel.filament();
+                const spools = self.templateData.selectedSpoolsByToolIdx();
+
+                return modelFilaments.map((modelFilament, idx) => {
+                    const spoolFilamentData = spools[idx]?.spoolData.filament;
+                    const requiredFilamentLength = modelFilament.data().length;
+                    const weight = (
+                        spoolFilamentData
+                        ? calculateWeight(
+                            requiredFilamentLength,
+                            spoolFilamentData.diameter,
+                            spoolFilamentData.density
+                        )
+                        : undefined
+                    );
+
+                    return {
+                        ...modelFilament,
+                        data: ko.observable({
+                            ...modelFilament.data(),
+                            weight,
+                        })
+                    }
+                });
+            });
+
+            const template = document.createElement('template');
+            template.innerHTML = `<span><span data-bind="text: _.sprintf(gettext('Filament (%(name)s)'), { name: name() }), attr: {title: _.sprintf(gettext('Filament usage for %(name)s'), {name: name()})}"></span>: <strong data-bind="text: $root.formatEnhancedFilament(data())"></strong><br></span>`;
+
+            const nodeIteratorLoopStart = document.createComment(' ko foreach: enhancedFilaments ');
+            const nodeIteratorLoopElement = template.content.firstChild?.cloneNode(true);
+            const nodeIteratorLoopEnd = document.createComment(' /ko ');
+
+            // Could not create replacement node, abort
+            if (!nodeIteratorLoopElement) {
+                return;
+            }
+
+            // Replace original iterator with empty array to prevent rendering
+            koFilamentCommentNode.nodeValue = ' ko foreach: [] ';
+
+            /**
+             * Inject new iterator with enhanced filament info.
+             * Based on original OctoPrint's formatting template.
+             *
+             * @see https://github.com/OctoPrint/OctoPrint/blob/a8fff3930e3c3901bd560ca77656c281959134b3/src/octoprint/templates/sidebar/state.jinja2#L14
+             */
+
+            koFilamentCommentNode.parentNode?.insertBefore(nodeIteratorLoopStart, koFilamentCommentNode);
+            koFilamentCommentNode.parentNode?.insertBefore(nodeIteratorLoopElement, koFilamentCommentNode);
+            koFilamentCommentNode.parentNode?.insertBefore(nodeIteratorLoopEnd, koFilamentCommentNode);
+        };
+
         const monkeypatchOctoprintUI = () => {
             const origStartPrintFunction = self.printerStateViewModel.print;
             const origLoadAndPrintFunction = self.filesViewModel.loadFile;
@@ -291,6 +376,9 @@ $(() => {
             self.filesViewModel.loadFile = newLoadAndPrintFunction;
         };
 
+        self.onStartup = () => {
+            monkeypatchOctoprintPrinterState();
+        };
         self.onBeforeBinding = () => {
             SpoolmanModalSelectSpoolComponent.registerComponent();
             SpoolmanModalConfirmSpoolComponent.registerComponent();
