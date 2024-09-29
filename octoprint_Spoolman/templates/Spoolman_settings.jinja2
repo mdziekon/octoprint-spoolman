@@ -1,8 +1,4 @@
-
-<form
-    id="settings_spoolman"
-    class="form-horizontal"
->
+<form id="settings_spoolman" class="form-horizontal">
     <h3>
         Spoolman
         <small>{{ _('Version') }}:
@@ -10,15 +6,9 @@
         </small>
     </h3>
     <div class="tabbable">
-        <ul
-            class="nav nav-tabs"
-            id="spoolmanger-settings-tab"
-        >
+        <ul class="nav nav-tabs" id="spoolmanger-settings-tab">
             <li class="active">
-                <a
-                    href="#tab-spoolman-General"
-                    data-toggle="tab"
-                >
+                <a href="#tab-spoolman-General" data-toggle="tab">
                     General
                 </a>
             </li>
@@ -26,91 +16,92 @@
 
         <div class="tab-content">
             <!-- Tab: General -->
-            <div
-                id="tab-spoolman-General"
-                class="tab-pane active"
-            >
+            <div id="tab-spoolman-General" class="tab-pane active">
                 <div class="control-group">
-                    <label
-                        class="control-label"
-                        for="settings-spoolman-general-spoolmanUrl"
-                    >
+                    <label class="control-label" for="settings-spoolman-general-spoolmanUrl">
                         Spoolman instance URL
                     </label>
                     <div class="controls">
-                        <input
-                            id="settings-spoolman-general-spoolmanUrl"
-                            type="text"
-                            class="input-xlarge text-left"
-                            data-bind="textInput: pluginSettings.spoolmanUrl"
-                            placeholder="https://192.168.1.100:7912"
-                        >
+                        <input id="settings-spoolman-general-spoolmanUrl" type="text" class="input-xlarge text-left"
+                            data-bind="textInput: pluginSettings.spoolmanUrl" placeholder="https://192.168.1.100:7912">
                     </div>
                 </div>
                 <div class="control-group">
-                    <label
-                        class="control-label"
-                        for="settings-spoolman-general-isSpoolmanCertVerifyEnabled"
-                    >
+                    <label class="control-label" for="settings-spoolman-general-isSpoolmanCertVerifyEnabled">
                         Verify SSL certificate (if applicable)
                     </label>
                     <div class="controls">
                         <div>
-                            <input
-                                id="settings-spoolman-general-isSpoolmanCertVerifyEnabled"
-                                type="checkbox"
-                                class="text-left"
-                                data-bind="checked: pluginSettings.isSpoolmanCertVerifyEnabled"
-                            >
+                            <input id="settings-spoolman-general-isSpoolmanCertVerifyEnabled" type="checkbox"
+                                class="text-left" data-bind="checked: pluginSettings.isSpoolmanCertVerifyEnabled">
                         </div>
                     </div>
                 </div>
                 <div class="control-group">
-                    <label
-                        class="control-label"
-                        for="settings-spoolman-general-spoolmanCertPemPath"
-                    >
+                    <label class="control-label" for="settings-spoolman-general-spoolmanCertPemPath">
                         SSL certificate <code>.pem</code> path
                     </label>
                     <div class="controls">
                         <div>
-                            <input
-                                id="settings-spoolman-general-spoolmanCertPemPath"
-                                type="text"
-                                class="input-xlarge text-left"
-                                data-bind="textInput: pluginSettings.spoolmanCertPemPath"
-                                placeholder="/path/to/cert.pem"
-                            >
+                            <input id="settings-spoolman-general-spoolmanCertPemPath" type="text"
+                                class="input-xlarge text-left" data-bind="textInput: pluginSettings.spoolmanCertPemPath"
+                                placeholder="/path/to/cert.pem">
                         </div>
                         <div style="margin-top: 0.25em">
                             <small>
-                                In case your Spoolman instance is using an SSL certificate which is unavailable to your Octoprint instance (eg. self-signed certificate), you can provide a path to custom certificate chain file. This allows the plugin to establish secure connection without disabling certificate verification. The file must be located on Octoprint's machine, and should be readable for Octoprint.
+                                In case your Spoolman instance is using an SSL certificate which is unavailable to your
+                                Octoprint instance (eg. self-signed certificate), you can provide a path to custom
+                                certificate chain file. This allows the plugin to establish secure connection without
+                                disabling certificate verification. The file must be located on Octoprint's machine, and
+                                should be readable for Octoprint.
                             </small>
                         </div>
                     </div>
                 </div>
                 <div>
-                    <hr/>
+                    <hr />
                 </div>
                 <div class="control-group">
-                    <label
-                        class="control-label"
-                        for="settings-spoolman-general-isPreprintSpoolVerifyEnabled"
-                    >
+                    <label class="control-label" for="settings-spoolman-general-isPreprintSpoolVerifyEnabled">
                         Verify spools before print
                     </label>
                     <div class="controls">
                         <div>
-                            <input
-                                id="settings-spoolman-general-isPreprintSpoolVerifyEnabled"
-                                type="checkbox"
-                                class="text-left"
-                                data-bind="checked: pluginSettings.isPreprintSpoolVerifyEnabled"
-                            >
+                            <input id="settings-spoolman-general-isPreprintSpoolVerifyEnabled" type="checkbox"
+                                class="text-left" data-bind="checked: pluginSettings.isPreprintSpoolVerifyEnabled">
                         </div>
                         <div style="margin-top: 0.25em">
                             <small>
-                                Spools verification displays a modal after clicking the 'Print' button, which presents all necessary info & warnings before the actual print job starts. It allows the user to either confirm (and start the print) or cancel the job. Verification consists of: checking remaining filament, checking spool selection, detecting tools count mismatch (multi-tool printers).
+                                Spools verification displays a modal after clicking the 'Print' button, which presents
+                                all necessary info & warnings before the actual print job starts. It allows the user to
+                                either confirm (and start the print) or cancel the job. Verification consists of:
+                                checking remaining filament, checking spool selection, detecting tools count mismatch
+                                (multi-tool printers).
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="control-group">
+                    <label class="control-label" for="settings-spoolman-general-isstatusBackupEnabled">
+                        Enable filament usage backup
+                    </label>
+                    <div class="controls">
+                        <div>
+                            <input id="settings-spoolman-general-isstatusBackupEnabled" type="checkbox"
+                                class="text-left" data-bind="checked: pluginSettings.isstatusBackupEnabled">
+                        </div>
+                        <div style="margin-top: 0.25em">
+                            <small>
+                                Enabling the backup function allows you to store relevant information during the current
+                                printing process and generate
+                                an event with the print data. In particular, it records the grams of material used by
+                                the tools up to the moment a
+                                failure occurs. If this option is enabled and a failure occurs, the system will
+                                automatically update the data of the
+                                failed print when starting again, avoiding loss of information. For low-performance
+                                equipment, it is recommended to keep
+                                this option disabled.
                             </small>
                         </div>
                     </div>

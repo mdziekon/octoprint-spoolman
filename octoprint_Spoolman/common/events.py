@@ -5,3 +5,4 @@ class PluginEvents():
 	SPOOL_SELECTED = "spool_selected"
 	SPOOL_USAGE_COMMITTED = "spool_usage_committed"
 	SPOOL_USAGE_ERROR = "spool_usage_error"
+	SPOOL_USAGE_UPDATE	= "spool_usage_update"
