@@ -247,26 +247,38 @@ $(() => {
 
                 const originalFilamentDisplay = formatFilament(filament);
 
-                if (filament.weight === undefined) {
-                    return originalFilamentDisplay
+                if (filament.modelWeight === undefined) {
+                    return originalFilamentDisplay;
                 }
 
                 return [
-                    toWeight(filament.weight, { constants: self.constants }),
+                    toWeight(filament.modelWeight, { constants: self.constants }),
                     originalFilamentDisplay,
                 ]
                     .filter((value) => Boolean(value))
                     .join(' / ');
             };
+            printerStateViewModel.formatEnhancedFilamentColor = (filament) => {
+                if (
+                    !filament ||
+                    filament.modelWeight === undefined ||
+                    filament.isEnoughFilament === undefined
+                ) {
+                    return '';
+                }
 
-            printerStateViewModel.enhancedFilaments = ko.computed(() => {
+                return filament.isEnoughFilament ? 'text-success' : 'text-error';
+            };
+
+            printerStateViewModel.enhancedFilaments = ko.computed(function () {
                 const modelFilaments = self.printerStateViewModel.filament();
                 const spools = self.templateData.selectedSpoolsByToolIdx();
 
                 return modelFilaments.map((modelFilament, idx) => {
-                    const spoolFilamentData = spools[idx]?.spoolData.filament;
+                    const spoolData = spools[idx]?.spoolData;
+                    const spoolFilamentData = spoolData?.filament;
                     const requiredFilamentLength = modelFilament.data().length;
-                    const weight = (
+                    const modelWeight = (
                         spoolFilamentData
                         ? calculateWeight(
                             requiredFilamentLength,
@@ -277,17 +289,22 @@ $(() => {
                     );
 
                     return {
-                        ...modelFilament,
+                        name: modelFilament.name,
                         data: ko.observable({
                             ...modelFilament.data(),
-                            weight,
+                            modelWeight,
+                            isEnoughFilament: (
+                                modelWeight && spoolData?.remaining_weight !== undefined
+                                    ? modelWeight <= spoolData.remaining_weight
+                                    : undefined
+                            )
                         })
                     }
                 });
             });
 
             const template = document.createElement('template');
-            template.innerHTML = `<span><span data-bind="text: _.sprintf(gettext('Filament (%(name)s)'), { name: name() }), attr: {title: _.sprintf(gettext('Filament usage for %(name)s'), {name: name()})}"></span>: <strong data-bind="text: $root.formatEnhancedFilament(data())"></strong><br></span>`;
+            template.innerHTML = `<span><span data-bind="text: _.sprintf(gettext('Filament (%(name)s)'), { name: name() }), attr: {title: _.sprintf(gettext('Filament usage for %(name)s'), {name: name()})}"></span>: <strong data-bind="class: $root.formatEnhancedFilamentColor(data()), text: $root.formatEnhancedFilament(data())"></strong><br></span>`;
 
             const nodeIteratorLoopStart = document.createComment(' ko foreach: enhancedFilaments ');
             const nodeIteratorLoopElement = template.content.firstChild?.cloneNode(true);
