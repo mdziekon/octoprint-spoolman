@@ -57,6 +57,7 @@ class SpoolmanPlugin(
 
     def on_after_startup(self):
         self._logger.info("[Spoolman][init] Plugin activated")
+        self.loadSaveSpoolUsage()
 
     # Printing events handlers
     def on_event(self, event, payload):
@@ -68,7 +69,8 @@ class SpoolmanPlugin(
             event == Events.PRINT_CANCELLED
         ):
             self.handlePrintingStatusChange(event)
-
+            self.resetSaveStatus(event)
+                
         pass
 
     def on_sentGCodeHook(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
@@ -76,6 +78,7 @@ class SpoolmanPlugin(
             return
 
         self.handlePrintingGCode(cmd)
+        self.detectLayerChange(cmd)
 
         pass
 
@@ -126,6 +129,8 @@ class SpoolmanPlugin(
             SettingsKeys.SPOOLMAN_CERT_PEM_PATH: "",
             SettingsKeys.SELECTED_SPOOL_IDS: {},
             SettingsKeys.IS_PREPRINT_SPOOL_VERIFY_ENABLED: True,
+            SettingsKeys.STATUS_BACKUP: False,
+            SettingsKeys.BACKUP_DATA: {}
         }
 
         return settings
@@ -141,7 +146,8 @@ class SpoolmanPlugin(
             PluginEvents.SPOOL_SELECTED,
             PluginEvents.SPOOL_USAGE_COMMITTED,
             PluginEvents.SPOOL_USAGE_ERROR,
-        ]
+            PluginEvents.SPOOL_USAGE_COMMITTED_STARTUP,	
+        ]            
 
     def get_update_information(self):
         return {

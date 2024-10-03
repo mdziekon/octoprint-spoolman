@@ -1,6 +1,7 @@
 # coding=utf-8
 from __future__ import absolute_import
 
+import re
 import copy
 from octoprint.events import Events
 
@@ -12,6 +13,7 @@ class PrinterHandler():
         self.lastPrintCancelled = False
         self.lastPrintOdometer = None
         self.lastPrintOdometerLoad = None
+        self.currentZ = None
 
     def handlePrintingStatusChange(self, eventType):
         if eventType == Events.PRINT_STARTED:
@@ -103,3 +105,96 @@ class PrinterHandler():
                     'extrusionLength': toolExtrusionLength,
                 }
             )
+            
+    def detectLayerChange(self, cmd):
+        if not self._printer.is_printing() or not self._settings.get_boolean([SettingsKeys.STATUS_BACKUP]):
+            return
+
+        if cmd.startswith(("G0", "G1")):
+            match = re.search(r'Z([\d.]+)', cmd)
+            if match:
+                zValue = float(match.group(1))
+                try:
+                    if zValue != self.currentZ:
+                        self.currentZ = zValue
+                        self.saveFilamentStatusChange()
+                        
+                except AttributeError:
+                    self.currentZ = zValue
+                
+    def saveFilamentStatusChange(self):            
+        backup_save = {}
+        peek_stats_helpers = self.lastPrintOdometerLoad.send(False)
+        current_extrusion_stats = copy.deepcopy(peek_stats_helpers['get_current_extrusion_stats']())
+
+        selectedSpoolIds = self._settings.get([SettingsKeys.SELECTED_SPOOL_IDS])
+
+        for toolIdx, toolExtrusionLength in enumerate(current_extrusion_stats['extrusionAmount']):
+            try:
+                selectedSpool = selectedSpoolIds[str(toolIdx)]
+            except:
+                self._logger.info("Extruder Saved '%s', spool id: none", toolIdx)
+
+            if not selectedSpool or selectedSpool.get('spoolId', None) == None:
+                continue
+
+            selectedSpoolId = selectedSpool['spoolId']
+            
+            backup_save[str(toolIdx)] = {
+                'toolIdx': toolIdx,
+                'spoolId': selectedSpoolId,
+                'extrusionLength': toolExtrusionLength
+            }
+            
+        if backup_save:
+            self._settings.set([SettingsKeys.BACKUP_DATA], backup_save)
+            self._settings.save()
+                
+    def loadSaveSpoolUsage(self):
+        if not self._settings.get([SettingsKeys.BACKUP_DATA]):
+            return
+        
+        for toolIdx, spool_data in self._settings.get([SettingsKeys.BACKUP_DATA]).items():
+            selectedSpoolId = spool_data.get('spoolId')
+            toolExtrusionLength = spool_data.get('extrusionLength')
+
+            if not selectedSpoolId or toolExtrusionLength is None:
+                self._logger.info("Loading saved spool usage: Extruder '%s', spool id: none or invalid data", toolIdx)
+                continue
+
+            self._logger.info(
+                "Loading saved spool usage: Extruder '%s', spool id: %s, usage: %s",
+                toolIdx,
+                selectedSpoolId,
+                toolExtrusionLength
+            )
+
+            result = self.getSpoolmanConnector().handleCommitSpoolUsage(selectedSpoolId, toolExtrusionLength)
+
+            if result.get('error', None):
+                self.triggerPluginEvent(
+                    Events.PLUGIN_SPOOLMAN_SPOOL_USAGE_ERROR,
+                    result['error']
+                )
+                return
+
+            self.triggerPluginEvent(
+                Events.PLUGIN_SPOOLMAN_SPOOL_USAGE_COMMITTED_STARTUP,
+                {
+                    'toolIdx': toolIdx,
+                    'spoolId': selectedSpoolId,
+                    'extrusionLength': toolExtrusionLength,
+                }
+            )
+            
+        self._settings.set([SettingsKeys.BACKUP_DATA], {})
+        self._settings.save()
+        
+    def resetSaveStatus(self,eventType):
+        if (
+            eventType == Events.PRINT_DONE or
+            eventType == Events.PRINT_CANCELLED and
+            self._settings.get_boolean([SettingsKeys.STATUS_BACKUP])
+        ):
+            self._settings.set([SettingsKeys.BACKUP_DATA], {})
+            self._settings.save()

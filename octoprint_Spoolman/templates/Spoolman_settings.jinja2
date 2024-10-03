@@ -115,6 +115,25 @@
                         </div>
                     </div>
                 </div>
+                <div>
+                    <hr />
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="settings-spoolman-general-isstatusBackupEnabled">
+                        Enable filament usage backup
+                    </label>
+                    <div class="controls">
+                        <div>
+                            <input id="settings-spoolman-general-isstatusBackupEnabled" type="checkbox"
+                                class="text-left" data-bind="checked: pluginSettings.isstatusBackupEnabled">
+                        </div>
+                        <div style="margin-top: 0.25em">
+                            <small>
+                                Enabling the backup function allows you to store relevant information during the current printing process and generate an event with the print data. In particular, it records the grams of material used by the tools up to the moment a failure occurs. If this option is enabled and a failure occurs, the system will automatically update the data of the failed print when starting again, avoiding loss of information. For low-performance equipment, it is recommended to keep this option disabled.
+                            </small>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
