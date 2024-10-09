@@ -27,7 +27,7 @@ const toSpoolForDisplay = (spool, params) => {
                 cssValue: (
                     spool.filament.color_hex
                         ? `#${spool.filament.color_hex}`
-                        : 'linear-gradient(45deg, #000000 -25%, #ffffff)'
+                        : calculateGradient(spool.filament.multi_color_direction, spool.filament.multi_color_hexes)
                 ),
             },
             name: (
@@ -90,3 +90,33 @@ const calculateWeight = (length, diameter, density) => {
 
     return volume * density;
 };
+
+/**
+ *  Builds a linear-gradient CSS property from the given colors and direction
+ * @param {string | undefined} direction
+ *  Direction of the gradient
+ * @param {string | undefined} colors
+ *  Comma-separated list of colors
+ * @returns string
+ */
+const calculateGradient = (direction, colors) => {
+    if (!direction || !colors) {
+        return 'linear-gradient(45deg, #000000 -25%, #ffffff)';
+    }
+
+    let gradient = 'linear-gradient(';
+
+    if (direction === 'coaxial') {
+        gradient += '90deg';
+    } else {
+        gradient += '180deg';
+    }
+
+    let colorsArray = colors.split(',');
+    for (let i = 0; i < colorsArray.length; i++) {
+        gradient += `, #${colorsArray[i]} ${(i / colorsArray.length) * 100}% ${((i+1) / colorsArray.length) * 100}%`;
+    }
+
+    gradient += ')';
+    return gradient;
+}
