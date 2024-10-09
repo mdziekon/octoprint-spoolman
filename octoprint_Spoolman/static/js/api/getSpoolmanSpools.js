@@ -25,6 +25,8 @@
  * @property {string | undefined} filament.material
  * @property {string | undefined} filament.name
  * @property {string | undefined} filament.color_hex
+ * @property {string | undefined} filament.multi_color_hexes
+ * @property {string | undefined} filament.multi_color_direction
  * @property {FilamentVendor | undefined} filament.vendor
  */
 
