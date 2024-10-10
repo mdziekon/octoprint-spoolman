@@ -113,7 +113,10 @@
                             </div>
                         <!-- /ko -->
 
-                        <div>
+                        <div style="text-align: center;">
+                            <span
+                                style="margin-right: 5px;" 
+                                data-bind="text: $data.spoolId, attr: { title: $data.spoolId }"></span>
                             <span
                                 class="color-preview"
                                 style="flex-shrink: 0;"
@@ -127,7 +130,10 @@
                             <span>[<span data-bind="
                                 text: $data.spoolDisplayData.filament.material.displayShort,
                                 attr: { title: $data.spoolDisplayData.filament.material.displayValue }
-                            "></span>]</span>
+                            "></span>] <span data-bind="
+                                text: $data.spoolDisplayData.lot.displayValue,
+                                attr: { title: $data.spoolDisplayData.lot.displayValue }
+                            "></span></span>
                             <span data-bind="
                                 text: $data.spoolDisplayData.filament.name.displayValue,
                                 attr: { title: $data.spoolDisplayData.filament.name.displayValue }
