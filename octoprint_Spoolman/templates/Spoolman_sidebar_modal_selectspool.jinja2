@@ -106,16 +106,22 @@
                                 ID
                             </th>
                             <th
-                                style="width: 55%"
+                                style="width: 50%"
                                 data-bind="visible: templateData.tableAttributeVisibility.spoolName"
                             >
                                 Name
                             </th>
                             <th
-                                style="width: 20%"
+                                style="width: 15%"
                                 data-bind="visible: templateData.tableAttributeVisibility.material"
                             >
                                 Material
+                            </th>
+                            <th
+                                style="width: 15%"
+                                data-bind="visible: templateData.tableAttributeVisibility.lot"
+                            >
+                                Lot #
                             </th>
                             <th
                                 style="text-align: center; width: 15%;"
@@ -177,6 +183,9 @@
                                 </td>
                                 <td data-bind="visible: $component.templateData.tableAttributeVisibility.material">
                                     <span data-bind="text: $data.displayData.filament.material.displayValue, attr: { title: $data.displayData.filament.material.displayValue }"></span>
+                                </td>
+                                <td data-bind="visible: $component.templateData.tableAttributeVisibility.lot" style="overflow-wrap: break-word;">
+                                    <span data-bind="text: $data.displayData.lot.displayValue, attr: { title: $data.displayData.lot.displayValue }"></span>
                                 </td>
                                 <td
                                     data-bind="visible: $component.templateData.tableAttributeVisibility.weight" style="text-align: right;"
