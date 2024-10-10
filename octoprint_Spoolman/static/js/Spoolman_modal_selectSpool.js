@@ -150,6 +150,7 @@ $(() => {
                 id: true,
                 spoolName: true,
                 material: true,
+                lot: true,
                 weight: true,
             },
             tableItemsOnCurrentPage: ko.observable([]),
