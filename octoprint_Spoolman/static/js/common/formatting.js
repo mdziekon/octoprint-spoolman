@@ -18,18 +18,12 @@ const toWeight = (weight, params) => {
 const toSpoolForDisplay = (spool, params) => {
     return {
         filament: {
-            color: {
-                cssProperty: (
-                    spool.filament.color_hex
-                        ? 'background-color'
-                        : 'background'
+            color: 
+                calculateColorCSS(
+                    spool.filament.color_hex,
+                    spool.filament.multi_color_direction,
+                    spool.filament.multi_color_hexes
                 ),
-                cssValue: (
-                    spool.filament.color_hex
-                        ? `#${spool.filament.color_hex}`
-                        : calculateGradient(spool.filament.multi_color_direction, spool.filament.multi_color_hexes)
-                ),
-            },
             name: (
                 spool.filament.name
                     ? {
@@ -92,18 +86,44 @@ const calculateWeight = (length, diameter, density) => {
 };
 
 /**
+ *  Generates a CSS property and value for the filament color
+ * @param {string | undefined} color_hex 
+ *  Hex color code for a single color filament or undefined
+ * @param {string | undefined} multi_color_direction 
+ *  Direction of the gradient for multi-color filaments or undefined
+ * @param {string | undefined} multi_color_hexes 
+ *  Hex color codes for multi-color filaments or undefined
+ * @returns Object {string, string}
+ *  cssProperty and cssValue for the filament color
+ */
+const calculateColorCSS = (color_hex, multi_color_direction, multi_color_hexes) => {
+    if (color_hex) {
+        return {cssProperty: 'background-color', cssValue: `#${color_hex}`};
+    }
+
+    let multiColorCSS = {
+        cssProperty: 'background',
+        cssValue: '',
+    };
+
+    if (!multi_color_direction || !multi_color_hexes) {
+        multiColorCSS.cssValue = 'linear-gradient(45deg, #000000 -25%, #ffffff)';
+        return multiColorCSS;
+    }
+
+    multiColorCSS.cssValue = calculateGradient(multi_color_direction, multi_color_hexes);
+    return multiColorCSS;
+}
+
+/**
  *  Builds a linear-gradient CSS property from the given colors and direction
- * @param {string | undefined} direction
+ * @param {string} direction
  *  Direction of the gradient
- * @param {string | undefined} colors
+ * @param {string} colors
  *  Comma-separated list of colors
  * @returns string
  */
 const calculateGradient = (direction, colors) => {
-    if (!direction || !colors) {
-        return 'linear-gradient(45deg, #000000 -25%, #ffffff)';
-    }
-
     let gradient = 'linear-gradient(';
 
     if (direction === 'coaxial') {
