@@ -22,6 +22,14 @@
                     General
                 </a>
             </li>
+            <li>
+                <a
+                    href="#tab-spoolman-Display-Settings"
+                    data-toggle="tab"
+                >
+                    Display Settings
+                </a>
+            </li>
         </ul>
 
         <div class="tab-content">
@@ -111,6 +119,35 @@
                         <div style="margin-top: 0.25em">
                             <small>
                                 Spools verification displays a modal after clicking the 'Print' button, which presents all necessary info & warnings before the actual print job starts. It allows the user to either confirm (and start the print) or cancel the job. Verification consists of: checking remaining filament, checking spool selection, detecting tools count mismatch (multi-tool printers).
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Tab: Display Settings -->
+            <div
+                id="tab-spoolman-Display-Settings"
+                class="tab-pane"
+            >
+                <div class="control-group">
+                    <label
+                        class="control-label"
+                        for="settings-spoolman-display-settings-showLotNumberColumnInSpoolSelectModal"
+                    >
+                        Show Lot Number column in Spool Select Modal
+                    </label>
+                    <div class="controls">
+                        <div>
+                            <input
+                                id="settings-spoolman-display-settings-showLotNumberColumnInSpoolSelectModal"
+                                type="checkbox"
+                                class="text-left"
+                                data-bind="checked: pluginSettings.showLotNumberColumnInSpoolSelectModal"
+                            >
+                        </div>
+                        <div style="margin-top: 0.25em">
+                            <small>
+                                If enabled, the "Lot Number" column will be displayed in the Spool Select Modal. The column will show the lot number of the spool, if available.
                             </small>
                         </div>
                     </div>
