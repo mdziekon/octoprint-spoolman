@@ -18,7 +18,7 @@ const toWeight = (weight, params) => {
 const toSpoolForDisplay = (spool, params) => {
     return {
         filament: {
-            color: 
+            color:
                 calculateColorCSS(
                     spool.filament.color_hex,
                     spool.filament.multi_color_direction,
@@ -87,32 +87,37 @@ const calculateWeight = (length, diameter, density) => {
 
 /**
  *  Generates a CSS property and value for the filament color
- * @param {string | undefined} color_hex 
+ * @param {string | undefined} color_hex
  *  Hex color code for a single color filament or undefined
- * @param {string | undefined} multi_color_direction 
+ * @param {string | undefined} multi_color_direction
  *  Direction of the gradient for multi-color filaments or undefined
- * @param {string | undefined} multi_color_hexes 
+ * @param {string | undefined} multi_color_hexes
  *  Hex color codes for multi-color filaments or undefined
- * @returns Object {string, string}
+ * @returns {{
+*   cssProperty: string,
+*   cssValue: string,
+*  }}
  *  cssProperty and cssValue for the filament color
  */
 const calculateColorCSS = (color_hex, multi_color_direction, multi_color_hexes) => {
     if (color_hex) {
-        return {cssProperty: 'background-color', cssValue: `#${color_hex}`};
+        return {
+            cssProperty: 'background-color',
+            cssValue: `#${color_hex}`,
+        };
     }
-
-    let multiColorCSS = {
-        cssProperty: 'background',
-        cssValue: '',
-    };
 
     if (!multi_color_direction || !multi_color_hexes) {
-        multiColorCSS.cssValue = 'linear-gradient(45deg, #000000 -25%, #ffffff)';
-        return multiColorCSS;
+        return {
+            cssProperty: 'background',
+            cssValue: 'linear-gradient(45deg, #000000 -25%, #ffffff)',
+        };
     }
 
-    multiColorCSS.cssValue = calculateGradient(multi_color_direction, multi_color_hexes);
-    return multiColorCSS;
+    return {
+        cssProperty: 'background',
+        cssValue: calculateGradient(multi_color_direction, multi_color_hexes),
+    };
 }
 
 /**
