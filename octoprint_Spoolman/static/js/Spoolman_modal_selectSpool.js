@@ -89,6 +89,8 @@ $(() => {
 
             self.templateData.spoolmanUrl(getPluginSettings().spoolmanUrl());
 
+            self.templateData.tableAttributeVisibility.lot(Boolean(getPluginSettings().showLotNumberColumnInSpoolSelectModal()));
+
             refreshModalLayout();
         };
 
@@ -150,6 +152,7 @@ $(() => {
                 id: true,
                 spoolName: true,
                 material: true,
+                lot: ko.observable(Boolean(getPluginSettings().showLotNumberColumnInSpoolSelectModal())),
                 weight: true,
             },
             tableItemsOnCurrentPage: ko.observable([]),

@@ -126,6 +126,7 @@ class SpoolmanPlugin(
             SettingsKeys.SPOOLMAN_CERT_PEM_PATH: "",
             SettingsKeys.SELECTED_SPOOL_IDS: {},
             SettingsKeys.IS_PREPRINT_SPOOL_VERIFY_ENABLED: True,
+            SettingsKeys.SHOW_LOT_NUMBER_COLUMN_IN_SPOOL_SELECT_MODAL: False,
         }
 
         return settings

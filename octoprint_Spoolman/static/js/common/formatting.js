@@ -66,6 +66,14 @@ const toSpoolForDisplay = (spool, params) => {
                     displayValue: "Unavailable",
                 }
         ),
+        lot: (
+            spool.lot_nr
+                ? {
+                    displayValue: spool.lot_nr,
+                } : {
+                    displayValue: "",
+                }
+        ),
     };
 };
 

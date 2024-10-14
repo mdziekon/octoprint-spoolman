@@ -15,6 +15,7 @@
  * @property {number} used_weight
  * @property {number | undefined} remaining_length
  * @property {number | undefined} remaining_weight
+ * @property {string | undefined} lot_nr
  * @property {Object} filament
  * @property {number} filament.id
  * @property {string} filament.registered
