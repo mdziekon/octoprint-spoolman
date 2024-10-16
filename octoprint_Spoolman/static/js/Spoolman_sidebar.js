@@ -93,6 +93,9 @@ $(() => {
             self.templateData.selectedSpoolsByToolIdx.valueHasMutated();
 
             self.templateData.spoolmanUrl(getPluginSettings().spoolmanUrl());
+
+            self.templateData.optionalFieldVisibility.lotNumber(Boolean(getPluginSettings().showLotNumberInSidebar()));
+            self.templateData.optionalFieldVisibility.spoolID(Boolean(getPluginSettings().showSpoolIdInSidebar()));
         };
 
         /**
@@ -215,6 +218,11 @@ $(() => {
             spoolmanUrl: ko.observable(undefined),
 
             settingsViewModel: ko.observable(undefined),
+
+            optionalFieldVisibility: {
+                lotNumber: ko.observable(false),
+                spoolID: ko.observable(false),
+            },
 
             modals: {
                 selectSpool: {
