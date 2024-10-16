@@ -7,6 +7,8 @@ $(() => {
 
         const previousSettings = {
             spoolmanUrl: undefined,
+            showLotNumberInSidebar: undefined,
+            showSpoolIdInSidebar: undefined,
         };
 
         self.settingsViewModel = params[0];
@@ -444,15 +446,24 @@ $(() => {
         self.onSettingsHidden = () => {
             const newSettings = {
                 spoolmanUrl: getPluginSettings().spoolmanUrl(),
+                showLotNumberInSidebar: getPluginSettings().showLotNumberInSidebar(),
+                showSpoolIdInSidebar: getPluginSettings().showSpoolIdInSidebar(),
             };
 
-            if (previousSettings.spoolmanUrl === newSettings.spoolmanUrl) {
-                return;
+            if (previousSettings.spoolmanUrl !== newSettings.spoolmanUrl) {
+                previousSettings.spoolmanUrl = newSettings.spoolmanUrl;
+                pluginSpoolmanApi.getSpoolmanSpools.invalidate();
             }
 
-            previousSettings.spoolmanUrl = newSettings.spoolmanUrl;
+            if (
+                previousSettings.showLotNumberInSidebar !== newSettings.showLotNumberInSidebar ||
+                previousSettings.showSpoolIdInSidebar !== newSettings.showSpoolIdInSidebar
+            ) {
+                previousSettings.showLotNumberInSidebar = newSettings.showLotNumberInSidebar;
+                previousSettings.showSpoolIdInSidebar = newSettings.showSpoolIdInSidebar;
 
-            pluginSpoolmanApi.getSpoolmanSpools.invalidate();
+                updateSelectedSpools();
+            }
         };
     };
 
