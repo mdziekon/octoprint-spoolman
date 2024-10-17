@@ -269,6 +269,17 @@ $(() => {
 
                 return filament.isEnoughFilament ? 'text-success' : 'text-error';
             };
+            printerStateViewModel.formatEnhancedFilamentIcon = (filament) => {
+                if (
+                    !filament ||
+                    filament.modelWeight === undefined ||
+                    filament.isEnoughFilament === undefined
+                ) {
+                    return '';
+                }
+
+                return filament.isEnoughFilament ? 'fa fa-circle-check' : 'fa fa-warning';
+            };
 
             printerStateViewModel.enhancedFilaments = ko.computed(function () {
                 const modelFilaments = self.printerStateViewModel.filament();
@@ -304,7 +315,7 @@ $(() => {
             });
 
             const template = document.createElement('template');
-            template.innerHTML = `<span><span data-bind="text: _.sprintf(gettext('Filament (%(name)s)'), { name: name() }), attr: {title: _.sprintf(gettext('Filament usage for %(name)s'), {name: name()})}"></span>: <strong data-bind="class: $root.formatEnhancedFilamentColor(data()), text: $root.formatEnhancedFilament(data())"></strong><br></span>`;
+            template.innerHTML = `<span><span data-bind="text: _.sprintf(gettext('Filament (%(name)s)'), { name: name() }), attr: {title: _.sprintf(gettext('Filament usage for %(name)s'), {name: name()})}"></span>: <span data-bind="class: $root.formatEnhancedFilamentColor(data())"><span data-bind="class: $root.formatEnhancedFilamentIcon(data())"></span> <strong data-bind="text: $root.formatEnhancedFilament(data())"></strong></span><br></span>`;
 
             const nodeIteratorLoopStart = document.createComment(' ko foreach: enhancedFilaments ');
             const nodeIteratorLoopElement = template.content.firstChild?.cloneNode(true);
