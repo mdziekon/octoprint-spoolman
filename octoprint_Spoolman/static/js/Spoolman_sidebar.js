@@ -269,6 +269,17 @@ $(() => {
 
                 return filament.isEnoughFilament ? 'text-success' : 'text-error';
             };
+            printerStateViewModel.formatEnhancedFilamentIcon = (filament) => {
+                if (
+                    !filament ||
+                    filament.modelWeight === undefined ||
+                    filament.isEnoughFilament === undefined
+                ) {
+                    return '';
+                }
+
+                return filament.isEnoughFilament ? 'fa fa-circle-check' : 'fa fa-warning';
+            };
 
             printerStateViewModel.enhancedFilaments = ko.computed(function () {
                 const modelFilaments = self.printerStateViewModel.filament();
