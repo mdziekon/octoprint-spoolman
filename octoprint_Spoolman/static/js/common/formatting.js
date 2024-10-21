@@ -72,8 +72,8 @@ const toSpoolForDisplay = (spool, params) => {
                     displayShort: calculateShortLot(spool.lot_nr),
                     displayValue: spool.lot_nr,
                 } : {
-                    displayShort: "",
-                    displayValue: "",
+                    displayShort: "N/A",
+                    displayValue: "N/A",
                 }
         ),
     };
