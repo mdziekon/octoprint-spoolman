@@ -7,6 +7,8 @@ $(() => {
 
         const previousSettings = {
             spoolmanUrl: undefined,
+            showLotNumberInSidebar: undefined,
+            showSpoolIdInSidebar: undefined,
         };
 
         self.settingsViewModel = params[0];
@@ -93,6 +95,9 @@ $(() => {
             self.templateData.selectedSpoolsByToolIdx.valueHasMutated();
 
             self.templateData.spoolmanUrl(getPluginSettings().spoolmanUrl());
+
+            self.templateData.optionalFieldVisibility.lotNumber(Boolean(getPluginSettings().showLotNumberInSidebar()));
+            self.templateData.optionalFieldVisibility.spoolID(Boolean(getPluginSettings().showSpoolIdInSidebar()));
         };
 
         /**
@@ -215,6 +220,11 @@ $(() => {
             spoolmanUrl: ko.observable(undefined),
 
             settingsViewModel: ko.observable(undefined),
+
+            optionalFieldVisibility: {
+                lotNumber: ko.observable(false),
+                spoolID: ko.observable(false),
+            },
 
             modals: {
                 selectSpool: {
@@ -447,15 +457,24 @@ $(() => {
         self.onSettingsHidden = () => {
             const newSettings = {
                 spoolmanUrl: getPluginSettings().spoolmanUrl(),
+                showLotNumberInSidebar: getPluginSettings().showLotNumberInSidebar(),
+                showSpoolIdInSidebar: getPluginSettings().showSpoolIdInSidebar(),
             };
 
-            if (previousSettings.spoolmanUrl === newSettings.spoolmanUrl) {
-                return;
+            if (previousSettings.spoolmanUrl !== newSettings.spoolmanUrl) {
+                previousSettings.spoolmanUrl = newSettings.spoolmanUrl;
+                pluginSpoolmanApi.getSpoolmanSpools.invalidate();
             }
 
-            previousSettings.spoolmanUrl = newSettings.spoolmanUrl;
+            if (
+                previousSettings.showLotNumberInSidebar !== newSettings.showLotNumberInSidebar ||
+                previousSettings.showSpoolIdInSidebar !== newSettings.showSpoolIdInSidebar
+            ) {
+                previousSettings.showLotNumberInSidebar = newSettings.showLotNumberInSidebar;
+                previousSettings.showSpoolIdInSidebar = newSettings.showSpoolIdInSidebar;
 
-            pluginSpoolmanApi.getSpoolmanSpools.invalidate();
+                updateSelectedSpools();
+            }
         };
     };
 

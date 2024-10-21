@@ -141,6 +141,14 @@
                                 attr: {title: 'Remaining weight'},
                                 class: ($data.spoolDisplayData.remaining_weight.isValid) ? '' : 'text-error'
                             "></span></span>
+                            <span data-bind="visible: $parent.templateData.optionalFieldVisibility.spoolID"><span data-bind="
+                                text: $data.spoolId,
+                                attr: { title: 'ID: ' + $data.spoolId }    
+                            "></span></span>
+                            <span data-bind="visible: $parent.templateData.optionalFieldVisibility.lotNumber"><span data-bind="
+                                text: $data.spoolDisplayData.lot.displayShort,
+                                attr: { title: 'Lot #: ' + $data.spoolDisplayData.lot.displayValue }
+                            "></span></span>
                         </div>
                     </div>
                     <div style="display: flex; flex-shrink: 0;">

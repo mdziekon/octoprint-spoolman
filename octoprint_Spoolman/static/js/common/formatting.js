@@ -69,9 +69,11 @@ const toSpoolForDisplay = (spool, params) => {
         lot: (
             spool.lot_nr
                 ? {
+                    displayShort: calculateShortLot(spool.lot_nr),
                     displayValue: spool.lot_nr,
                 } : {
-                    displayValue: "",
+                    displayShort: "N/A",
+                    displayValue: "N/A",
                 }
         ),
     };
@@ -152,4 +154,17 @@ const calculateGradient = (direction, colors) => {
 
     gradient += ')';
     return gradient;
+}
+
+/**
+ * @param {string} lot_nr
+ *  Lot number
+ * @returns string
+ */
+const calculateShortLot = (lot_nr) => {
+    if (lot_nr.length <= 9) {
+        return lot_nr;
+    }
+
+    return `${lot_nr.substring(0, 3)}...${lot_nr.substring(lot_nr.length - 3)}`;
 }
