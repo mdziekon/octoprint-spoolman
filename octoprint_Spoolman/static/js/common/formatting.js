@@ -2,11 +2,12 @@
 /**
  * @param {number} weight
  * @param {{
-*  constants: Record<string, unknown>
+*  constants: Record<string, unknown>;
+*  precision?: number
 * }} params
 */
 const toWeight = (weight, params) => {
-    return `${weight.toFixed(1)}${params.constants['weight_unit']}`;
+    return `${weight.toFixed(params.precision ?? 1)}${params.constants['weight_unit']}`;
 };
 
 /**
@@ -52,6 +53,12 @@ const toSpoolForDisplay = (spool, params) => {
                         }
                 ),
             },
+        },
+        initial_weight: {
+            displayValue: toWeight((spool.filament.weight ?? 0), {
+                ...params,
+                precision: 0,
+            })
         },
         used_weight: {
             displayValue: spool.used_weight.toFixed(1),

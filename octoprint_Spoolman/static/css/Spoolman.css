@@ -15,6 +15,13 @@
     white-space: pre-wrap;
     overflow-wrap: anywhere;
 }
+.sidebar-spool-info {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+
+    overflow-wrap: anywhere;
+}
 
 .tool-row {
     display: flex;
