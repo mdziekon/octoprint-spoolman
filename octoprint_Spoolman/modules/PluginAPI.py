@@ -81,6 +81,8 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
             }
         )
 
+        self.infoSpool(spoolId,toolId)
+        
         return flask.jsonify({
             "data": {}
         })

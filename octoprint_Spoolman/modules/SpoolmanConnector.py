@@ -163,3 +163,50 @@ class SpoolmanConnector():
         return {
             "data": {}
         }
+
+    def handleCommitSpoolInfo(self, spoolId):
+        precheckResult = self._precheckSpoolman()
+
+        if precheckResult and precheckResult.get('error', False):
+            return precheckResult
+
+        spoolIdStr = str(spoolId)
+        endpointUrl = self._createSpoolmanEndpointUrl("/spool/" + spoolIdStr)
+
+        self._logSpoolmanCall(endpointUrl)
+
+        try:
+            session = requests.Session()
+            session.verify = self.verifyConfig
+            retries = Retry(total = 3, backoff_factor = 1, status_forcelist = [ 500, 502, 503, 504 ])
+
+            session.mount(self.instanceUrl, HTTPAdapter(max_retries=retries))
+
+            response = session.get(
+                url = endpointUrl,
+                json = {},
+                timeout = 1
+            )
+        except Exception as caughtException:
+            return self._handleSpoolmanConnectionError(caughtException)
+
+        if response.status_code == 404:
+            return self._handleSpoolmanError(
+                response,
+                {
+                    "code": "spoolman_api__spool_not_found",
+                    "spoolman_api": {
+                        "status_code": response.status_code,
+                    },
+                    "data": {
+                        "spoolId": spoolIdStr,
+                    },
+                }
+            )
+
+        if response.status_code != 200:
+            return self._handleSpoolmanError(response)
+
+        self._logSpoolmanSuccess(response)
+
+        return response.json()

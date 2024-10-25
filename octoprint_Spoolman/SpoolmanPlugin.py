@@ -57,6 +57,7 @@ class SpoolmanPlugin(
 
     def on_after_startup(self):
         self._logger.info("[Spoolman][init] Plugin activated")
+        self.loadSaveSpoolUsage()
 
     # Printing events handlers
     def on_event(self, event, payload):
@@ -68,8 +69,12 @@ class SpoolmanPlugin(
             event == Events.PRINT_CANCELLED
         ):
             self.handlePrintingStatusChange(event)
+            self.resetSaveStatus(event)
 
         pass
+
+        if event == Events.FILE_SELECTED:
+            self.handleFileSelected(payload)
 
     def on_sentGCodeHook(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
         if not self._isInitialized:
@@ -129,6 +134,8 @@ class SpoolmanPlugin(
             SettingsKeys.SHOW_LOT_NUMBER_COLUMN_IN_SPOOL_SELECT_MODAL: False,
             SettingsKeys.SHOW_LOT_NUMBER_IN_SIDE_BAR: False,
             SettingsKeys.SHOW_SPOOL_ID_IN_SIDE_BAR: False,
+            SettingsKeys.STATUS_BACKUP: False,
+            SettingsKeys.BACKUP_DATA: None            
         }
 
         return settings
@@ -144,6 +151,9 @@ class SpoolmanPlugin(
             PluginEvents.SPOOL_SELECTED,
             PluginEvents.SPOOL_USAGE_COMMITTED,
             PluginEvents.SPOOL_USAGE_ERROR,
+            PluginEvents.SPOOL_INFO_ERROR,
+            PluginEvents.SPOOL_USAGE_COMMITTED_RECOVERY,	
+            PluginEvents.SPOOL_FILE_SELECTED,            
         ]
 
     def get_update_information(self):
