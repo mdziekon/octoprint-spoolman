@@ -11,3 +11,5 @@ class SettingsKeys():
 	SHOW_LOT_NUMBER_COLUMN_IN_SPOOL_SELECT_MODAL = "showLotNumberColumnInSpoolSelectModal"
 	SHOW_LOT_NUMBER_IN_SIDE_BAR = "showLotNumberInSidebar"
 	SHOW_SPOOL_ID_IN_SIDE_BAR = "showSpoolIdInSidebar"
+	BACKUP_DATA = "backupData"
+	STATUS_BACKUP = "isstatusBackupEnabled"
