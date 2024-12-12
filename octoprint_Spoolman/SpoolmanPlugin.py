@@ -22,7 +22,7 @@ class SpoolmanPlugin(
 
     def initialize(self):
         self._isInitialized = True
-
+        
     # TODO: Investigate caching again in the future.
     # Currently re-instantiating is fine, as there's nothing "heavy" in the ctor,
     # nor there's any useful persistence in the class itself.
@@ -75,7 +75,7 @@ class SpoolmanPlugin(
 
         if event == Events.FILE_SELECTED:
             self.handleFileSelected(payload)
-
+            
     def on_sentGCodeHook(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
         if not self._isInitialized:
             return
@@ -153,7 +153,8 @@ class SpoolmanPlugin(
             PluginEvents.SPOOL_USAGE_ERROR,
             PluginEvents.SPOOL_INFO_ERROR,
             PluginEvents.SPOOL_USAGE_COMMITTED_RECOVERY,	
-            PluginEvents.SPOOL_FILE_SELECTED,            
+            PluginEvents.SPOOL_FILE_SELECTED,
+            PluginEvents.SPOOL_CHANGED      
         ]
 
     def get_update_information(self):

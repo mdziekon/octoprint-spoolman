@@ -8,3 +8,4 @@ class PluginEvents():
 	SPOOL_INFO_ERROR = "spool_info_error"
 	SPOOL_USAGE_COMMITTED_RECOVERY = "spool_usage_committed_recovery" 
 	SPOOL_FILE_SELECTED = "spool_file_selected"
+	SPOOL_CHANGED = "spool_changed"

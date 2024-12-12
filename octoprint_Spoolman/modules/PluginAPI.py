@@ -41,6 +41,35 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
 
         return value
 
+    def changeSpool(self, spoolId,toolId):
+        jobFilamentUsage = self.getCurrentJobFilamentUsage()
+            
+        if jobFilamentUsage['jobHasFilamentLengthData']:
+            filamentLength = jobFilamentUsage["jobFilamentLengthsPerTool"][toolId]
+            weight = self.getWeight(toolId, filamentLength)
+            cost = self.getCost(toolId, weight)
+            
+            filament = self.dataSpool.get(toolId, {}).get('filament', {})
+            
+            name = filament.get('name', None)
+            material = filament.get('material', None)
+            colorHex = filament.get('color_hex', None)
+        
+            self.triggerPluginEvent(
+                Events.PLUGIN_SPOOLMAN_SPOOL_CHANGED,
+                {
+                    'toolIdx': str(toolId),
+                    'spoolId': spoolId,
+                    'estimatedExtrusionLength': filamentLength,
+                    'estimatedWeight': weight,
+                    'estimatedCost': cost,
+                    'name': name,
+                    'material': material,
+                    'colorHex': colorHex
+                }
+            )
+                
+
     @octoprint.plugin.BlueprintPlugin.route("/spoolman/spools", methods=["GET"])
     def handleGetSpoolsAvailable(self):
         self._logger.debug("API: GET /spoolman/spools")
@@ -58,7 +87,6 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
     @octoprint.plugin.BlueprintPlugin.route("/self/spool", methods=["POST"])
     def handleUpdateActiveSpool(self):
         self._logger.debug("API: POST /self/spool")
-
         jsonData = flask.request.json
 
         toolId = self._getIntFromJSONOrNone("toolIdx", jsonData)
@@ -72,7 +100,7 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
 
         self._settings.set([SettingsKeys.SELECTED_SPOOL_IDS], spools)
         self._settings.save()
-
+        
         self.triggerPluginEvent(
             Events.PLUGIN_SPOOLMAN_SPOOL_SELECTED,
             {
@@ -80,8 +108,9 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
                 'spoolId': spoolId,
             }
         )
-
+        
         self.infoSpool(spoolId,toolId)
+        self.changeSpool(spoolId,toolId)
         
         return flask.jsonify({
             "data": {}
