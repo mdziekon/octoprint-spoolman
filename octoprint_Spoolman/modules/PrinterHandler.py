@@ -7,7 +7,7 @@ from octoprint.events import Events
 from ..thirdparty.gcodeInterpreter import gcode
 from ..common.settings import SettingsKeys
 
-class PrinterHandler():
+class PrinterHandler(object):
     def initialize(self):
         self.lastPrintCancelled = False
         self.lastPrintOdometer = None

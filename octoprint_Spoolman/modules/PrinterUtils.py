@@ -3,7 +3,7 @@ from __future__ import absolute_import
 
 import math
 
-class PrinterUtils:
+class PrinterUtils(object):
     def getCurrentJobFilamentUsage(self):
         printer = self._printer
         fileManager = self._file_manager

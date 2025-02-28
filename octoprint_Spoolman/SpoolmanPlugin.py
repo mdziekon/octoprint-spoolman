@@ -11,14 +11,14 @@ from .common.events import PluginEvents
 
 class SpoolmanPlugin(
     octoprint.plugin.StartupPlugin,
+    octoprint.plugin.SettingsPlugin,
     octoprint.plugin.AssetPlugin,
     octoprint.plugin.TemplatePlugin,
-    octoprint.plugin.SettingsPlugin,
     octoprint.plugin.EventHandlerPlugin,
-    octoprint.plugin.BlueprintPlugin,  # Added for API endpoints
-    PluginAPI,
-    PrinterHandler,
+    octoprint.plugin.BlueprintPlugin,
     PrinterUtils,
+    PrinterHandler,
+    PluginAPI
 ):
     _isInitialized = False
 

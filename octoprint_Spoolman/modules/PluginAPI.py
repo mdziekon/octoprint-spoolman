@@ -9,7 +9,7 @@ import http
 from ..common.settings import SettingsKeys
 from .PrinterUtils import PrinterUtils
 
-class PluginAPI(octoprint.plugin.BlueprintPlugin):
+class PluginAPI(object):
     def is_blueprint_csrf_protected(self):
         return True
 
