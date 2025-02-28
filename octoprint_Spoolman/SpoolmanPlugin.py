@@ -206,25 +206,30 @@ class SpoolmanPlugin(
             selected_spool_ids = self._settings.get([SettingsKeys.SELECTED_SPOOL_IDS])
             
             # Spule für das angegebene Tool auswählen
-            selected_spool_ids[tool] = spool_id
+            # Die Spulen-ID muss als Dictionary mit 'spoolId' gespeichert werden, 
+            # damit sie korrekt mit der UI-Logik funktioniert
+            tool_index = tool.replace("tool", "") if tool.startswith("tool") else tool
+            selected_spool_ids[tool_index] = {
+                'spoolId': str(spool_id)
+            }
             
             # Settings aktualisieren
             self._settings.set([SettingsKeys.SELECTED_SPOOL_IDS], selected_spool_ids)
             self._settings.save()
             
-            # Event auslösen
+            # Event auslösen mit korrektem Datenformat
             self.triggerPluginEvent(
                 PluginEvents.SPOOL_SELECTED,
                 {
-                    "toolIndex": tool,
-                    "spoolId": spool_id
+                    'toolIdx': int(tool_index),
+                    'spoolId': str(spool_id)
                 }
             )
             
             return jsonify({
                 "success": True,
                 "selected_spool": spool_id,
-                "tool": tool
+                "tool": tool_index
             }), 200
             
         except Exception as e:
