@@ -56,6 +56,12 @@ class SpoolmanPlugin(
         )
 
     def triggerPluginEvent(self, eventType, eventPayload = {}):
+        # Sicherstellen, dass der Event-Name korrekt für OctoPrint formatiert wird
+        # OctoPrint-Event-Namen sollten das Format "plugin_pluginId_eventName" haben
+        if not eventType.startswith("plugin_"):
+            # Füge das "plugin_Spoolman_" Präfix hinzu, wenn es noch nicht vorhanden ist
+            eventType = f"plugin_Spoolman_{eventType}"
+            
         self._logger.info("[Spoolman][event] Triggered '" + eventType + "' with payload '" + str(eventPayload) + "'")
         self._event_bus.fire(
             eventType,
@@ -202,13 +208,14 @@ class SpoolmanPlugin(
             # Optional Parameter
             tool = data.get("tool", "tool0")
             
+            # Extrahiere nur die Nummer aus dem Tool-Namen
+            tool_index = tool.replace("tool", "") if tool.startswith("tool") else tool
+            
             # Bestehende Settings holen
             selected_spool_ids = self._settings.get([SettingsKeys.SELECTED_SPOOL_IDS])
             
             # Spule für das angegebene Tool auswählen
-            # Die Spulen-ID muss als Dictionary mit 'spoolId' gespeichert werden, 
-            # damit sie korrekt mit der UI-Logik funktioniert
-            tool_index = tool.replace("tool", "") if tool.startswith("tool") else tool
+            # Die Spulen-ID muss als Observable-kompatibles Format gespeichert werden
             selected_spool_ids[tool_index] = {
                 'spoolId': str(spool_id)
             }
@@ -217,11 +224,11 @@ class SpoolmanPlugin(
             self._settings.set([SettingsKeys.SELECTED_SPOOL_IDS], selected_spool_ids)
             self._settings.save()
             
-            # Event auslösen mit korrektem Datenformat
+            # Event auslösen mit korrektem Datenformat - das "plugin_Spoolman_" Präfix wird automatisch hinzugefügt
             self.triggerPluginEvent(
                 PluginEvents.SPOOL_SELECTED,
                 {
-                    'toolIdx': int(tool_index),
+                    'toolIdx': int(tool_index) if tool_index.isdigit() else tool_index,
                     'spoolId': str(spool_id)
                 }
             )
