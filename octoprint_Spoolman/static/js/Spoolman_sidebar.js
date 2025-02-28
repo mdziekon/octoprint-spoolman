@@ -183,7 +183,10 @@ $(() => {
 
         const handlePluginSocketEvents = async (eventType, eventPayload) => {
             if (eventType === "plugin_Spoolman_spool_selected") {
-                return;
+                // Aktualisiere die UI direkt, wenn eine Spule ausgewählt wurde
+                self._logger && self._logger.info("[Spoolman] Detected spool selection, refreshing UI");
+                await handleForceRefresh();
+                return updateSelectedSpools();
             }
             if (eventType === "plugin_Spoolman_spool_usage_committed") {
                 return await handleForceRefresh();
