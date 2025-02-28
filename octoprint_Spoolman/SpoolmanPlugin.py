@@ -16,14 +16,19 @@ class SpoolmanPlugin(
     octoprint.plugin.TemplatePlugin,
     octoprint.plugin.EventHandlerPlugin,
     octoprint.plugin.BlueprintPlugin,
-    PrinterUtils,
-    PrinterHandler,
-    PluginAPI
+    PluginAPI,
+    PrinterHandler
 ):
     _isInitialized = False
 
     def initialize(self):
         self._isInitialized = True
+        self._printer_utils = PrinterUtils(self._printer, self._file_manager)
+        PrinterHandler.initialize(self)
+
+    # Using composition for PrinterUtils instead of inheritance
+    def getCurrentJobFilamentUsage(self):
+        return self._printer_utils.getCurrentJobFilamentUsage()
 
     # TODO: Investigate caching again in the future.
     # Currently re-instantiating is fine, as there's nothing "heavy" in the ctor,

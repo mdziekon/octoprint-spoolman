@@ -4,6 +4,10 @@ from __future__ import absolute_import
 import math
 
 class PrinterUtils(object):
+    def __init__(self, printer, file_manager):
+        self._printer = printer
+        self._file_manager = file_manager
+        
     def getCurrentJobFilamentUsage(self):
         printer = self._printer
         fileManager = self._file_manager

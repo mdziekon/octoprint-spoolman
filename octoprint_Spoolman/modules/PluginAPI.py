@@ -7,7 +7,6 @@ import flask
 import http
 
 from ..common.settings import SettingsKeys
-from .PrinterUtils import PrinterUtils
 
 class PluginAPI(object):
     def is_blueprint_csrf_protected(self):
@@ -112,6 +111,9 @@ class PluginAPI(object):
 
         selectedSpools = self._settings.get([SettingsKeys.SELECTED_SPOOL_IDS])
 
+        # Use the PrinterUtils static method directly through getCurrentJobFilamentUsage()
+        # This avoids the circular dependency
+        from .PrinterUtils import PrinterUtils
         filamentUsageDataPerTool = PrinterUtils.getFilamentUsageDataPerTool(
             filamentLengthPerTool = jobFilamentUsage['jobFilamentLengthsPerTool'],
             selectedSpoolsPerTool = selectedSpools,
