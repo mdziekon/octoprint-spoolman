@@ -1,5 +1,6 @@
 import octoprint.plugin
 from octoprint.events import Events
+from flask import request, jsonify
 
 from .modules.PluginAPI import PluginAPI
 from .modules.PrinterHandler import PrinterHandler
@@ -14,6 +15,7 @@ class SpoolmanPlugin(
     octoprint.plugin.TemplatePlugin,
     octoprint.plugin.SettingsPlugin,
     octoprint.plugin.EventHandlerPlugin,
+    octoprint.plugin.BlueprintPlugin,  # Added for API endpoints
     PluginAPI,
     PrinterHandler,
     PrinterUtils,
@@ -175,3 +177,51 @@ class SpoolmanPlugin(
                 ]
             }
         }
+
+    # Webhook for FilaMan to select a spool
+    @octoprint.plugin.BlueprintPlugin.route("/selectSpool", methods=["POST"])
+    def select_spool_webhook(self):
+        if not self._isInitialized:
+            return jsonify({"error": "Plugin not initialized"}), 503
+            
+        try:
+            data = request.json
+            
+            if not data:
+                return jsonify({"error": "Missing request data"}), 400
+                
+            spool_id = data.get("spool_id")
+            if spool_id is None:
+                return jsonify({"error": "Missing spool_id parameter"}), 400
+                
+            # Optional Parameter
+            tool = data.get("tool", "tool0")
+            
+            # Bestehende Settings holen
+            selected_spool_ids = self._settings.get([SettingsKeys.SELECTED_SPOOL_IDS])
+            
+            # Spule für das angegebene Tool auswählen
+            selected_spool_ids[tool] = spool_id
+            
+            # Settings aktualisieren
+            self._settings.set([SettingsKeys.SELECTED_SPOOL_IDS], selected_spool_ids)
+            self._settings.save()
+            
+            # Event auslösen
+            self.triggerPluginEvent(
+                PluginEvents.SPOOL_SELECTED,
+                {
+                    "toolIndex": tool,
+                    "spoolId": spool_id
+                }
+            )
+            
+            return jsonify({
+                "success": True,
+                "selected_spool": spool_id,
+                "tool": tool
+            }), 200
+            
+        except Exception as e:
+            self._logger.error(f"[Spoolman][API] Error in webhook: {str(e)}")
+            return jsonify({"error": f"Internal error: {str(e)}"}), 500
