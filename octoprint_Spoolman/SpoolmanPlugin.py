@@ -56,10 +56,8 @@ class SpoolmanPlugin(
         )
 
     def triggerPluginEvent(self, eventType, eventPayload = {}):
-        # Sicherstellen, dass der Event-Name korrekt für OctoPrint formatiert wird
-        # OctoPrint-Event-Namen sollten das Format "plugin_pluginId_eventName" haben
+        # Füge das "plugin_Spoolman_" Präfix hinzu, wenn es noch nicht vorhanden ist
         if not eventType.startswith("plugin_"):
-            # Füge das "plugin_Spoolman_" Präfix hinzu, wenn es noch nicht vorhanden ist
             eventType = f"plugin_Spoolman_{eventType}"
             
         self._logger.info("[Spoolman][event] Triggered '" + eventType + "' with payload '" + str(eventPayload) + "'")
@@ -215,7 +213,6 @@ class SpoolmanPlugin(
             selected_spool_ids = self._settings.get([SettingsKeys.SELECTED_SPOOL_IDS])
             
             # Spule für das angegebene Tool auswählen
-            # Die Spulen-ID muss als Observable-kompatibles Format gespeichert werden
             selected_spool_ids[tool_index] = {
                 'spoolId': str(spool_id)
             }
@@ -224,7 +221,7 @@ class SpoolmanPlugin(
             self._settings.set([SettingsKeys.SELECTED_SPOOL_IDS], selected_spool_ids)
             self._settings.save()
             
-            # Event auslösen mit korrektem Datenformat - das "plugin_Spoolman_" Präfix wird automatisch hinzugefügt
+            # Event auslösen
             self.triggerPluginEvent(
                 PluginEvents.SPOOL_SELECTED,
                 {

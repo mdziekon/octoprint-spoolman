@@ -34,49 +34,34 @@ $(() => {
          * it acts like that "generic place" for now.
          */
         const initSocket = async () => {
-            console.log("[Spoolman Debug] Initializing WebSocket listener");
-            
             OctoPrint.socket.onMessage("event", (message) => {
-                console.log("[Spoolman Debug] Received socket message:", message);
-                
                 if (!(message.data.type || '').includes("plugin_Spoolman_")) {
                     return;
                 }
-                
-                console.log("[Spoolman Debug] Processing Spoolman event:", message.data.type, message.data.payload);
                 handlePluginSocketEvents(message.data.type, message.data.payload);
             });
         };
 
         const updateSelectedSpools = async () => {
-            console.log("[Spoolman Debug] Updating selected spools display");
             self.templateData.loadingError(undefined);
             self.templateData.isLoadingData(true);
 
             try {
                 const spoolmanSpoolsResult = await pluginSpoolmanApi.getSpoolmanSpools();
-                console.log("[Spoolman Debug] Got spools data:", spoolmanSpoolsResult);
-                
                 self.templateData.isLoadingData(false);
 
                 if (!spoolmanSpoolsResult.isSuccess) {
                     const responseError = spoolmanSpoolsResult.error.response.error;
-
                     const code = Object.values(self.constants.knownErrors).includes(responseError?.code)
                         ? responseError?.code
                         : undefined;
-
-                    console.error("[Spoolman Debug] Error loading spools:", responseError);
                     self.templateData.loadingError({
                         code,
                     });
-
                     return;
                 }
 
                 const spoolmanSpools = spoolmanSpoolsResult.payload.response.data.spools;
-                console.log("[Spoolman Debug] Available spools:", spoolmanSpools);
-
                 const currentProfileData = self.settingsViewModel.printerProfiles.currentProfileData();
                 const currentExtrudersCount = (
                     currentProfileData
@@ -88,28 +73,13 @@ $(() => {
                     length: currentExtrudersCount
                 }, () => undefined);
 
-                // WICHTIG: Die selectedSpoolIds neu laden, um sicherzustellen, dass wir aktuelle Daten haben
-                const settings = self.settingsViewModel.settings.plugins[PLUGIN_ID];
-                // Force reload settings if needed
-                if (settings && typeof settings.selectedSpoolIds === 'object') {
-                    // Wir müssen die Settings neu aus dem ViewModel laden
-                    console.log("[Spoolman Debug] Current settings:", settings);
-                    console.log("[Spoolman Debug] Current selectedSpoolIds:", settings.selectedSpoolIds);
-                }
-
                 const selectedSpoolIds = getPluginSettings().selectedSpoolIds;
-                console.log("[Spoolman Debug] Selected spool IDs:", selectedSpoolIds);
                 
                 const selectedSpools = extruders.map((_, extruderIdx) => {
                     const toolIdxStr = String(extruderIdx);
                     const spoolIdData = selectedSpoolIds[toolIdxStr];
-                    console.log(`[Spoolman Debug] Looking up spool for tool ${toolIdxStr}:`, spoolIdData);
-                    
                     const spoolId = spoolIdData?.spoolId?.();
-                    console.log(`[Spoolman Debug] Spool ID for tool ${toolIdxStr}:`, spoolId);
-
                     const spoolData = spoolmanSpools.find((spool) => String(spool.id) === spoolId);
-                    console.log(`[Spoolman Debug] Found spool data for tool ${toolIdxStr}:`, spoolData);
 
                     return {
                         spoolId,
@@ -118,7 +88,6 @@ $(() => {
                     };
                 });
 
-                console.log("[Spoolman Debug] Setting selected spools:", selectedSpools);
                 self.templateData.selectedSpoolsByToolIdx(selectedSpools);
                 self.templateData.selectedSpoolsByToolIdx.valueHasMutated();
 
@@ -128,7 +97,6 @@ $(() => {
                 
                 return true;
             } catch (error) {
-                console.error("[Spoolman Debug] Error updating spools:", error);
                 self.templateData.isLoadingData(false);
                 return false;
             }
@@ -139,7 +107,6 @@ $(() => {
          */
         const handleOpenSpoolSelector = async (toolIdx) => {
             self.templateData.modals.selectSpool.toolIdx(toolIdx);
-
             self.modals.selectSpool().modal("show");
         };
 
@@ -159,18 +126,18 @@ $(() => {
             }
 
             await reloadSettingsViewModel(self.settingsViewModel);
-
             updateSelectedSpools();
         };
 
         const handleForceRefresh = async () => {
-            console.log("[Spoolman Debug] Force refreshing spool data");
             pluginSpoolmanApi.getSpoolmanSpools.invalidate();
             return updateSelectedSpools();
         };
+
         const handleTryAgainOnError = async () => {
             await handleForceRefresh();
         };
+
         const handleSpoolUsageError = async (eventPayload) => {
             if (eventPayload.code === "spoolman_api__spool_not_found") {
                 const spoolId = eventPayload.data.spoolId;
@@ -218,29 +185,18 @@ $(() => {
         };
 
         const handlePluginSocketEvents = async (eventType, eventPayload) => {
-            console.log(`[Spoolman Debug] Handling event: ${eventType}`, eventPayload);
-            
-            // Die OctoPrint Event-Namen haben das Format "plugin_Spoolman_spool_selected"
-            // ODER (je nach OctoPrint-Version) "plugin_spoolman_spool_selected"
-            // Daher müssen wir beide Formate abfangen
-            
             if (eventType.toLowerCase().includes("plugin_spoolman_spool_selected")) {
-                console.log("[Spoolman Debug] Spool selected event detected", eventPayload);
-                
                 // Force reload settings to ensure we have the latest data
                 try {
                     await self.settingsViewModel.requestData();
-                    console.log("[Spoolman Debug] Settings reloaded after spool selection");
                     
                     // Invalidate cache to force a fresh data load
                     pluginSpoolmanApi.getSpoolmanSpools.invalidate();
-                    console.log("[Spoolman Debug] API cache invalidated");
                     
                     // Update the UI
-                    const updated = await updateSelectedSpools();
-                    console.log("[Spoolman Debug] UI updated after spool selection:", updated);
+                    await updateSelectedSpools();
                 } catch (error) {
-                    console.error("[Spoolman Debug] Error updating after spool selection:", error);
+                    // Silent error handling
                 }
                 
                 return;
