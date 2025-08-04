@@ -186,32 +186,22 @@ $(() => {
             }
 
             return items.filter((item) => {
-                // Search in all relevant fields
                 const spoolData = item.spoolData;
 
                 // Each termPart must match
                 return filterTermParts.every((filterTermPart) => {
-                    // Check spool ID
                     if (spoolData.id.toString().includes(filterTermPart)) {
                         return true;
                     }
-
-                    // Check filament name
                     if ((spoolData.filament.name ?? "").toLowerCase().includes(filterTermPart)) {
                         return true;
                     }
-
-                    // Check filament material
                     if ((spoolData.filament.material ?? "").toLowerCase().includes(filterTermPart)) {
                         return true;
                     }
-
-                    // Check filament vendor name
                     if ((spoolData.filament?.vendor?.name ?? "").toLowerCase().includes(filterTermPart)) {
                         return true;
                     }
-
-                    // Check lot number
                     if ((spoolData.lot_nr ?? "").toLowerCase().includes(filterTermPart)) {
                         return true;
                     }
