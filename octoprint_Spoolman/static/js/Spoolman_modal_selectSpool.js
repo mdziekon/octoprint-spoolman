@@ -148,6 +148,8 @@ $(() => {
             toolCurrentSpoolId: ko.observable(undefined),
             toolCurrentSpool: ko.observable(undefined),
 
+            searchFilter: ko.observable(""),
+
             tableAttributeVisibility: {
                 id: true,
                 spoolName: true,
@@ -156,10 +158,66 @@ $(() => {
                 weight: true,
             },
             tableItemsOnCurrentPage: ko.observable([]),
+            // Computed value, needs to be defined once `self.templateData` already exists
+            filteredTableItemsOnCurrentPage: undefined,
 
             spoolmanUrl: ko.observable(undefined),
         };
+
+        self.templateData.filteredTableItemsOnCurrentPage = ko.computed(function () {
+            if (!self.templateData) {
+                return ko.observable([]);
+            }
+
+            const filterTerm = self.templateData.searchFilter().toLowerCase();
+            const items = self.templateData.tableItemsOnCurrentPage();
+
+            const filterTermParts = filterTerm
+                .split(" ")
+                .map((subTerm) => {
+                    return subTerm.trim();
+                })
+                .filter((subTerm) => {
+                    return subTerm.length > 0;
+                })
+
+            if (!filterTermParts.length) {
+                return items;
+            }
+
+            return items.filter((item) => {
+                const spoolData = item.spoolData;
+
+                // Each termPart must match
+                return filterTermParts.every((filterTermPart) => {
+                    if (spoolData.id.toString().includes(filterTermPart)) {
+                        return true;
+                    }
+                    if ((spoolData.filament.name ?? "").toLowerCase().includes(filterTermPart)) {
+                        return true;
+                    }
+                    if ((spoolData.filament.material ?? "").toLowerCase().includes(filterTermPart)) {
+                        return true;
+                    }
+                    if ((spoolData.filament?.vendor?.name ?? "").toLowerCase().includes(filterTermPart)) {
+                        return true;
+                    }
+                    if ((spoolData.lot_nr ?? "").toLowerCase().includes(filterTermPart)) {
+                        return true;
+                    }
+
+                    return false;
+                });
+            });
+        }, self.templateData)
         /** -- end of bindings -- */
+
+        self.templateData.filteredTableItemsOnCurrentPage.subscribe(() => {
+            // Refresh modal layout after we're done with rendering
+            setTimeout(() => {
+                refreshModalLayout();
+            }, 100);
+        });
 
         $(document).on("shown", SpoolmanModalSelectSpoolComponent.modalSelector, async () => {
             this._isVisible = true;
