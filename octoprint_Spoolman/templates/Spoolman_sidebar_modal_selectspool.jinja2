@@ -62,6 +62,26 @@
 
             <hr style="margin: 10px 0;"/>
 
+            <div class="control-group" style="margin-bottom: 10px;">
+                <label
+                    class="control-label"
+                    for="spoolman-modal-selectSpool-search"
+                >
+                    Search for spool
+                </label>
+                <div class="controls">
+                    <input
+                        type="text"
+                        id="spoolman-modal-selectSpool-search"
+                        class="input-block-level"
+                        placeholder="Search spools by id, name, material, vendor or lot number."
+                        data-bind="value: templateData.searchFilter, valueUpdate: 'keyup'"
+                    />
+                </div>
+            </div>
+
+            <hr style="margin: 10px 0;"/>
+
             <div
                 data-bind="visible: templateData.isLoadingData()"
                 style="margin: 16px; text-align: center;"
@@ -132,8 +152,8 @@
                         </tr>
                     </thead>
 
-                    <!-- ko if: (templateData.tableItemsOnCurrentPage().length > 0) -->
-                        <tbody data-bind="foreach: templateData.tableItemsOnCurrentPage">
+                    <!-- ko if: (templateData.filteredTableItemsOnCurrentPage().length > 0) -->
+                        <tbody data-bind="foreach: templateData.filteredTableItemsOnCurrentPage">
                             <tr
                                 style="cursor: pointer;"
                                 data-bind="
@@ -210,6 +230,20 @@
                                 >
                                     <i class="muted">
                                         No spools available
+                                    </i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    <!-- /ko -->
+                    <!-- ko if: (templateData.tableItemsOnCurrentPage().length > 0 && templateData.filteredTableItemsOnCurrentPage().length === 0) -->
+                        <tbody>
+                            <tr>
+                                <td
+                                    colspan="4"
+                                    style="text-align: center;"
+                                >
+                                    <i class="muted">
+                                        No spools found
                                     </i>
                                 </td>
                             </tr>

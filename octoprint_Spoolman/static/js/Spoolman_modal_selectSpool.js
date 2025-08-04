@@ -148,6 +148,8 @@ $(() => {
             toolCurrentSpoolId: ko.observable(undefined),
             toolCurrentSpool: ko.observable(undefined),
 
+            searchFilter: ko.observable(""),
+
             tableAttributeVisibility: {
                 id: true,
                 spoolName: true,
@@ -156,10 +158,64 @@ $(() => {
                 weight: true,
             },
             tableItemsOnCurrentPage: ko.observable([]),
+            // Computed value, needs to be defined once `self.templateData` already exists
+            filteredTableItemsOnCurrentPage: undefined,
 
             spoolmanUrl: ko.observable(undefined),
         };
+
+        self.templateData.filteredTableItemsOnCurrentPage = ko.computed(function () {
+            if (!self.templateData) {
+                return ko.observable([]);
+            }
+
+            const filterTerm = self.templateData.searchFilter().toLowerCase();
+            const items = self.templateData.tableItemsOnCurrentPage();
+
+            if (!filterTerm) {
+                return items;
+            }
+
+            return items.filter((item) => {
+                // Search in all relevant fields
+                const spoolData = item.spoolData;
+
+                // Check spool ID
+                if (spoolData.id.toString().includes(filterTerm)) {
+                    return true;
+                }
+
+                // Check filament name
+                if ((spoolData.filament.name ?? "").toLowerCase().includes(filterTerm)) {
+                    return true;
+                }
+
+                // Check filament material
+                if ((spoolData.filament.material ?? "").toLowerCase().includes(filterTerm)) {
+                    return true;
+                }
+
+                // Check filament vendor name
+                if ((spoolData.filament?.vendor?.name ?? "").toLowerCase().includes(filterTerm)) {
+                    return true;
+                }
+
+                // Check lot number
+                if ((spoolData.lot_nr ?? "").toLowerCase().includes(filterTerm)) {
+                    return true;
+                }
+
+                return false;
+            });
+        }, self.templateData)
         /** -- end of bindings -- */
+
+        self.templateData.filteredTableItemsOnCurrentPage.subscribe(() => {
+            // Refresh modal layout after we're done with rendering
+            setTimeout(() => {
+                refreshModalLayout();
+            }, 100);
+        });
 
         $(document).on("shown", SpoolmanModalSelectSpoolComponent.modalSelector, async () => {
             this._isVisible = true;
