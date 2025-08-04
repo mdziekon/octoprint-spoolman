@@ -172,7 +172,16 @@ $(() => {
             const filterTerm = self.templateData.searchFilter().toLowerCase();
             const items = self.templateData.tableItemsOnCurrentPage();
 
-            if (!filterTerm) {
+            const filterTermParts = filterTerm
+                .split(" ")
+                .map((subTerm) => {
+                    return subTerm.trim();
+                })
+                .filter((subTerm) => {
+                    return subTerm.length > 0;
+                })
+
+            if (!filterTermParts.length) {
                 return items;
             }
 
@@ -180,32 +189,35 @@ $(() => {
                 // Search in all relevant fields
                 const spoolData = item.spoolData;
 
-                // Check spool ID
-                if (spoolData.id.toString().includes(filterTerm)) {
-                    return true;
-                }
+                // Each termPart must match
+                return filterTermParts.every((filterTermPart) => {
+                    // Check spool ID
+                    if (spoolData.id.toString().includes(filterTermPart)) {
+                        return true;
+                    }
 
-                // Check filament name
-                if ((spoolData.filament.name ?? "").toLowerCase().includes(filterTerm)) {
-                    return true;
-                }
+                    // Check filament name
+                    if ((spoolData.filament.name ?? "").toLowerCase().includes(filterTermPart)) {
+                        return true;
+                    }
 
-                // Check filament material
-                if ((spoolData.filament.material ?? "").toLowerCase().includes(filterTerm)) {
-                    return true;
-                }
+                    // Check filament material
+                    if ((spoolData.filament.material ?? "").toLowerCase().includes(filterTermPart)) {
+                        return true;
+                    }
 
-                // Check filament vendor name
-                if ((spoolData.filament?.vendor?.name ?? "").toLowerCase().includes(filterTerm)) {
-                    return true;
-                }
+                    // Check filament vendor name
+                    if ((spoolData.filament?.vendor?.name ?? "").toLowerCase().includes(filterTermPart)) {
+                        return true;
+                    }
 
-                // Check lot number
-                if ((spoolData.lot_nr ?? "").toLowerCase().includes(filterTerm)) {
-                    return true;
-                }
+                    // Check lot number
+                    if ((spoolData.lot_nr ?? "").toLowerCase().includes(filterTermPart)) {
+                        return true;
+                    }
 
-                return false;
+                    return false;
+                });
             });
         }, self.templateData)
         /** -- end of bindings -- */
