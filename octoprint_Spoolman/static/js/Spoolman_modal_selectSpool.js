@@ -130,6 +130,27 @@ $(() => {
         const handleTryAgainOnError = async () => {
             await handleForceRefresh();
         };
+        /**
+         * @param {string} newSortField
+         */
+        const handleSortChange = (newSortField) => {
+            if (self.templateData.sortField() !== newSortField) {
+                self.templateData.sortField(newSortField);
+                self.templateData.sortDirection('asc');
+
+                return;
+            }
+
+            if (self.templateData.sortDirection() === 'asc') {
+                self.templateData.sortDirection('desc');
+            } else if (self.templateData.sortDirection() === 'desc') {
+                self.templateData.sortDirection(null);
+                self.templateData.sortField(null);
+            } else {
+                self.templateData.sortDirection('asc');
+                self.templateData.sortField(newSortField);
+            }
+        };
 
         /** Bindings for the template */
         self.constants = {
@@ -139,6 +160,7 @@ $(() => {
             handleSelectSpoolForTool,
             handleTryAgainOnError,
             handleForceRefresh,
+            handleSortChange,
         };
         self.templateData = {
             isLoadingData: ko.observable(true),
@@ -149,6 +171,8 @@ $(() => {
             toolCurrentSpool: ko.observable(undefined),
 
             searchFilter: ko.observable(""),
+            sortField: ko.observable('id'),
+            sortDirection: ko.observable('asc'),
 
             tableAttributeVisibility: {
                 id: true,
@@ -159,12 +183,64 @@ $(() => {
             },
             tableItemsOnCurrentPage: ko.observable([]),
             // Computed value, needs to be defined once `self.templateData` already exists
-            filteredTableItemsOnCurrentPage: undefined,
+            computedTableItemsOnCurrentPage: undefined,
 
             spoolmanUrl: ko.observable(undefined),
         };
 
-        self.templateData.filteredTableItemsOnCurrentPage = ko.computed(function () {
+        /**
+         * @param {*} tableItem
+         * @param {string} field
+         */
+        const getSortValue = (tableItem, field) => {
+            switch (field) {
+                case 'id':
+                    return tableItem.spoolId;
+                case 'spoolName':
+                    return tableItem.displayData.filament.name.displayValue.toLowerCase();
+                case 'material':
+                    return tableItem.displayData.filament.material.displayValue.toLowerCase();
+                case 'lot':
+                    return tableItem.displayData.lot.displayValue.toLowerCase();
+                case 'weight':
+                    // For weight, use `remaining_weight`
+                    return tableItem.displayData.remaining_weight.isValid ?
+                        parseFloat(tableItem.displayData.remaining_weight.displayValue) : 0;
+                default:
+                    return '';
+            }
+        };
+
+        /**
+         * @param {*} tableItems
+         * @param {string} field
+         * @param {'asc' | 'desc' | null} direction
+         */
+        const sortSpools = (tableItems, field, direction) => {
+            if (!field || !direction) {
+                return tableItems;
+            }
+
+            return [...tableItems].sort((left, right) => {
+                const valueA = getSortValue(left, field);
+                const valueB = getSortValue(right, field);
+
+                let comparison = 0;
+
+                if (typeof valueA === 'string' && typeof valueB === 'string') {
+                    comparison = valueA.localeCompare(valueB);
+                } else {
+                    comparison = valueA - valueB;
+                }
+
+                return direction === 'desc' ? -comparison : comparison;
+            });
+        };
+
+        /**
+         * Filter & sort table items before displaying
+         */
+        self.templateData.computedTableItemsOnCurrentPage = ko.computed(function () {
             if (!self.templateData) {
                 return ko.observable([]);
             }
@@ -179,40 +255,55 @@ $(() => {
                 })
                 .filter((subTerm) => {
                     return subTerm.length > 0;
-                })
+                });
 
-            if (!filterTermParts.length) {
-                return items;
+            const filteredItems = (() => {
+                if (!filterTermParts.length) {
+                    return items;
+                }
+
+                return items.filter((item) => {
+                    const spoolData = item.spoolData;
+
+                    // Each termPart must match
+                    return filterTermParts.every((filterTermPart) => {
+                        if (spoolData.id.toString().includes(filterTermPart)) {
+                            return true;
+                        }
+                        if ((spoolData.filament.name ?? "").toLowerCase().includes(filterTermPart)) {
+                            return true;
+                        }
+                        if ((spoolData.filament.material ?? "").toLowerCase().includes(filterTermPart)) {
+                            return true;
+                        }
+                        if ((spoolData.filament?.vendor?.name ?? "").toLowerCase().includes(filterTermPart)) {
+                            return true;
+                        }
+                        if ((spoolData.lot_nr ?? "").toLowerCase().includes(filterTermPart)) {
+                            return true;
+                        }
+
+                        return false;
+                    });
+                });
+            })();
+
+            if (
+                self.templateData.sortField() &&
+                self.templateData.sortDirection()
+            ) {
+                return sortSpools(
+                    filteredItems,
+                    self.templateData.sortField(),
+                    self.templateData.sortDirection()
+                );
             }
 
-            return items.filter((item) => {
-                const spoolData = item.spoolData;
-
-                // Each termPart must match
-                return filterTermParts.every((filterTermPart) => {
-                    if (spoolData.id.toString().includes(filterTermPart)) {
-                        return true;
-                    }
-                    if ((spoolData.filament.name ?? "").toLowerCase().includes(filterTermPart)) {
-                        return true;
-                    }
-                    if ((spoolData.filament.material ?? "").toLowerCase().includes(filterTermPart)) {
-                        return true;
-                    }
-                    if ((spoolData.filament?.vendor?.name ?? "").toLowerCase().includes(filterTermPart)) {
-                        return true;
-                    }
-                    if ((spoolData.lot_nr ?? "").toLowerCase().includes(filterTermPart)) {
-                        return true;
-                    }
-
-                    return false;
-                });
-            });
+            return filteredItems;
         }, self.templateData)
         /** -- end of bindings -- */
 
-        self.templateData.filteredTableItemsOnCurrentPage.subscribe(() => {
+        self.templateData.computedTableItemsOnCurrentPage.subscribe(() => {
             // Refresh modal layout after we're done with rendering
             setTimeout(() => {
                 refreshModalLayout();
