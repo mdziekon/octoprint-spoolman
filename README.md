@@ -18,7 +18,7 @@ An OctoPrint plugin integrating with [Spoolman](https://github.com/Donkie/Spoolm
         - By default, `archived` spools are not presented for selection
     - [x] Select & deselect spools for specified tools / extruders
     - [x] Commit spools usage to Spoolman
-- [ ] Spools filtering
+- [x] Spools filtering & sorting
 - [x] Check spools before starting a print
     - [x] Ask the user if the selected spool is correct
     - [x] Warn when no spool is selected

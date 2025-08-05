@@ -1,11 +1,10 @@
-
 /**
  * @param {number} weight
  * @param {{
-*  constants: Record<string, unknown>;
-*  precision?: number
-* }} params
-*/
+ *  constants: Record<string, unknown>;
+ *  precision?: number
+ * }} params
+ */
 const toWeight = (weight, params) => {
     return `${weight.toFixed(params.precision ?? 1)}${params.constants['weight_unit']}`;
 };
@@ -13,9 +12,9 @@ const toWeight = (weight, params) => {
 /**
  * @param {Spool} spool
  * @param {{
-*  constants: Record<string, unknown>
-* }} params
-*/
+ *  constants: Record<string, unknown>
+ * }} params
+ */
 const toSpoolForDisplay = (spool, params) => {
     return {
         filament: {
@@ -73,6 +72,16 @@ const toSpoolForDisplay = (spool, params) => {
                     displayValue: "Unavailable",
                 }
         ),
+        last_used: (
+            spool.last_used
+                ? {
+                    isValid: true,
+                    displayValue: formatDateForDisplay(spool.last_used),
+                } : {
+                    isValid: false,
+                    displayValue: "N/A",
+                }
+        ),
         lot: (
             spool.lot_nr
                 ? {
@@ -111,9 +120,9 @@ const calculateWeight = (length, diameter, density) => {
  * @param {string | undefined} multi_color_hexes
  *  Hex color codes for multi-color filaments or undefined
  * @returns {{
-*   cssProperty: string,
-*   cssValue: string,
-*  }}
+ *   cssProperty: string,
+ *   cssValue: string,
+ *  }}
  *  cssProperty and cssValue for the filament color
  */
 const calculateColorCSS = (color_hex, multi_color_direction, multi_color_hexes) => {
@@ -175,3 +184,30 @@ const calculateShortLot = (lot_nr) => {
 
     return `${lot_nr.substring(0, 3)}...${lot_nr.substring(lot_nr.length - 3)}`;
 }
+
+/**
+ * @param {string} dateString
+ *  ISO 8601 date string
+ * @returns string
+ *  Formatted date string in YYYY-MM-dd HH:mm:ss format
+ */
+const formatDateForDisplay = (dateString) => {
+    if (!dateString) {
+        return '';
+    }
+
+    const dateWrapper = new Date(dateString);
+
+    if (isNaN(dateWrapper.getTime())) {
+        return dateString;
+    }
+
+    const year = dateWrapper.getFullYear();
+    const month = String(dateWrapper.getMonth() + 1).padStart(2, '0');
+    const day = String(dateWrapper.getDate()).padStart(2, '0');
+    const hours = String(dateWrapper.getHours()).padStart(2, '0');
+    const minutes = String(dateWrapper.getMinutes()).padStart(2, '0');
+    const seconds = String(dateWrapper.getSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+};

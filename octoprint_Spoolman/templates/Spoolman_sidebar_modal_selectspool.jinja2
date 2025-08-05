@@ -120,40 +120,82 @@
                     <thead>
                         <tr>
                             <th
-                                style="width: 5%"
-                                data-bind="visible: templateData.tableAttributeVisibility.id"
+                                style="width: 5%; cursor: pointer;"
+                                data-bind="visible: templateData.tableAttributeVisibility.id, click: function() { templateApi.handleSortChange('id') }"
                             >
                                 ID
+                                <!-- ko if: templateData.sortField() === 'id' -->
+                                <i class="fa" data-bind="css: { 'fa-sort-up': templateData.sortDirection() === 'asc', 'fa-sort-down': templateData.sortDirection() === 'desc' }"></i>
+                                <!-- /ko -->
+                                <!-- ko ifnot: templateData.sortField() === 'id' -->
+                                <i class="fa fa-sort muted"></i>
+                                <!-- /ko -->
                             </th>
                             <th
-                                style="width: 50%"
-                                data-bind="visible: templateData.tableAttributeVisibility.spoolName"
+                                style="width: 40%; cursor: pointer;"
+                                data-bind="visible: templateData.tableAttributeVisibility.spoolName, click: function() { templateApi.handleSortChange('spoolName') }"
                             >
                                 Name
+                                <!-- ko if: templateData.sortField() === 'spoolName' -->
+                                <i class="fa" data-bind="css: { 'fa-sort-up': templateData.sortDirection() === 'asc', 'fa-sort-down': templateData.sortDirection() === 'desc' }"></i>
+                                <!-- /ko -->
+                                <!-- ko ifnot: templateData.sortField() === 'spoolName' -->
+                                <i class="fa fa-sort muted"></i>
+                                <!-- /ko -->
                             </th>
                             <th
-                                style="width: 15%"
-                                data-bind="visible: templateData.tableAttributeVisibility.material"
+                                style="width: 15%; cursor: pointer;"
+                                data-bind="visible: templateData.tableAttributeVisibility.material, click: function() { templateApi.handleSortChange('material') }"
                             >
                                 Material
+                                <!-- ko if: templateData.sortField() === 'material' -->
+                                <i class="fa" data-bind="css: { 'fa-sort-up': templateData.sortDirection() === 'asc', 'fa-sort-down': templateData.sortDirection() === 'desc' }"></i>
+                                <!-- /ko -->
+                                <!-- ko ifnot: templateData.sortField() === 'material' -->
+                                <i class="fa fa-sort muted"></i>
+                                <!-- /ko -->
                             </th>
                             <th
-                                style="width: 15%"
-                                data-bind="visible: templateData.tableAttributeVisibility.lot"
+                                style="width: 15%; cursor: pointer;"
+                                data-bind="visible: templateData.tableAttributeVisibility.lot, click: function() { templateApi.handleSortChange('lot') }"
                             >
                                 Lot #
+                                <!-- ko if: templateData.sortField() === 'lot' -->
+                                <i class="fa" data-bind="css: { 'fa-sort-up': templateData.sortDirection() === 'asc', 'fa-sort-down': templateData.sortDirection() === 'desc' }"></i>
+                                <!-- /ko -->
+                                <!-- ko ifnot: templateData.sortField() === 'lot' -->
+                                <i class="fa fa-sort muted"></i>
+                                <!-- /ko -->
                             </th>
                             <th
-                                style="text-align: center; width: 15%;"
-                                data-bind="visible: templateData.tableAttributeVisibility.weight"
+                                style="width: 15%; cursor: pointer;"
+                                data-bind="visible: templateData.tableAttributeVisibility.lastUsed, click: function() { templateApi.handleSortChange('lastUsed') }"
+                            >
+                                Last used
+                                <!-- ko if: templateData.sortField() === 'lastUsed' -->
+                                <i class="fa" data-bind="css: { 'fa-sort-up': templateData.sortDirection() === 'asc', 'fa-sort-down': templateData.sortDirection() === 'desc' }"></i>
+                                <!-- /ko -->
+                                <!-- ko ifnot: templateData.sortField() === 'lastUsed' -->
+                                <i class="fa fa-sort muted"></i>
+                                <!-- /ko -->
+                            </th>
+                            <th
+                                style="text-align: right; width: 15%; cursor: pointer;"
+                                data-bind="visible: templateData.tableAttributeVisibility.weight, click: function() { templateApi.handleSortChange('weight') }"
                             >
                                 Weight
+                                <!-- ko if: templateData.sortField() === 'weight' -->
+                                <i class="fa" data-bind="css: { 'fa-sort-up': templateData.sortDirection() === 'asc', 'fa-sort-down': templateData.sortDirection() === 'desc' }"></i>
+                                <!-- /ko -->
+                                <!-- ko ifnot: templateData.sortField() === 'weight' -->
+                                <i class="fa fa-sort muted"></i>
+                                <!-- /ko -->
                             </th>
                         </tr>
                     </thead>
 
-                    <!-- ko if: (templateData.filteredTableItemsOnCurrentPage().length > 0) -->
-                        <tbody data-bind="foreach: templateData.filteredTableItemsOnCurrentPage">
+                    <!-- ko if: (templateData.computedTableItemsOnCurrentPage().length > 0) -->
+                        <tbody data-bind="foreach: templateData.computedTableItemsOnCurrentPage">
                             <tr
                                 style="cursor: pointer;"
                                 data-bind="
@@ -204,8 +246,17 @@
                                 <td data-bind="visible: $component.templateData.tableAttributeVisibility.material">
                                     <span data-bind="text: $data.displayData.filament.material.displayValue, attr: { title: $data.displayData.filament.material.displayValue }"></span>
                                 </td>
-                                <td data-bind="visible: $component.templateData.tableAttributeVisibility.lot" style="overflow-wrap: break-word;">
+                                <td
+                                    data-bind="visible: $component.templateData.tableAttributeVisibility.lot"
+                                    style="overflow-wrap: break-word;"
+                                >
                                     <span data-bind="text: $data.displayData.lot.displayValue, attr: { title: $data.displayData.lot.displayValue }"></span>
+                                </td>
+                                <td
+                                    data-bind="visible: $component.templateData.tableAttributeVisibility.lastUsed"
+                                    style="overflow-wrap: break-word;"
+                                >
+                                    <span data-bind="text: $data.displayData.last_used.displayValue, attr: { title: $data.displayData.last_used.displayValue }"></span>
                                 </td>
                                 <td
                                     data-bind="visible: $component.templateData.tableAttributeVisibility.weight" style="text-align: right;"
@@ -235,7 +286,7 @@
                             </tr>
                         </tbody>
                     <!-- /ko -->
-                    <!-- ko if: (templateData.tableItemsOnCurrentPage().length > 0 && templateData.filteredTableItemsOnCurrentPage().length === 0) -->
+                    <!-- ko if: (templateData.tableItemsOnCurrentPage().length > 0 && templateData.computedTableItemsOnCurrentPage().length === 0) -->
                         <tbody>
                             <tr>
                                 <td
