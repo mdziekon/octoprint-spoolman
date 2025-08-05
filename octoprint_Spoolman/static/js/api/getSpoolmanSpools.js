@@ -11,6 +11,11 @@
  * @property {number} id
  * @property {boolean} archived
  * @property {string} registered
+ *  When the spool was registered in the database. UTC Timezone. ISO 8601 format.
+ * @property {string | null} first_used
+ *  First logged occurence of spool usage. UTC Timezone. ISO 8601 format.
+ * @property {string | null} last_used
+ *  Last logged occurence of spool usage. UTC Timezone. ISO 8601 format.
  * @property {number} used_length
  * @property {number} used_weight
  * @property {number | undefined} remaining_length

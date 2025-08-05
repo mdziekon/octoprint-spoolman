@@ -90,6 +90,7 @@ $(() => {
             self.templateData.spoolmanUrl(getPluginSettings().spoolmanUrl());
 
             self.templateData.tableAttributeVisibility.lot(Boolean(getPluginSettings().showLotNumberColumnInSpoolSelectModal()));
+            self.templateData.tableAttributeVisibility.lastUsed(Boolean(getPluginSettings().showLastUsedColumnInSpoolSelectModal()));
 
             refreshModalLayout();
         };
@@ -179,6 +180,7 @@ $(() => {
                 spoolName: true,
                 material: true,
                 lot: ko.observable(Boolean(getPluginSettings().showLotNumberColumnInSpoolSelectModal())),
+                lastUsed: ko.observable(Boolean(getPluginSettings().showLastUsedColumnInSpoolSelectModal())),
                 weight: true,
             },
             tableItemsOnCurrentPage: ko.observable([]),
@@ -206,6 +208,12 @@ $(() => {
                     // For weight, use `remaining_weight`
                     return tableItem.displayData.remaining_weight.isValid ?
                         parseFloat(tableItem.displayData.remaining_weight.displayValue) : 0;
+                case 'lastUsed':
+                    if (!tableItem.spoolData.last_used) {
+                        return -1;
+                    }
+
+                    return (new Date(tableItem.spoolData.last_used)).getTime();
                 default:
                     return '';
             }

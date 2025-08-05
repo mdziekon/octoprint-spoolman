@@ -132,7 +132,7 @@
                                 <!-- /ko -->
                             </th>
                             <th
-                                style="width: 50%; cursor: pointer;"
+                                style="width: 40%; cursor: pointer;"
                                 data-bind="visible: templateData.tableAttributeVisibility.spoolName, click: function() { templateApi.handleSortChange('spoolName') }"
                             >
                                 Name
@@ -164,6 +164,18 @@
                                 <i class="fa" data-bind="css: { 'fa-sort-up': templateData.sortDirection() === 'asc', 'fa-sort-down': templateData.sortDirection() === 'desc' }"></i>
                                 <!-- /ko -->
                                 <!-- ko ifnot: templateData.sortField() === 'lot' -->
+                                <i class="fa fa-sort muted"></i>
+                                <!-- /ko -->
+                            </th>
+                            <th
+                                style="width: 15%; cursor: pointer;"
+                                data-bind="visible: templateData.tableAttributeVisibility.lastUsed, click: function() { templateApi.handleSortChange('lastUsed') }"
+                            >
+                                Last used
+                                <!-- ko if: templateData.sortField() === 'lastUsed' -->
+                                <i class="fa" data-bind="css: { 'fa-sort-up': templateData.sortDirection() === 'asc', 'fa-sort-down': templateData.sortDirection() === 'desc' }"></i>
+                                <!-- /ko -->
+                                <!-- ko ifnot: templateData.sortField() === 'lastUsed' -->
                                 <i class="fa fa-sort muted"></i>
                                 <!-- /ko -->
                             </th>
@@ -234,8 +246,17 @@
                                 <td data-bind="visible: $component.templateData.tableAttributeVisibility.material">
                                     <span data-bind="text: $data.displayData.filament.material.displayValue, attr: { title: $data.displayData.filament.material.displayValue }"></span>
                                 </td>
-                                <td data-bind="visible: $component.templateData.tableAttributeVisibility.lot" style="overflow-wrap: break-word;">
+                                <td
+                                    data-bind="visible: $component.templateData.tableAttributeVisibility.lot"
+                                    style="overflow-wrap: break-word;"
+                                >
                                     <span data-bind="text: $data.displayData.lot.displayValue, attr: { title: $data.displayData.lot.displayValue }"></span>
+                                </td>
+                                <td
+                                    data-bind="visible: $component.templateData.tableAttributeVisibility.lastUsed"
+                                    style="overflow-wrap: break-word;"
+                                >
+                                    <span data-bind="text: $data.displayData.last_used.displayValue, attr: { title: $data.displayData.last_used.displayValue }"></span>
                                 </td>
                                 <td
                                     data-bind="visible: $component.templateData.tableAttributeVisibility.weight" style="text-align: right;"
