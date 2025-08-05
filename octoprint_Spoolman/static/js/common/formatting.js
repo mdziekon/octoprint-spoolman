@@ -1,11 +1,10 @@
-
 /**
  * @param {number} weight
  * @param {{
-*  constants: Record<string, unknown>;
-*  precision?: number
-* }} params
-*/
+ *  constants: Record<string, unknown>;
+ *  precision?: number
+ * }} params
+ */
 const toWeight = (weight, params) => {
     return `${weight.toFixed(params.precision ?? 1)}${params.constants['weight_unit']}`;
 };
@@ -13,9 +12,9 @@ const toWeight = (weight, params) => {
 /**
  * @param {Spool} spool
  * @param {{
-*  constants: Record<string, unknown>
-* }} params
-*/
+ *  constants: Record<string, unknown>
+ * }} params
+ */
 const toSpoolForDisplay = (spool, params) => {
     return {
         filament: {
@@ -121,9 +120,9 @@ const calculateWeight = (length, diameter, density) => {
  * @param {string | undefined} multi_color_hexes
  *  Hex color codes for multi-color filaments or undefined
  * @returns {{
-*   cssProperty: string,
-*   cssValue: string,
-*  }}
+ *   cssProperty: string,
+ *   cssValue: string,
+ *  }}
  *  cssProperty and cssValue for the filament color
  */
 const calculateColorCSS = (color_hex, multi_color_direction, multi_color_hexes) => {
