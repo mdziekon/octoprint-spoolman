@@ -319,7 +319,7 @@
                     <a
                         class="btn btn-default"
                         target="_blank"
-                        data-bind="attr: { href: templateData.spoolmanUrl }"
+                        data-bind="attr: { href: templateData.spoolmanWebUrl() || templateData.spoolmanUrl() }"
                         title="Open Spoolman in new tab"
                     >
                         <i class="fa fa-sm fa-database"></i>

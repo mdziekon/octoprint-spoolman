@@ -88,6 +88,7 @@ $(() => {
             self.templateData.tableItemsOnCurrentPage(spoolmanSafeSpools);
 
             self.templateData.spoolmanUrl(getPluginSettings().spoolmanUrl());
+            self.templateData.spoolmanWebUrl(getPluginSettings().spoolmanWebUrl());
 
             self.templateData.tableAttributeVisibility.lot(Boolean(getPluginSettings().showLotNumberColumnInSpoolSelectModal()));
             self.templateData.tableAttributeVisibility.lastUsed(Boolean(getPluginSettings().showLastUsedColumnInSpoolSelectModal()));
@@ -188,6 +189,7 @@ $(() => {
             computedTableItemsOnCurrentPage: undefined,
 
             spoolmanUrl: ko.observable(undefined),
+            spoolmanWebUrl: ko.observable(undefined),
         };
 
         /**

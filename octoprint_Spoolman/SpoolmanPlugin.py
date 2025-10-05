@@ -122,6 +122,7 @@ class SpoolmanPlugin(
         settings = {
             SettingsKeys.INSTALLED_VERSION: self._plugin_version,
             SettingsKeys.SPOOLMAN_URL: "",
+            SettingsKeys.SPOOLMAN_WEB_URL: "",
             SettingsKeys.IS_SPOOLMAN_CERT_VERIFY_ENABLED: True,
             SettingsKeys.SPOOLMAN_CERT_PEM_PATH: "",
             SettingsKeys.SELECTED_SPOOL_IDS: {},

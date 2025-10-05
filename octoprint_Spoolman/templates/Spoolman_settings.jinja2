@@ -97,6 +97,28 @@
                         </div>
                     </div>
                 </div>
+                <div class="control-group">
+                    <label
+                        class="control-label"
+                        for="settings-spoolman-general-spoolmanWebUrl"
+                    >
+                        Spoolman Web interface URL
+                    </label>
+                    <div class="controls">
+                        <input
+                            id="settings-spoolman-general-spoolmanWebUrl"
+                            type="text"
+                            class="input-xlarge text-left"
+                            data-bind="textInput: pluginSettings.spoolmanWebUrl"
+                            placeholder="https://192.168.1.100:7912"
+                        >
+                        <div style="margin-top: 0.25em">
+                            <small>
+                                Optional URL to the Spoolman Web interface. If provided, this URL will be used when clicking "Open Spoolman in new tab" instead of the instance URL. Useful in situations where Octoprint and Spoolman are communicating in a different network compared to the Spoolman's Web interface as exposed to the user (eg. when using Docker).
+                            </small>
+                        </div>
+                    </div>
+                </div>
                 <div>
                     <hr/>
                 </div>
