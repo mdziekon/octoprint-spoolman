@@ -42,10 +42,16 @@ class SpoolmanPlugin(
         else:
             verifyConfig = False
 
+        isSpoolmanApiKeyEnabled = self._settings.get([ SettingsKeys.IS_SPOOLMAN_API_KEY_ENABLED ])
+        spoolmanApiKeyHeader = self._settings.get([ SettingsKeys.SPOOLMAN_API_KEY_HEADER ]) if isSpoolmanApiKeyEnabled else None
+        spoolmanApiKey = self._settings.get([ SettingsKeys.SPOOLMAN_API_KEY ]) if isSpoolmanApiKeyEnabled else None
+
         return SpoolmanConnector(
             instanceUrl = spoolmanInstanceUrl,
             logger = self._logger,
             verifyConfig = verifyConfig,
+            apiKeyHeader = spoolmanApiKeyHeader,
+            apiKey = spoolmanApiKey,
         )
 
     def triggerPluginEvent(self, eventType, eventPayload = {}):
@@ -130,12 +136,29 @@ class SpoolmanPlugin(
             SettingsKeys.SHOW_LAST_USED_COLUMN_IN_SPOOL_SELECT_MODAL: True,
             SettingsKeys.SHOW_LOT_NUMBER_IN_SIDE_BAR: False,
             SettingsKeys.SHOW_SPOOL_ID_IN_SIDE_BAR: False,
+            SettingsKeys.IS_SPOOLMAN_API_KEY_ENABLED: False,
+            SettingsKeys.SPOOLMAN_API_KEY_HEADER: "",
+            SettingsKeys.SPOOLMAN_API_KEY: "",
         }
 
         return settings
 
+    def get_settings_restricted_paths(self):
+        return {
+            'never': [
+                [ SettingsKeys.SPOOLMAN_API_KEY ],
+            ],
+        }
+
     def on_settings_save(self, data):
         self._logger.info("[Spoolman][Settings] Saved data")
+
+        # When Api Key usage was disabled, reset header & key values to defaults
+        if SettingsKeys.IS_SPOOLMAN_API_KEY_ENABLED in data and not data[SettingsKeys.IS_SPOOLMAN_API_KEY_ENABLED]:
+            defaultSettings = self.get_settings_defaults()
+
+            data[SettingsKeys.SPOOLMAN_API_KEY_HEADER] = defaultSettings[SettingsKeys.SPOOLMAN_API_KEY_HEADER]
+            data[SettingsKeys.SPOOLMAN_API_KEY] = defaultSettings[SettingsKeys.SPOOLMAN_API_KEY]
 
         octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
 

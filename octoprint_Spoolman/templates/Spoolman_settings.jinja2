@@ -97,6 +97,78 @@
                         </div>
                     </div>
                 </div>
+                <div class="control-group">
+                    <label
+                        class="control-label"
+                        for="settings-spoolman-general-isSpoolmanApiKeyEnabled"
+                    >
+                        Use API Key Authentication
+                    </label>
+                    <div class="controls">
+                        <div>
+                            <input
+                                id="settings-spoolman-general-isSpoolmanApiKeyEnabled"
+                                type="checkbox"
+                                class="text-left"
+                                data-bind="checked: pluginSettings.isSpoolmanApiKeyEnabled"
+                            >
+                        </div>
+                        <div style="margin-top: 0.25em">
+                            <small>
+                                Enable API key authentication when plugin communicates with Spoolman instance.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <div class="control-group" data-bind="visible: pluginSettings.isSpoolmanApiKeyEnabled">
+                    <label
+                        class="control-label"
+                        for="settings-spoolman-general-spoolmanApiKeyHeader"
+                    >
+                        Spoolman API Key Header
+                    </label>
+                    <div class="controls">
+                        <div>
+                            <input
+                                id="settings-spoolman-general-spoolmanApiKeyHeader"
+                                type="text"
+                                class="input-xlarge text-left"
+                                data-bind="textInput: pluginSettings.spoolmanApiKeyHeader"
+                                placeholder="X-Auth-Header-Example"
+                            >
+                        </div>
+                        <div style="margin-top: 0.25em">
+                            <small>
+                                Header name to be used when sending Spoolman API Key.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <div class="control-group" data-bind="visible: pluginSettings.isSpoolmanApiKeyEnabled">
+                    <label
+                        class="control-label"
+                        for="settings-spoolman-general-spoolmanApiKey"
+                    >
+                        Spoolman API Key
+                    </label>
+                    <div class="controls">
+                        <div>
+                            <input
+                                id="settings-spoolman-general-spoolmanApiKey"
+                                type="password"
+                                class="input-xlarge text-left"
+                                data-bind="textInput: pluginSettings.spoolmanApiKey"
+                                placeholder="Enter new API key"
+                            >
+                        </div>
+                        <div style="margin-top: 0.25em">
+                            <small>
+                                Enter the API key for your Spoolman instance. This key will be sent in an additional header (header name as specified in <code>Spoolman API Key Header</code> setting) with all requests.<br/>
+                                <strong>Warning:</strong> for security reasons, the currently saven API key value is NOT revealed in the input above. However, setting or changing the API key value is a one time action, and does not have to be performed repeatedly on every settings change.
+                            </small>
+                        </div>
+                    </div>
+                </div>
                 <div>
                     <hr/>
                 </div>

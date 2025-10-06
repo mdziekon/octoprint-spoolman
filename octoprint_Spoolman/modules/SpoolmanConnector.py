@@ -5,10 +5,12 @@ import requests
 from requests.adapters import HTTPAdapter, Retry
 
 class SpoolmanConnector():
-    def __init__(self, instanceUrl, logger, verifyConfig):
+    def __init__(self, instanceUrl, logger, verifyConfig, apiKeyHeader = None, apiKey = None):
         self.instanceUrl = self._cleanupInstanceUrl(instanceUrl)
         self._logger = logger
         self.verifyConfig = verifyConfig
+        self.apiKeyHeader = apiKeyHeader
+        self.apiKey = apiKey
 
     def _cleanupInstanceUrl(self, value):
         trailingSlash = "/"
@@ -25,6 +27,14 @@ class SpoolmanConnector():
 
     def _createSpoolmanEndpointUrl(self, endpoint):
         return self._createSpoolmanApiUrl() + endpoint;
+
+    def _buildRequestHeaders(self):
+        headers = {}
+
+        if self.apiKeyHeader and self.apiKey:
+            headers[self.apiKeyHeader] = self.apiKey
+
+        return headers
 
     def _logSpoolmanCall(self, endpointUrl):
         self._logger.debug("[Spoolman API] calling endpoint %s" % endpointUrl)
@@ -95,7 +105,11 @@ class SpoolmanConnector():
         self._logSpoolmanCall(endpointUrl)
 
         try:
-            response = requests.get(endpointUrl, verify = self.verifyConfig)
+            response = requests.get(
+                endpointUrl,
+                verify = self.verifyConfig,
+                headers = self._buildRequestHeaders()
+            )
         except Exception as caughtException:
             return self._handleSpoolmanConnectionError(caughtException)
 
@@ -135,6 +149,7 @@ class SpoolmanConnector():
                 json = {
                     'use_length': spoolUsedLength,
                 },
+                headers = self._buildRequestHeaders(),
                 timeout = 1
             )
         except Exception as caughtException:
