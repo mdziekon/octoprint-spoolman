@@ -137,10 +137,33 @@ class SpoolmanConnector():
 
         self._logSpoolmanCall(endpointUrl)
 
+        connectorLogger = self._logger
+
+        class RetryWithLogger(Retry):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+
+                lastHistoryItem = self.history[-1] if self.history else None
+                lastStatus = lastHistoryItem.status if lastHistoryItem else None
+                lastError = lastHistoryItem.error if lastHistoryItem else None
+
+                if (lastStatus or lastError) and self.total > 0:
+                    connectorLogger.debug(
+                        "[Spoolman API] retrying request (previous status: %s, error: %s) (retries left: %s)",
+                        lastStatus if lastStatus else "unknown",
+                        lastError if lastError else "unknown",
+                        self.total
+                    )
+
+        retries = RetryWithLogger(
+            total = 3,
+            backoff_factor = 1,
+            status_forcelist = [ 500, 502, 503, 504 ]
+        )
+
         try:
             session = requests.Session()
             session.verify = self.verifyConfig
-            retries = Retry(total = 3, backoff_factor = 1, status_forcelist = [ 500, 502, 503, 504 ])
 
             session.mount(self.instanceUrl, HTTPAdapter(max_retries=retries))
 
