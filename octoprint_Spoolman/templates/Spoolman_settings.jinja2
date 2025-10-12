@@ -223,6 +223,36 @@
                         </div>
                     </div>
                 </div>
+                <div>
+                    <hr/>
+                </div>
+                <div class="control-group">
+                    <label
+                        class="control-label"
+                        for="settings-spoolman-general-isUseRequestRetryLogicEnabled"
+                    >
+                        Retry spool usage update on error
+                    </label>
+                    <div class="controls">
+                        <div>
+                            <input
+                                id="settings-spoolman-general-isUseRequestRetryLogicEnabled"
+                                type="checkbox"
+                                class="text-left"
+                                data-bind="checked: pluginSettings.isUseRequestRetryLogicEnabled"
+                            >
+                        </div>
+                        <div style="margin-top: 0.25em">
+                            <small>
+                                If communication with the Spoolman API fails, the plugin will attempt to commit the spool usage again. When this retry mechanism is <strong>enabled</strong>, the plugin will try up to 3 times before notifying the user of the issue. Retries are triggered in cases of server errors (5xx responses) or communication timeouts.
+                                <br/>
+                                If the mechanism is <strong>disabled</strong>, only one attempt is made. If that attempt fails, no further retries will occur.
+                                <br/>
+                                <strong>Consider disabling this feature</strong> if you've observed significantly higher spool usage than expected (for example, 2-3 times the estimated amount).
+                            </small>
+                        </div>
+                    </div>
+                </div>
             </div>
             <!-- Tab: Display Settings -->
             <div

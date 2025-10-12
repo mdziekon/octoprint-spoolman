@@ -16,3 +16,4 @@ class SettingsKeys():
 	IS_SPOOLMAN_API_KEY_ENABLED = "isSpoolmanApiKeyEnabled"
 	SPOOLMAN_API_KEY_HEADER = "spoolmanApiKeyHeader"
 	SPOOLMAN_API_KEY = "spoolmanApiKey"
+	IS_USE_REQUEST_RETRY_LOGIC_ENABLED = "isUseRequestRetryLogicEnabled"

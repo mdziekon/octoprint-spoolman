@@ -5,12 +5,13 @@ import requests
 from requests.adapters import HTTPAdapter, Retry
 
 class SpoolmanConnector():
-    def __init__(self, instanceUrl, logger, verifyConfig, apiKeyHeader = None, apiKey = None):
+    def __init__(self, instanceUrl, logger, verifyConfig, apiKeyHeader = None, apiKey = None, isRetryLogicEnabled = True):
         self.instanceUrl = self._cleanupInstanceUrl(instanceUrl)
         self._logger = logger
         self.verifyConfig = verifyConfig
         self.apiKeyHeader = apiKeyHeader
         self.apiKey = apiKey
+        self.isRetryLogicEnabled = isRetryLogicEnabled
 
     def _cleanupInstanceUrl(self, value):
         trailingSlash = "/"
@@ -155,8 +156,10 @@ class SpoolmanConnector():
                         self.total
                     )
 
+        retryCount = 1 if not self.isRetryLogicEnabled else 3
+
         retries = RetryWithLogger(
-            total = 3,
+            total = retryCount,
             backoff_factor = 1,
             status_forcelist = [ 500, 502, 503, 504 ]
         )

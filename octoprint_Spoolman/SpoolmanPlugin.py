@@ -45,6 +45,7 @@ class SpoolmanPlugin(
         isSpoolmanApiKeyEnabled = self._settings.get([ SettingsKeys.IS_SPOOLMAN_API_KEY_ENABLED ])
         spoolmanApiKeyHeader = self._settings.get([ SettingsKeys.SPOOLMAN_API_KEY_HEADER ]) if isSpoolmanApiKeyEnabled else None
         spoolmanApiKey = self._settings.get([ SettingsKeys.SPOOLMAN_API_KEY ]) if isSpoolmanApiKeyEnabled else None
+        isUseRequestRetryLogicEnabled = self._settings.get([ SettingsKeys.IS_USE_REQUEST_RETRY_LOGIC_ENABLED ])
 
         return SpoolmanConnector(
             instanceUrl = spoolmanInstanceUrl,
@@ -52,6 +53,7 @@ class SpoolmanPlugin(
             verifyConfig = verifyConfig,
             apiKeyHeader = spoolmanApiKeyHeader,
             apiKey = spoolmanApiKey,
+            isRetryLogicEnabled = isUseRequestRetryLogicEnabled,
         )
 
     def triggerPluginEvent(self, eventType, eventPayload = {}):
@@ -140,6 +142,7 @@ class SpoolmanPlugin(
             SettingsKeys.IS_SPOOLMAN_API_KEY_ENABLED: False,
             SettingsKeys.SPOOLMAN_API_KEY_HEADER: "",
             SettingsKeys.SPOOLMAN_API_KEY: "",
+            SettingsKeys.IS_USE_REQUEST_RETRY_LOGIC_ENABLED: True,
         }
 
         return settings
