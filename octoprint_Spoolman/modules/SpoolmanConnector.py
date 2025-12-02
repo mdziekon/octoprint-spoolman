@@ -166,12 +166,13 @@ class SpoolmanConnector():
 
         try:
             session = requests.Session()
-            session.verify = self.verifyConfig
+            session.verify = self.verifyConfig # this get's ignored when REQUESTS_CA_BUNDLE environment variable is set according to https://github.com/psf/requests/issues/3829 (02.12.2025)
 
             session.mount(self.instanceUrl, HTTPAdapter(max_retries=retries))
 
             response = session.put(
                 url = endpointUrl,
+                verify = self.verifyConfig, # see above, remove as soon as requests library is fixed
                 json = {
                     'use_length': spoolUsedLength,
                 },
