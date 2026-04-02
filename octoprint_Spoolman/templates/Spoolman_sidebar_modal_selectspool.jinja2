@@ -179,6 +179,18 @@
                                 <i class="fa fa-sort muted"></i>
                                 <!-- /ko -->
                             </th>
+							<th
+                                style="width: 15%; cursor: pointer;"
+                                data-bind="visible: templateData.tableAttributeVisibility.location, click: function() { templateApi.handleSortChange('location') }"
+                            >
+                                Location
+                                <!-- ko if: templateData.sortField() === 'location' -->
+                                <i class="fa" data-bind="css: { 'fa-sort-up': templateData.sortDirection() === 'asc', 'fa-sort-down': templateData.sortDirection() === 'desc' }"></i>
+                                <!-- /ko -->
+                                <!-- ko ifnot: templateData.sortField() === 'location' -->
+                                <i class="fa fa-sort muted"></i>
+                                <!-- /ko -->
+                            </th>
                             <th
                                 style="text-align: right; width: 15%; cursor: pointer;"
                                 data-bind="visible: templateData.tableAttributeVisibility.weight, click: function() { templateApi.handleSortChange('weight') }"
@@ -258,6 +270,12 @@
                                 >
                                     <span data-bind="text: $data.displayData.last_used.displayValue, attr: { title: $data.displayData.last_used.displayValue }"></span>
                                 </td>
+								<td
+                                    data-bind="visible: $component.templateData.tableAttributeVisibility.location"
+                                    style="overflow-wrap: break-word;"
+                                >
+                                    <span data-bind="text: $data.displayData.location.displayValue, attr: { title: $data.displayData.location.displayValue }"></span>
+                                </td>
                                 <td
                                     data-bind="visible: $component.templateData.tableAttributeVisibility.weight" style="text-align: right;"
                                 >
@@ -276,7 +294,7 @@
                         <tbody>
                             <tr>
                                 <td
-                                    colspan="4"
+                                    colspan="5"
                                     style="text-align: center;"
                                 >
                                     <i class="muted">
