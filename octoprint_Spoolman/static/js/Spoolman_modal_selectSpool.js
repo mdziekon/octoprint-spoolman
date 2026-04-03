@@ -219,6 +219,8 @@ $(() => {
                     }
 
                     return (new Date(tableItem.spoolData.last_used)).getTime();
+				case 'location':
+					return tableItem.displayData.location.displayValue.toLowerCase();
                 default:
                     return '';
             }
