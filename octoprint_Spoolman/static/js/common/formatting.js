@@ -92,6 +92,16 @@ const toSpoolForDisplay = (spool, params) => {
                     displayValue: "N/A",
                 }
         ),
+		location: (
+		    spool.location
+			? {
+				displayShort: spool.location,
+				displayValue: spool.location,
+			} : {
+				displayShort: "N/A",
+				displayValue: "N/A",
+			}
+		),
     };
 };
 

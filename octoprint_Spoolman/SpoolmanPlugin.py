@@ -137,6 +137,7 @@ class SpoolmanPlugin(
             SettingsKeys.IS_PREPRINT_SPOOL_VERIFY_ENABLED: True,
             SettingsKeys.SHOW_LOT_NUMBER_COLUMN_IN_SPOOL_SELECT_MODAL: False,
             SettingsKeys.SHOW_LAST_USED_COLUMN_IN_SPOOL_SELECT_MODAL: True,
+            SettingsKeys.SHOW_LOCATION_COLUMN_IN_SPOOL_SELECT_MODAL: False,
             SettingsKeys.SHOW_LOT_NUMBER_IN_SIDE_BAR: False,
             SettingsKeys.SHOW_SPOOL_ID_IN_SIDE_BAR: False,
             SettingsKeys.IS_SPOOLMAN_API_KEY_ENABLED: False,
