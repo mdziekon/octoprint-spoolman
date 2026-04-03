@@ -92,6 +92,8 @@ $(() => {
 
             self.templateData.tableAttributeVisibility.lot(Boolean(getPluginSettings().showLotNumberColumnInSpoolSelectModal()));
             self.templateData.tableAttributeVisibility.lastUsed(Boolean(getPluginSettings().showLastUsedColumnInSpoolSelectModal()));
+            self.templateData.tableAttributeVisibility.location(Boolean(getPluginSettings().showLocationColumnInSpoolSelectModal()));
+
 
             refreshModalLayout();
         };
@@ -182,6 +184,7 @@ $(() => {
                 material: true,
                 lot: ko.observable(Boolean(getPluginSettings().showLotNumberColumnInSpoolSelectModal())),
                 lastUsed: ko.observable(Boolean(getPluginSettings().showLastUsedColumnInSpoolSelectModal())),
+				location: ko.observable(Boolean(getPluginSettings().showLocationColumnInSpoolSelectModal())),
                 weight: true,
             },
             tableItemsOnCurrentPage: ko.observable([]),
