@@ -305,7 +305,53 @@
                         </div>
                     </div>
                 </div>
-                <hr>
+                <div class="control-group">
+                    <label
+                        class="control-label"
+                        for="settings-spoolman-display-settings-showLocationColumnInSpoolSelectModal"
+                    >
+                        Show Location column in Spool Select Modal
+                    </label>
+                    <div class="controls">
+                        <div>
+                            <input
+                                id="settings-spoolman-display-settings-showLocationColumnInSpoolSelectModal"
+                                type="checkbox"
+                                class="text-left"
+                                data-bind="checked: pluginSettings.showLocationColumnInSpoolSelectModal"
+                            >
+                        </div>
+                        <div style="margin-top: 0.25em">
+                            <small>
+                                If enabled, the "Location" column will be displayed in the Spool Select Modal. The column will show the location of the spool, if available.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+				<hr>
+				<div class="control-group">
+                    <label
+                        class="control-label"
+                        for="settings-spoolman-display-settings-renumberSpoolStart"
+                    >
+                        Renumber Tools to Start at #1 in Sidebar
+                    </label>
+                    <div class="controls">
+                        <div>
+                            <input
+                                id="settings-spoolman-display-settings-renumberSpoolStart"
+                                type="checkbox"
+                                class="text-left"
+                                data-bind="checked: pluginSettings.renumberSpoolStart"
+                            >
+                        </div>
+                        <div style="margin-top: 0.25em">
+                            <small>
+                                If enabled, tools will be renumbered to start at #1 in the sidebar instead of #0. This will make tools match the numbers printed on a Prusa MMU, for example. 
+                            </small>
+                        </div>
+                    </div>
+                </div>
                 <div class="control-group">
                     <label
                         class="control-label"
@@ -325,29 +371,6 @@
                         <div style="margin-top: 0.25em">
                             <small>
                                 If enabled, a shortened version (maximum of 9 characters) of the "Lot Number" will be shown in the sidebar when a spool is assigned to a tool. The full lot number is visible if you hover over the shortened version.
-                            </small>
-                        </div>
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label
-                        class="control-label"
-                        for="settings-spoolman-display-settings-showSpoolIdInSidebar"
-                    >
-                        Show Spool ID in Sidebar
-                    </label>
-                    <div class="controls">
-                        <div>
-                            <input
-                                id="settings-spoolman-display-settings-showSpoolIdInSidebar"
-                                type="checkbox"
-                                class="text-left"
-                                data-bind="checked: pluginSettings.showSpoolIdInSidebar"
-                            >
-                        </div>
-                        <div style="margin-top: 0.25em">
-                            <small>
-                                If enabled, the ID of the selected spool will be shown in the sidebar info.
                             </small>
                         </div>
                     </div>

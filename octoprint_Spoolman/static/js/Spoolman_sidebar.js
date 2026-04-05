@@ -99,6 +99,7 @@ $(() => {
 
             self.templateData.optionalFieldVisibility.lotNumber(Boolean(getPluginSettings().showLotNumberInSidebar()));
             self.templateData.optionalFieldVisibility.spoolID(Boolean(getPluginSettings().showSpoolIdInSidebar()));
+			self.templateData.renumberSpoolStart(Boolean(getPluginSettings().renumberSpoolStart()));
         };
 
         /**
@@ -227,6 +228,8 @@ $(() => {
                 lotNumber: ko.observable(false),
                 spoolID: ko.observable(false),
             },
+
+			renumberSpoolStart: ko.observable(false),
 
             modals: {
                 selectSpool: {
@@ -461,12 +464,15 @@ $(() => {
                 spoolmanUrl: getPluginSettings().spoolmanUrl(),
                 showLotNumberInSidebar: getPluginSettings().showLotNumberInSidebar(),
                 showSpoolIdInSidebar: getPluginSettings().showSpoolIdInSidebar(),
+				renumberSpoolStart: getPluginSettings().renumberSpoolStart(),
             };
 
             if (previousSettings.spoolmanUrl !== newSettings.spoolmanUrl) {
                 previousSettings.spoolmanUrl = newSettings.spoolmanUrl;
                 pluginSpoolmanApi.getSpoolmanSpools.invalidate();
             }
+
+            // TODO: update the view on settings saved
 
             if (
                 previousSettings.showLotNumberInSidebar !== newSettings.showLotNumberInSidebar ||
