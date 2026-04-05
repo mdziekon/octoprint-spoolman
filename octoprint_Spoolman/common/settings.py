@@ -1,6 +1,7 @@
 # coding=utf-8
 from __future__ import absolute_import
 
+
 class SettingsKeys:
     INSTALLED_VERSION = "installed_version"
     SPOOLMAN_URL = "spoolmanUrl"
@@ -21,4 +22,3 @@ class SettingsKeys:
     SPOOLMAN_API_KEY_HEADER = "spoolmanApiKeyHeader"
     SPOOLMAN_API_KEY = "spoolmanApiKey"
     IS_USE_REQUEST_RETRY_LOGIC_ENABLED = "isUseRequestRetryLogicEnabled"
-

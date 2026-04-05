@@ -4,8 +4,17 @@ from __future__ import absolute_import
 import requests
 from requests.adapters import HTTPAdapter, Retry
 
-class SpoolmanConnector():
-    def __init__(self, instanceUrl, logger, verifyConfig, apiKeyHeader = None, apiKey = None, isRetryLogicEnabled = True):
+
+class SpoolmanConnector:
+    def __init__(
+        self,
+        instanceUrl,
+        logger,
+        verifyConfig,
+        apiKeyHeader=None,
+        apiKey=None,
+        isRetryLogicEnabled=True,
+    ):
         self.instanceUrl = self._cleanupInstanceUrl(instanceUrl)
         self._logger = logger
         self.verifyConfig = verifyConfig
@@ -17,7 +26,7 @@ class SpoolmanConnector():
         trailingSlash = "/"
 
         if value.endswith(trailingSlash):
-            value = value[:-len(trailingSlash)]
+            value = value[: -len(trailingSlash)]
 
         return value
 
@@ -27,7 +36,7 @@ class SpoolmanConnector():
         return self.instanceUrl + apiPath
 
     def _createSpoolmanEndpointUrl(self, endpoint):
-        return self._createSpoolmanApiUrl() + endpoint;
+        return self._createSpoolmanApiUrl() + endpoint
 
     def _buildRequestHeaders(self):
         headers = {}
@@ -49,7 +58,9 @@ class SpoolmanConnector():
         self._logger.error("[Spoolman API] request failed with status %s" % statusCode)
 
     def _logSpoolmanSuccess(self, response):
-        self._logger.debug("[Spoolman API] request succeeded with status %s" % response.status_code)
+        self._logger.debug(
+            "[Spoolman API] request succeeded with status %s" % response.status_code
+        )
 
     def _precheckSpoolman(self):
         if not self.instanceUrl:
@@ -78,13 +89,12 @@ class SpoolmanConnector():
                 "code": code,
             },
         }
-    def _handleSpoolmanError(self, response, customError = None):
+
+    def _handleSpoolmanError(self, response, customError=None):
         self._logSpoolmanError(response)
 
         if customError != None:
-            return {
-                "error": customError
-            }
+            return {"error": customError}
 
         return {
             "error": {
@@ -98,7 +108,7 @@ class SpoolmanConnector():
     def handleGetSpoolsAvailable(self):
         precheckResult = self._precheckSpoolman()
 
-        if precheckResult and precheckResult.get('error', False):
+        if precheckResult and precheckResult.get("error", False):
             return precheckResult
 
         endpointUrl = self._createSpoolmanEndpointUrl("/spool")
@@ -108,8 +118,8 @@ class SpoolmanConnector():
         try:
             response = requests.get(
                 endpointUrl,
-                verify = self.verifyConfig,
-                headers = self._buildRequestHeaders()
+                verify=self.verifyConfig,
+                headers=self._buildRequestHeaders(),
             )
         except Exception as caughtException:
             return self._handleSpoolmanConnectionError(caughtException)
@@ -121,16 +131,12 @@ class SpoolmanConnector():
 
         data = response.json()
 
-        return {
-            "data": {
-                "spools": data
-            }
-        }
+        return {"data": {"spools": data}}
 
     def handleCommitSpoolUsage(self, spoolId, spoolUsedLength):
         precheckResult = self._precheckSpoolman()
 
-        if precheckResult and precheckResult.get('error', False):
+        if precheckResult and precheckResult.get("error", False):
             return precheckResult
 
         spoolIdStr = str(spoolId)
@@ -153,15 +159,13 @@ class SpoolmanConnector():
                         "[Spoolman API] retrying request (previous status: %s, error: %s) (retries left: %s)",
                         lastStatus if lastStatus else "unknown",
                         lastError if lastError else "unknown",
-                        self.total
+                        self.total,
                     )
 
         retryCount = 1 if not self.isRetryLogicEnabled else 3
 
         retries = RetryWithLogger(
-            total = retryCount,
-            backoff_factor = 1,
-            status_forcelist = [ 500, 502, 503, 504 ]
+            total=retryCount, backoff_factor=1, status_forcelist=[500, 502, 503, 504]
         )
 
         try:
@@ -171,12 +175,12 @@ class SpoolmanConnector():
             session.mount(self.instanceUrl, HTTPAdapter(max_retries=retries))
 
             response = session.put(
-                url = endpointUrl,
-                json = {
-                    'use_length': spoolUsedLength,
+                url=endpointUrl,
+                json={
+                    "use_length": spoolUsedLength,
                 },
-                headers = self._buildRequestHeaders(),
-                timeout = 1
+                headers=self._buildRequestHeaders(),
+                timeout=1,
             )
         except Exception as caughtException:
             return self._handleSpoolmanConnectionError(caughtException)
@@ -193,7 +197,7 @@ class SpoolmanConnector():
                         "spoolId": spoolIdStr,
                         "usedLength": spoolUsedLength,
                     },
-                }
+                },
             )
 
         if response.status_code != 200:
@@ -201,6 +205,4 @@ class SpoolmanConnector():
 
         self._logSpoolmanSuccess(response)
 
-        return {
-            "data": {}
-        }
+        return {"data": {}}

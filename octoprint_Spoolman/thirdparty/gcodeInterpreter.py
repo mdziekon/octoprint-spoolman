@@ -379,9 +379,7 @@ class gcode:
             offsets += [(0, 0)] * (max_extruders - len(offsets))
 
         def get_current_extrusion_stats():
-            return {
-                'extrusionAmount': maxExtrusion
-            }
+            return {"extrusionAmount": maxExtrusion}
 
         # Reset extrusion stats without affecting other temporary states
         def reset_extrusion_stats():
@@ -390,8 +388,8 @@ class gcode:
                 totalExtrusion[toolIndex] = 0.0
 
         peek_stats_helpers = {
-            'get_current_extrusion_stats': get_current_extrusion_stats,
-            'reset_extrusion_stats': reset_extrusion_stats,
+            "get_current_extrusion_stats": get_current_extrusion_stats,
+            "reset_extrusion_stats": reset_extrusion_stats,
         }
 
         while True:

@@ -7,7 +7,8 @@ from octoprint.events import Events
 from ..thirdparty.gcodeInterpreter import gcode
 from ..common.settings import SettingsKeys
 
-class PrinterHandler():
+
+class PrinterHandler:
     def initialize(self):
         self.lastPrintCancelled = False
         self.lastPrintOdometer = None
@@ -29,25 +30,25 @@ class PrinterHandler():
             return
 
         if (
-            eventType == Events.PRINT_PAUSED or
-            eventType == Events.PRINT_DONE or
-            eventType == Events.PRINT_FAILED or
-            eventType == Events.PRINT_CANCELLED
+            eventType == Events.PRINT_PAUSED
+            or eventType == Events.PRINT_DONE
+            or eventType == Events.PRINT_FAILED
+            or eventType == Events.PRINT_CANCELLED
         ):
             self.commitSpoolUsage()
 
         if (
-            eventType == Events.PRINT_DONE or
-            eventType == Events.PRINT_FAILED or
-            eventType == Events.PRINT_CANCELLED
+            eventType == Events.PRINT_DONE
+            or eventType == Events.PRINT_FAILED
+            or eventType == Events.PRINT_CANCELLED
         ):
             self.lastPrintOdometer = None
             self.lastPrintOdometerLoad = None
 
     def handlePrintingGCode(self, command):
         if (
-            not hasattr(self, "lastPrintOdometerLoad") or
-            self.lastPrintOdometerLoad == None
+            not hasattr(self, "lastPrintOdometerLoad")
+            or self.lastPrintOdometerLoad == None
         ):
             return
 
@@ -56,13 +57,17 @@ class PrinterHandler():
     def commitSpoolUsage(self):
         peek_stats_helpers = self.lastPrintOdometerLoad.send(False)
 
-        current_extrusion_stats = copy.deepcopy(peek_stats_helpers['get_current_extrusion_stats']())
+        current_extrusion_stats = copy.deepcopy(
+            peek_stats_helpers["get_current_extrusion_stats"]()
+        )
 
-        peek_stats_helpers['reset_extrusion_stats']()
+        peek_stats_helpers["reset_extrusion_stats"]()
 
         selectedSpoolIds = self._settings.get([SettingsKeys.SELECTED_SPOOL_IDS])
 
-        for toolIdx, toolExtrusionLength in enumerate(current_extrusion_stats['extrusionAmount']):
+        for toolIdx, toolExtrusionLength in enumerate(
+            current_extrusion_stats["extrusionAmount"]
+        ):
             selectedSpool = None
 
             try:
@@ -70,27 +75,25 @@ class PrinterHandler():
             except:
                 self._logger.info("Extruder '%s', spool id: none", toolIdx)
 
-            if (
-                not selectedSpool or
-                selectedSpool.get('spoolId', None) == None
-            ):
+            if not selectedSpool or selectedSpool.get("spoolId", None) == None:
                 continue
 
-            selectedSpoolId = selectedSpool['spoolId']
+            selectedSpoolId = selectedSpool["spoolId"]
 
             self._logger.info(
                 "Extruder '%s', spool id: %s, usage: %s",
                 toolIdx,
                 selectedSpoolId,
-                toolExtrusionLength
+                toolExtrusionLength,
             )
 
-            result = self.getSpoolmanConnector().handleCommitSpoolUsage(selectedSpoolId, toolExtrusionLength)
+            result = self.getSpoolmanConnector().handleCommitSpoolUsage(
+                selectedSpoolId, toolExtrusionLength
+            )
 
-            if result.get('error', None):
+            if result.get("error", None):
                 self.triggerPluginEvent(
-                    Events.PLUGIN_SPOOLMAN_SPOOL_USAGE_ERROR,
-                    result['error']
+                    Events.PLUGIN_SPOOLMAN_SPOOL_USAGE_ERROR, result["error"]
                 )
 
                 return
@@ -98,8 +101,8 @@ class PrinterHandler():
             self.triggerPluginEvent(
                 Events.PLUGIN_SPOOLMAN_SPOOL_USAGE_COMMITTED,
                 {
-                    'toolIdx': toolIdx,
-                    'spoolId': selectedSpoolId,
-                    'extrusionLength': toolExtrusionLength,
-                }
+                    "toolIdx": toolIdx,
+                    "spoolId": selectedSpoolId,
+                    "extrusionLength": toolExtrusionLength,
+                },
             )
