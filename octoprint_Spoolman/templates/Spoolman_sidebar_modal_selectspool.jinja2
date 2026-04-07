@@ -18,7 +18,7 @@
     <div class="modal-body">
         <div>
             <div>
-                Tool #<span data-bind="text: templateData.toolIdx()"></span>:
+                Tool #<span data-bind="text: templateData.renumberSpoolStart() ? templateData.toolIdx() + 1 : templateData.toolIdx()"></span>:
                 &nbsp;
 
                 <!-- ko if: templateData.toolCurrentSpool() -->

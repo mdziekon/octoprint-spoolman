@@ -175,6 +175,8 @@ $(() => {
             searchFilter: ko.observable(""),
             sortField: ko.observable('id'),
             sortDirection: ko.observable('asc'),
+			
+			renumberSpoolStart: ko.observable(Boolean(getPluginSettings().renumberSpoolStart())),
 
             tableAttributeVisibility: {
                 id: true,
