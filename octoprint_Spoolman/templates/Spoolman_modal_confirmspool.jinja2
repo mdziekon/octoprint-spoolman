@@ -102,7 +102,7 @@
                         <div style="display: flex;">
                             <!-- ko if: $parent.templateData.selectedSpoolsByToolIdx().length > 1 -->
                                 <div class="tool-idx" style="margin-right: 0.25em;">
-                                    <b>Tool #<span data-bind="text: $index()"></span>:</b>
+                                    <b>Tool #<span data-bind="text: $parent.templateData.renumberSpoolStart() ? $index() +1 : $index()"></span>:</b>
                                 </div>
                             <!-- /ko -->
 
@@ -151,7 +151,7 @@
                         <div style="display: flex;">
                             <!-- ko if: $parent.templateData.selectedSpoolsByToolIdx().length > 1 -->
                                 <div class="tool-idx" style="margin-right: 0.25em;">
-                                    <b>Tool #<span data-bind="text: $index()"></span>:</b>
+                                    <b>Tool #<span data-bind="text: $parent.templateData.renumberSpoolStart() ? $index() +1 : $index()"></span>:</b>
                                 </div>
                             <!-- /ko -->
 

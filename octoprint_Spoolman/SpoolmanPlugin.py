@@ -8,6 +8,7 @@ from .modules.SpoolmanConnector import SpoolmanConnector
 from .common.settings import SettingsKeys
 from .common.events import PluginEvents
 
+
 class SpoolmanPlugin(
     octoprint.plugin.StartupPlugin,
     octoprint.plugin.AssetPlugin,
@@ -27,12 +28,14 @@ class SpoolmanPlugin(
     # Currently re-instantiating is fine, as there's nothing "heavy" in the ctor,
     # nor there's any useful persistence in the class itself.
     def getSpoolmanConnector(self):
-        spoolmanInstanceUrl = self._settings.get([ SettingsKeys.SPOOLMAN_URL ])
+        spoolmanInstanceUrl = self._settings.get([SettingsKeys.SPOOLMAN_URL])
 
         verifyConfig = None
 
-        isSpoolmanCertVerifyEnabled = self._settings.get([ SettingsKeys.IS_SPOOLMAN_CERT_VERIFY_ENABLED ])
-        spoolmanCertPemPath = self._settings.get([ SettingsKeys.SPOOLMAN_CERT_PEM_PATH ])
+        isSpoolmanCertVerifyEnabled = self._settings.get(
+            [SettingsKeys.IS_SPOOLMAN_CERT_VERIFY_ENABLED]
+        )
+        spoolmanCertPemPath = self._settings.get([SettingsKeys.SPOOLMAN_CERT_PEM_PATH])
 
         if isSpoolmanCertVerifyEnabled:
             if spoolmanCertPemPath:
@@ -42,26 +45,41 @@ class SpoolmanPlugin(
         else:
             verifyConfig = False
 
-        isSpoolmanApiKeyEnabled = self._settings.get([ SettingsKeys.IS_SPOOLMAN_API_KEY_ENABLED ])
-        spoolmanApiKeyHeader = self._settings.get([ SettingsKeys.SPOOLMAN_API_KEY_HEADER ]) if isSpoolmanApiKeyEnabled else None
-        spoolmanApiKey = self._settings.get([ SettingsKeys.SPOOLMAN_API_KEY ]) if isSpoolmanApiKeyEnabled else None
-        isUseRequestRetryLogicEnabled = self._settings.get([ SettingsKeys.IS_USE_REQUEST_RETRY_LOGIC_ENABLED ])
+        isSpoolmanApiKeyEnabled = self._settings.get(
+            [SettingsKeys.IS_SPOOLMAN_API_KEY_ENABLED]
+        )
+        spoolmanApiKeyHeader = (
+            self._settings.get([SettingsKeys.SPOOLMAN_API_KEY_HEADER])
+            if isSpoolmanApiKeyEnabled
+            else None
+        )
+        spoolmanApiKey = (
+            self._settings.get([SettingsKeys.SPOOLMAN_API_KEY])
+            if isSpoolmanApiKeyEnabled
+            else None
+        )
+        isUseRequestRetryLogicEnabled = self._settings.get(
+            [SettingsKeys.IS_USE_REQUEST_RETRY_LOGIC_ENABLED]
+        )
 
         return SpoolmanConnector(
-            instanceUrl = spoolmanInstanceUrl,
-            logger = self._logger,
-            verifyConfig = verifyConfig,
-            apiKeyHeader = spoolmanApiKeyHeader,
-            apiKey = spoolmanApiKey,
-            isRetryLogicEnabled = isUseRequestRetryLogicEnabled,
+            instanceUrl=spoolmanInstanceUrl,
+            logger=self._logger,
+            verifyConfig=verifyConfig,
+            apiKeyHeader=spoolmanApiKeyHeader,
+            apiKey=spoolmanApiKey,
+            isRetryLogicEnabled=isUseRequestRetryLogicEnabled,
         )
 
-    def triggerPluginEvent(self, eventType, eventPayload = {}):
-        self._logger.info("[Spoolman][event] Triggered '" + eventType + "' with payload '" + str(eventPayload) + "'")
-        self._event_bus.fire(
-            eventType,
-            payload = eventPayload
+    def triggerPluginEvent(self, eventType, eventPayload={}):
+        self._logger.info(
+            "[Spoolman][event] Triggered '"
+            + eventType
+            + "' with payload '"
+            + str(eventPayload)
+            + "'"
         )
+        self._event_bus.fire(eventType, payload=eventPayload)
 
     def on_after_startup(self):
         self._logger.info("[Spoolman][init] Plugin activated")
@@ -69,17 +87,19 @@ class SpoolmanPlugin(
     # Printing events handlers
     def on_event(self, event, payload):
         if (
-            event == Events.PRINT_STARTED or
-            event == Events.PRINT_PAUSED or
-            event == Events.PRINT_DONE or
-            event == Events.PRINT_FAILED or
-            event == Events.PRINT_CANCELLED
+            event == Events.PRINT_STARTED
+            or event == Events.PRINT_PAUSED
+            or event == Events.PRINT_DONE
+            or event == Events.PRINT_FAILED
+            or event == Events.PRINT_CANCELLED
         ):
             self.handlePrintingStatusChange(event)
 
         pass
 
-    def on_sentGCodeHook(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
+    def on_sentGCodeHook(
+        self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs
+    ):
         if not self._isInitialized:
             return
 
@@ -122,7 +142,7 @@ class SpoolmanPlugin(
             {
                 "type": "settings",
                 "template": "Spoolman_settings.jinja2",
-            }
+            },
         ]
 
     # SettingsPlugin
@@ -138,6 +158,7 @@ class SpoolmanPlugin(
             SettingsKeys.SHOW_LOT_NUMBER_COLUMN_IN_SPOOL_SELECT_MODAL: False,
             SettingsKeys.SHOW_LAST_USED_COLUMN_IN_SPOOL_SELECT_MODAL: True,
             SettingsKeys.SHOW_LOT_NUMBER_IN_SIDE_BAR: False,
+            SettingsKeys.RENUMBER_SPOOL_START: False,
             SettingsKeys.SHOW_SPOOL_ID_IN_SIDE_BAR: False,
             SettingsKeys.IS_SPOOLMAN_API_KEY_ENABLED: False,
             SettingsKeys.SPOOLMAN_API_KEY_HEADER: "",
@@ -149,8 +170,8 @@ class SpoolmanPlugin(
 
     def get_settings_restricted_paths(self):
         return {
-            'never': [
-                [ SettingsKeys.SPOOLMAN_API_KEY ],
+            "never": [
+                [SettingsKeys.SPOOLMAN_API_KEY],
             ],
         }
 
@@ -158,11 +179,18 @@ class SpoolmanPlugin(
         self._logger.info("[Spoolman][Settings] Saved data")
 
         # When Api Key usage was disabled, reset header & key values to defaults
-        if SettingsKeys.IS_SPOOLMAN_API_KEY_ENABLED in data and not data[SettingsKeys.IS_SPOOLMAN_API_KEY_ENABLED]:
+        if (
+            SettingsKeys.IS_SPOOLMAN_API_KEY_ENABLED in data
+            and not data[SettingsKeys.IS_SPOOLMAN_API_KEY_ENABLED]
+        ):
             defaultSettings = self.get_settings_defaults()
 
-            data[SettingsKeys.SPOOLMAN_API_KEY_HEADER] = defaultSettings[SettingsKeys.SPOOLMAN_API_KEY_HEADER]
-            data[SettingsKeys.SPOOLMAN_API_KEY] = defaultSettings[SettingsKeys.SPOOLMAN_API_KEY]
+            data[SettingsKeys.SPOOLMAN_API_KEY_HEADER] = defaultSettings[
+                SettingsKeys.SPOOLMAN_API_KEY_HEADER
+            ]
+            data[SettingsKeys.SPOOLMAN_API_KEY] = defaultSettings[
+                SettingsKeys.SPOOLMAN_API_KEY
+            ]
 
         octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
 
@@ -179,16 +207,13 @@ class SpoolmanPlugin(
             "Spoolman": {
                 "displayName": "Spoolman Plugin",
                 "displayVersion": self._plugin_version,
-
                 # version check: github repository
                 "type": "github_release",
                 "user": "mdziekon",
                 "repo": "octoprint-spoolman",
                 "current": self._plugin_version,
-
                 # update method: pip
                 "pip": "https://github.com/mdziekon/octoprint-spoolman/archive/{target_version}.zip",
-
                 "stable_branch": {
                     "name": "Stable",
                     "branch": "stable",
@@ -200,6 +225,6 @@ class SpoolmanPlugin(
                         "branch": "rc",
                         "comittish": ["rc", "stable"],
                     },
-                ]
+                ],
             }
         }

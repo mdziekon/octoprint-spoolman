@@ -77,7 +77,7 @@
                         <div class="sidebar-spool-info">
                             <!-- ko if: $parent.templateData.selectedSpoolsByToolIdx().length > 1 -->
                                 <div>
-                                    <b>Tool #<span data-bind="text: $index()"></span>:</b>
+                                    <b>Tool #<span data-bind="text: $parent.templateData.renumberSpoolStart() ? $index() +1 : $index()"></span>:</b>
                                 </div>
                             <!-- /ko -->
                             <div>
@@ -127,7 +127,7 @@
                         <div class="sidebar-spool-info">
                             <!-- ko if: $parent.templateData.selectedSpoolsByToolIdx().length > 1 -->
                                 <div>
-                                    <b>Tool #<span data-bind="text: $index()"></span>:</b>
+                                    <b>Tool #<span data-bind="text: $parent.templateData.renumberSpoolStart() ? $index() +1 : $index()"></span>:</b>
                                 </div>
                             <!-- /ko -->
                             <div>

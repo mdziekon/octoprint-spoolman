@@ -243,6 +243,8 @@ $(() => {
             isLoadingData: ko.observable(true),
             loadingError: ko.observable(undefined),
 
+			renumberSpoolStart: ko.observable(Boolean(getPluginSettings().renumberSpoolStart())),
+
             detectedProblems: ko.observable([]),
             selectedSpoolsByToolIdx: ko.observable([]),
         };

@@ -9,6 +9,7 @@ import http
 from ..common.settings import SettingsKeys
 from .PrinterUtils import PrinterUtils
 
+
 class PluginAPI(octoprint.plugin.BlueprintPlugin):
     def is_blueprint_csrf_protected(self):
         return True
@@ -37,7 +38,14 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
             value = None
 
             errorMessage = str(e)
-            self._logger.error("could not transform value '" + str(value) + "' for key '" + key + "' to int:" + errorMessage)
+            self._logger.error(
+                "could not transform value '"
+                + str(value)
+                + "' for key '"
+                + key
+                + "' to int:"
+                + errorMessage
+            )
 
         return value
 
@@ -47,7 +55,7 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
 
         result = self.getSpoolmanConnector().handleGetSpoolsAvailable()
 
-        if result.get('error', False):
+        if result.get("error", False):
             response = flask.jsonify(result)
             response.status = http.HTTPStatus.BAD_REQUEST
 
@@ -67,7 +75,7 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
         spools = self._settings.get([SettingsKeys.SELECTED_SPOOL_IDS])
 
         spools[toolId] = {
-            'spoolId': spoolId,
+            "spoolId": spoolId,
         }
 
         self._settings.set([SettingsKeys.SELECTED_SPOOL_IDS], spools)
@@ -76,23 +84,25 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
         self.triggerPluginEvent(
             Events.PLUGIN_SPOOLMAN_SPOOL_SELECTED,
             {
-                'toolIdx': toolId,
-                'spoolId': spoolId,
-            }
+                "toolIdx": toolId,
+                "spoolId": spoolId,
+            },
         )
 
-        return flask.jsonify({
-            "data": {}
-        })
+        return flask.jsonify({"data": {}})
 
-    @octoprint.plugin.BlueprintPlugin.route("/self/current-job-requirements", methods=["GET"])
+    @octoprint.plugin.BlueprintPlugin.route(
+        "/self/current-job-requirements", methods=["GET"]
+    )
     def handleGetCurrentJobRequirements(self):
         self._logger.debug("API: GET /self/current-job-requirements")
 
         # TODO: Ideally, this should be pulled from cache
-        getSpoolsAvailableResult = self.getSpoolmanConnector().handleGetSpoolsAvailable()
+        getSpoolsAvailableResult = (
+            self.getSpoolmanConnector().handleGetSpoolsAvailable()
+        )
 
-        if getSpoolsAvailableResult.get('error', False):
+        if getSpoolsAvailableResult.get("error", False):
             response = flask.jsonify(getSpoolsAvailableResult)
             response.status = http.HTTPStatus.BAD_REQUEST
 
@@ -103,24 +113,28 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
         jobFilamentUsage = self.getCurrentJobFilamentUsage()
 
         if not jobFilamentUsage["jobHasFilamentLengthData"]:
-            return flask.jsonify({
-                "data": {
-                    "isFilamentUsageAvailable": False,
-                    "tools": {},
-                },
-            })
+            return flask.jsonify(
+                {
+                    "data": {
+                        "isFilamentUsageAvailable": False,
+                        "tools": {},
+                    },
+                }
+            )
 
         selectedSpools = self._settings.get([SettingsKeys.SELECTED_SPOOL_IDS])
 
         filamentUsageDataPerTool = PrinterUtils.getFilamentUsageDataPerTool(
-            filamentLengthPerTool = jobFilamentUsage['jobFilamentLengthsPerTool'],
-            selectedSpoolsPerTool = selectedSpools,
-            spoolsAvailable = spoolsAvailable,
+            filamentLengthPerTool=jobFilamentUsage["jobFilamentLengthsPerTool"],
+            selectedSpoolsPerTool=selectedSpools,
+            spoolsAvailable=spoolsAvailable,
         )
 
-        return flask.jsonify({
-            "data": {
-                "isFilamentUsageAvailable": True,
-                "tools": filamentUsageDataPerTool,
-            },
-        })
+        return flask.jsonify(
+            {
+                "data": {
+                    "isFilamentUsageAvailable": True,
+                    "tools": filamentUsageDataPerTool,
+                },
+            }
+        )
