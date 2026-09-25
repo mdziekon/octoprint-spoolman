@@ -184,6 +184,14 @@ $(() => {
 
         const handlePluginSocketEvents = async (eventType, eventPayload) => {
             if (eventType === "plugin_Spoolman_spool_selected") {
+                // Apply just the committed selection. Saving empty settings here
+                // would require admin rights and can overwrite unrelated edits.
+                const selected = getPluginSettings().selectedSpoolIds;
+                const key = String(eventPayload.toolIdx);
+                if (selected[key]?.spoolId) selected[key].spoolId(eventPayload.spoolId);
+                else selected[key] = { spoolId: ko.observable(eventPayload.spoolId) };
+                await updateSelectedSpools();
+                document.dispatchEvent(new CustomEvent("spoolman:selection", { detail: eventPayload }));
                 return;
             }
             if (eventType === "plugin_Spoolman_spool_usage_committed") {
