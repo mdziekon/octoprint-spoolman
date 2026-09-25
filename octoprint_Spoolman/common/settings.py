@@ -5,6 +5,7 @@ class SettingsKeys():
 	INSTALLED_VERSION = "installed_version"
 	SPOOLMAN_URL = "spoolmanUrl"
 	SPOOLMAN_WEB_URL = "spoolmanWebUrl"
+	QR_CODE_BASE_URL = "qrCodeBaseUrl"
 	IS_SPOOLMAN_CERT_VERIFY_ENABLED = "isSpoolmanCertVerifyEnabled"
 	SPOOLMAN_CERT_PEM_PATH = "spoolmanCertPemPath"
 	SELECTED_SPOOL_IDS = "selectedSpoolIds"

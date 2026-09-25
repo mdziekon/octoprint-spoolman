@@ -109,7 +109,8 @@ class SpoolmanConnector():
             response = requests.get(
                 endpointUrl,
                 verify = self.verifyConfig,
-                headers = self._buildRequestHeaders()
+                headers = self._buildRequestHeaders(),
+                timeout = 5,
             )
         except Exception as caughtException:
             return self._handleSpoolmanConnectionError(caughtException)
@@ -119,13 +120,40 @@ class SpoolmanConnector():
 
         self._logSpoolmanSuccess(response)
 
-        data = response.json()
+        try:
+            data = response.json()
+            if not isinstance(data, list):
+                raise ValueError("Spoolman returned an invalid spool list")
+        except ValueError as caughtException:
+            return self._handleSpoolmanConnectionError(caughtException)
 
         return {
             "data": {
                 "spools": data
             }
         }
+
+    def handleGetSpool(self, spoolId):
+        precheckResult = self._precheckSpoolman()
+        if precheckResult:
+            return precheckResult
+        try:
+            response = requests.get(
+                self._createSpoolmanEndpointUrl("/spool/" + spoolId),
+                verify=self.verifyConfig,
+                headers=self._buildRequestHeaders(),
+                timeout=5,
+            )
+            if response.status_code == 404:
+                return self._handleSpoolmanError(response, {"code": "spoolman_api__spool_not_found"})
+            if response.status_code != 200:
+                return self._handleSpoolmanError(response)
+            spool = response.json()
+            if not isinstance(spool, dict):
+                raise ValueError("Spoolman returned an invalid spool")
+            return {"data": {"spool": spool}}
+        except (requests.exceptions.RequestException, ValueError) as caughtException:
+            return self._handleSpoolmanConnectionError(caughtException)
 
     def handleCommitSpoolUsage(self, spoolId, spoolUsedLength):
         precheckResult = self._precheckSpoolman()

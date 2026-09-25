@@ -1,0 +1,56 @@
+<div id="spoolman_qr_print" class="modal hide fade spoolman-qr-modal" role="dialog" aria-labelledby="spoolman-print-title">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+        <h3 id="spoolman-print-title">Print labels in Spoolman</h3>
+    </div>
+    <div class="modal-body">
+        <p>Spool: <strong data-bind="text: printing.spool"></strong></p>
+        <p>QR target printer: <strong data-bind="text: printing.printer"></strong></p>
+        <p>Design and print your labels in Spoolman. Use this URL template so scanning a label opens this printer's spool confirmation screen.</p>
+        <label for="spoolman-qr-template">Custom QR URL template</label>
+        <p role="status" data-bind="visible: printing.loading">Finding this OctoPrint instance's IP address…</p>
+        <textarea id="spoolman-qr-template" class="spoolman-qr-url" rows="3" readonly data-bind="value: printing.template" spellcheck="false"></textarea>
+        <button type="button" class="btn" data-bind="click: copyQrTemplate, enable: printing.template">Copy URL template</button>
+        <span role="status" data-bind="text: printing.copyStatus"></span>
+        <p class="alert alert-error" role="alert" data-bind="text: printing.error, visible: printing.error"></p>
+        <p class="alert" data-bind="text: printing.warning, visible: printing.warning"></p>
+        <ol class="spoolman-qr-steps">
+            <li>Open Spoolman printing below. Choose or create a <strong>Spool</strong> label design.</li>
+            <li>In <strong>Design</strong>, select the QR code, choose <strong>Custom URL</strong> under <strong>QR code link</strong>, and paste the template. Keep <code>{id}</code> as written; Spoolman substitutes each spool's ID. Save the design.</li>
+            <li>Choose your label dimensions and contents in Spoolman. In <strong>Print</strong>, choose <strong>Label printer</strong> for one label per page.</li>
+        </ol>
+        <p>For one DYMO label, select one spool and one copy. Match Chrome's paper size and orientation to the loaded stock, use <strong>100% scale</strong>, and disable headers and footers. Check that the preview shows one page with all content inside the label.</p>
+        <p class="muted">Opening the printing page does not select a spool. A phone scan still requires login and <strong>Use this spool</strong> in OctoPrint.</p>
+        <p class="alert alert-error" role="alert" data-bind="text: printing.urlError, visible: printing.urlError"></p>
+    </div>
+    <div class="modal-footer">
+        <a class="btn btn-primary" target="_blank" rel="noopener noreferrer" data-bind="attr: { href: printing.template() ? printing.url() || null : null }, visible: printing.url() &amp;&amp; printing.template()">Open Spoolman printing</a>
+        <button type="button" class="btn" data-dismiss="modal">Close</button>
+    </div>
+</div>
+<div id="spoolman_qr_select" class="modal hide fade spoolman-qr-modal spoolman-qr-select" role="dialog" aria-labelledby="spoolman-qr-title">
+    <div class="modal-header"><h3 id="spoolman-qr-title">Use this spool</h3></div>
+    <div class="modal-body">
+        <p data-bind="visible: qr.loading">Loading spool…</p>
+        <p class="alert alert-error" role="alert" data-bind="text: qr.error, visible: qr.error"></p>
+        <p class="alert alert-success" role="status" data-bind="text: qr.success, visible: qr.success"></p>
+        <!-- ko if: qr.spool -->
+        <div data-bind="visible: !qr.success()">
+            <h4 data-bind="text: '#' + qr.spool().id + ' · ' + (qr.spool().filament.name || 'Unnamed filament')"></h4>
+            <p data-bind="text: (qr.spool().filament.vendor?.name || '') + ' · ' + (qr.spool().filament.material || 'Unknown material')"></p>
+            <p>Printer: <strong data-bind="text: qr.printer"></strong></p>
+            <label for="spoolman-qr-tool">Extruder</label>
+            <select id="spoolman-qr-tool" data-bind="options: qr.tools, optionsText: 'name', optionsValue: 'id', value: qr.tool, optionsCaption: 'Choose an extruder', disable: qr.saving() || qr.tools().length === 1"></select>
+            <p>Currently selected: <span data-bind="text: qr.current"></span></p>
+            <p class="alert" data-bind="visible: qr.busy">Finish or cancel the current print before changing spools. Paused prints are still active.</p>
+            <p class="alert" data-bind="visible: !qr.permitted()">An OctoPrint account with printer-control permission is required.</p>
+        </div>
+        <!-- /ko -->
+        <button type="button" class="btn" data-bind="click: loginForQr, visible: (!qr.permitted() || qr.loginRequired()) && !qr.success()">Log in</button>
+        <button type="button" class="btn" data-bind="click: loadQr, visible: qr.error, disable: qr.loading() || qr.saving()">Retry</button>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn" data-bind="click: cancelQr, disable: qr.saving, text: qr.success() ? 'Close' : 'Cancel'"></button>
+        <button type="button" class="btn btn-primary" data-bind="click: useSpool, visible: !qr.success(), enable: qr.spool() && Number.isInteger(qr.tool()) && !qr.loading() && !qr.saving() && qr.permitted() && !qr.busy(), text: qr.saving() ? 'Selecting…' : 'Use this spool'"></button>
+    </div>
+</div>

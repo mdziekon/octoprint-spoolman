@@ -1,0 +1,14 @@
+.spoolman-qr-modal { width: min(640px, 94vw); margin-left: max(-320px, -47vw); }
+.spoolman-qr-select { width: min(540px, 94vw); margin-left: max(-270px, -47vw); }
+.spoolman-qr-url { box-sizing: border-box; width: 100%; resize: vertical; overflow-wrap: anywhere; }
+.spoolman-qr-steps { margin-top: 16px; }
+.spoolman-qr-steps li { margin-bottom: 8px; }
+#spoolman_modal_selectspool { width: min(780px, 94vw); margin-left: max(-390px, -47vw); }
+#spoolman_modal_selectspool .table { min-width: 640px; }
+#spoolman_modal_selectspool .spoolman-label-action { box-sizing: border-box; width: 132px; white-space: nowrap; }
+@media (max-width: 767px) {
+    .spoolman-qr-modal, .spoolman-qr-select, #spoolman_modal_selectspool { left: 3vw; right: 3vw; width: auto; margin: 0; top: 3vh; }
+    /* Keep scrollable content inside the dialog despite Modal Manager's mobile overrides. */
+    .spoolman-qr-modal .modal-body, #spoolman_modal_selectspool .modal-body { max-height: 68vh !important; overflow: auto !important; }
+    .spoolman-qr-modal .btn, .spoolman-qr-select select { min-height: 44px; }
+}
