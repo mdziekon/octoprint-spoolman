@@ -1,0 +1,24 @@
+# Only for tests/compose.qr.yaml, which binds exclusively to localhost.
+api:
+  key: QR_TEST_ONLY_DO_NOT_USE_IN_PRODUCTION
+appearance:
+  name: QR Test Printer
+server:
+  firstRun: false
+  onlineCheck:
+    enabled: false
+  pluginBlacklist:
+    enabled: false
+plugins:
+  Spoolman:
+    spoolmanUrl: http://spoolman:8000
+    spoolmanWebUrl: http://127.0.0.1:7181/
+    qrCodeBaseUrl: http://127.0.0.1:7180/
+  virtual_printer:
+    enabled: true
+  tracking:
+    enabled: false
+serial:
+  port: VIRTUAL
+  baudrate: 115200
+  autoconnect: true

@@ -1,0 +1,23 @@
+# Disposable, localhost-only integration environment. No physical printer devices.
+services:
+  octoprint:
+    image: octoprint/octoprint:1.11.7
+    ports: ["127.0.0.1:7180:80"]
+    volumes:
+      - ../docker-data/qr/octoprint:/octoprint/octoprint
+      - ..:/workspace:ro
+      - ../octoprint_Spoolman:/octoprint/octoprint/plugins/Spoolman:ro
+  spoolman:
+    image: spoolman-qr-test
+    build:
+      context: ../../Spoolman
+      target: python-builder
+    command: [".venv/bin/uvicorn", "spoolman.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    ports: ["127.0.0.1:7181:8000"]
+    environment:
+      PATH: /home/app/spoolman/.venv/bin:/usr/local/bin:/usr/bin:/bin
+      SPOOLMAN_DB_TYPE: sqlite
+      SPOOLMAN_DIR_DATA: /data
+    volumes:
+      - ../../Spoolman/client_v2/build:/home/app/spoolman/client_v2/build:ro
+      - ../docker-data/qr/spoolman:/data

@@ -14,3 +14,7 @@ docker-data/
 # Debugging stuff that might appear during development
 __pycache__
 octoprint_Spoolman/octoprint
+
+# Local browser verification and print artifacts
+node_modules/
+tests/output/

@@ -1,0 +1,8 @@
+{
+  "name": "spoolman-qr-browser-tests",
+  "private": true,
+  "scripts": { "test": "node --test qr.test.cjs", "test:browser": "node browser.cjs" },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}
