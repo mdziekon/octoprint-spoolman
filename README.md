@@ -19,6 +19,7 @@ An OctoPrint plugin integrating with [Spoolman](https://github.com/Donkie/Spoolm
     - [x] Select & deselect spools for specified tools / extruders
     - [x] Commit spools usage to Spoolman
 - [x] Spools filtering & sorting
+- [x] [Phone QR spool selection with labels printed in Spoolman](docs/qr-labels.md)
 - [x] Check spools before starting a print
     - [x] Ask the user if the selected spool is correct
     - [x] Warn when no spool is selected
@@ -114,8 +115,11 @@ docker compose up
 
 ## Distributing
 
-### Zip folder method (manual)
+Run from the repository root to package the committed plugin:
 
 ```bash
-zip -r octoprint-spoolman.zip octoprint-spoolman -x "**/.git/*" "**/docker-data/*" "**/octoprint_Spoolman/octoprint/**" "**/__pycache__/*"
+git archive --format=zip --prefix=octoprint-spoolman/ --output=../octoprint-spoolman-install.zip HEAD
 ```
+
+Upload the ZIP through **Settings → Plugin Manager → Get More**. It includes
+`setup.py` and the plugin package; zipping only `octoprint_Spoolman` will not install.
