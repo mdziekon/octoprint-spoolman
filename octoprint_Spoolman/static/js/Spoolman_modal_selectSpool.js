@@ -159,6 +159,10 @@ $(() => {
             weight_unit: 'g',
         };
         self.templateApi = {
+            handleOpenSpoolmanPrinting: (spool, event) => {
+                event.stopPropagation();
+                document.dispatchEvent(new CustomEvent("spoolman:print-labels", { detail: spool.spoolData }));
+            },
             handleSelectSpoolForTool,
             handleTryAgainOnError,
             handleForceRefresh,

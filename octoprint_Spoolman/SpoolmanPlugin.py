@@ -97,6 +97,7 @@ class SpoolmanPlugin(
                 "js/common/promiseCache.js",
                 "js/common/octoprint.js",
                 "js/common/formatting.js",
+                "js/common/qr.js",
                 "js/api/getSpoolmanSpools.js",
                 "js/api/getCurrentJobRequirements.js",
                 "js/api/updateActiveSpool.js",
@@ -105,9 +106,11 @@ class SpoolmanPlugin(
                 "js/Spoolman_settings.js",
                 "js/Spoolman_modal_selectSpool.js",
                 "js/Spoolman_modal_confirmSpool.js",
+                "js/Spoolman_qr.js",
             ],
             "css": [
                 "css/Spoolman.css",
+                "css/Spoolman_qr.css",
             ],
             "less": [],
         }
@@ -131,6 +134,7 @@ class SpoolmanPlugin(
             SettingsKeys.INSTALLED_VERSION: self._plugin_version,
             SettingsKeys.SPOOLMAN_URL: "",
             SettingsKeys.SPOOLMAN_WEB_URL: "",
+            SettingsKeys.QR_CODE_BASE_URL: "",
             SettingsKeys.IS_SPOOLMAN_CERT_VERIFY_ENABLED: True,
             SettingsKeys.SPOOLMAN_CERT_PEM_PATH: "",
             SettingsKeys.SELECTED_SPOOL_IDS: {},

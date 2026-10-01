@@ -81,6 +81,13 @@
                     <hr/>
                 </div>
                 <div class="control-group">
+                    <label class="control-label" for="settings-spoolman-qr-base-url">OctoPrint URL for QR labels</label>
+                    <div class="controls">
+                        <input id="settings-spoolman-qr-base-url" type="url" class="input-xlarge" data-bind="textInput: pluginSettings.qrCodeBaseUrl" placeholder="http://192.168.1.100/">
+                        <p class="help-block">Optional base address of this OctoPrint instance, including any port or proxy path. Leave blank to use the browser's address. “Print in Spoolman” automatically replaces the hostname (including .local) with its IP address in the QR URL template; you can keep opening OctoPrint by name. Reserve the IP address in your router so printed labels keep working. For a different phone-accessible address, enter it here.</p>
+                    </div>
+                </div>
+                <div class="control-group">
                     <label
                         class="control-label"
                         for="settings-spoolman-general-isSpoolmanApiKeyEnabled"

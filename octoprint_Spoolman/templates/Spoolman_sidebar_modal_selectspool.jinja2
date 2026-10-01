@@ -132,7 +132,7 @@
                                 <!-- /ko -->
                             </th>
                             <th
-                                style="width: 40%; cursor: pointer;"
+                                style="cursor: pointer;"
                                 data-bind="visible: templateData.tableAttributeVisibility.spoolName, click: function() { templateApi.handleSortChange('spoolName') }"
                             >
                                 Name
@@ -191,6 +191,7 @@
                                 <i class="fa fa-sort muted"></i>
                                 <!-- /ko -->
                             </th>
+                            <th class="spoolman-label-action">Label</th>
                         </tr>
                     </thead>
 
@@ -269,6 +270,7 @@
                                         <span data-bind="text: $data.displayData.used_weight.displayValue, attr: {title: 'Used weight'}"></span><span data-bind="text: $component.constants.weight_unit"></span>
                                     </span>
                                 </td>
+                                <td class="spoolman-label-action"><button type="button" class="btn btn-mini" title="Print this spool in Spoolman without selecting it" data-bind="click: function(data, event) { $component.templateApi.handleOpenSpoolmanPrinting(data, event); }, clickBubble: false">Print in Spoolman</button></td>
                             </tr>
                         </tbody>
                     <!-- /ko -->
