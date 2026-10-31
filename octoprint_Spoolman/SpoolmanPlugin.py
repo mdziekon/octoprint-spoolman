@@ -139,6 +139,7 @@ class SpoolmanPlugin(
             SettingsKeys.SHOW_LAST_USED_COLUMN_IN_SPOOL_SELECT_MODAL: True,
             SettingsKeys.SHOW_LOT_NUMBER_IN_SIDE_BAR: False,
             SettingsKeys.SHOW_SPOOL_ID_IN_SIDE_BAR: False,
+            SettingsKeys.SPOOL_LIST_FILTER: "",
             SettingsKeys.IS_SPOOLMAN_API_KEY_ENABLED: False,
             SettingsKeys.SPOOLMAN_API_KEY_HEADER: "",
             SettingsKeys.SPOOLMAN_API_KEY: "",

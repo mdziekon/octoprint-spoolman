@@ -51,7 +51,7 @@ $(() => {
 
             refreshModalLayout();
 
-            const spoolmanSpoolsResult = await pluginSpoolmanApi.getSpoolmanSpools();
+            const spoolmanSpoolsResult = await pluginSpoolmanApi.getSpoolmanSpoolsFiltered();
 
             self.templateData.isLoadingData(false);
 
@@ -127,7 +127,7 @@ $(() => {
         };
 
         const handleForceRefresh = async () => {
-            pluginSpoolmanApi.getSpoolmanSpools.invalidate();
+            pluginSpoolmanApi.getSpoolmanSpoolsFiltered.invalidate();
         };
         const handleTryAgainOnError = async () => {
             await handleForceRefresh();
@@ -330,7 +330,7 @@ $(() => {
         });
 
         const init = () => {
-            pluginSpoolmanApi.cache.onResourcesInvalidated([ "getSpoolmanSpools" ], () => {
+            pluginSpoolmanApi.cache.onResourcesInvalidated([ "getSpoolmanSpoolsFiltered" ], () => {
                 void refreshView();
             });
         };
