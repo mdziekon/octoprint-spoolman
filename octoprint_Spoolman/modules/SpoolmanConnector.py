@@ -1,6 +1,8 @@
 # coding=utf-8
 from __future__ import absolute_import
 
+import urllib.parse
+
 import requests
 from requests.adapters import HTTPAdapter, Retry
 
@@ -95,21 +97,44 @@ class SpoolmanConnector():
             }
         }
 
-    def handleGetSpoolsAvailable(self):
+    def _buildSpoolListFilterParams(self, filterString):
+        if not filterString:
+            return None
+
+        cleanedFilterString = filterString.strip()
+
+        if cleanedFilterString and (
+            cleanedFilterString.startswith("?") or cleanedFilterString.startswith("&")
+        ):
+            cleanedFilterString = cleanedFilterString[1:]
+
+        if not cleanedFilterString:
+            return None
+
+        return urllib.parse.parse_qsl(cleanedFilterString, keep_blank_values=True)
+
+    def handleGetSpoolsAvailable(self, filterString=None):
         precheckResult = self._precheckSpoolman()
 
-        if precheckResult and precheckResult.get('error', False):
+        if precheckResult and precheckResult.get("error", False):
             return precheckResult
 
         endpointUrl = self._createSpoolmanEndpointUrl("/spool")
+        filterParams = self._buildSpoolListFilterParams(filterString)
 
         self._logSpoolmanCall(endpointUrl)
+
+        if filterParams:
+            self._logger.debug(
+                "[Spoolman API] applying spool list filter: %s" % str(filterParams)
+            )
 
         try:
             response = requests.get(
                 endpointUrl,
-                verify = self.verifyConfig,
-                headers = self._buildRequestHeaders()
+                params=filterParams,
+                verify=self.verifyConfig,
+                headers=self._buildRequestHeaders(),
             )
         except Exception as caughtException:
             return self._handleSpoolmanConnectionError(caughtException)

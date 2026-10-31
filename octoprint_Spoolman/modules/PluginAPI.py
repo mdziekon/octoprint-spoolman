@@ -45,9 +45,22 @@ class PluginAPI(octoprint.plugin.BlueprintPlugin):
     def handleGetSpoolsAvailable(self):
         self._logger.debug("API: GET /spoolman/spools")
 
-        result = self.getSpoolmanConnector().handleGetSpoolsAvailable()
+        # The spool list filter is only applied when explicitly requested by the caller,
+        # ie. Frontends which display interactive spool lists (eg. the Spool Select Modal).
+        # Other consumers (eg. preprint spool verification) always retrieve the full list.
+        isSpoolListFilterRequested = bool(flask.request.args.get("applyFilter"))
 
-        if result.get('error', False):
+        spoolListFilter = (
+            self._settings.get([SettingsKeys.SPOOL_LIST_FILTER])
+            if isSpoolListFilterRequested
+            else None
+        )
+
+        result = self.getSpoolmanConnector().handleGetSpoolsAvailable(
+            filterString=spoolListFilter
+        )
+
+        if result.get("error", False):
             response = flask.jsonify(result)
             response.status = http.HTTPStatus.BAD_REQUEST
 

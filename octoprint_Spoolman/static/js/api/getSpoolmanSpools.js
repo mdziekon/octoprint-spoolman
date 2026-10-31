@@ -37,10 +37,21 @@
  */
 
 /**
- * @param {APIClient} apiClient
+ * @typedef {Object} GetSpoolmanSpoolsOptions
+ * @property {boolean} [isFilterEnabled]
+ *  When enabled, the spool list filter configured in the plugin settings is applied to the request.
  */
-async function getSpoolmanSpools(apiClient) {
-    const request = await apiClient.callApi("spoolman/spools", {});
+
+/**
+ * @param {APIClient} apiClient
+ * @param {GetSpoolmanSpoolsOptions} [options]
+ */
+async function getSpoolmanSpools(apiClient, options = {}) {
+    const url = options.isFilterEnabled
+        ? "spoolman/spools?applyFilter=1"
+        : "spoolman/spools";
+
+    const request = await apiClient.callApi(url, {});
 
     if (!request.isSuccess) {
         return request;

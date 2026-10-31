@@ -262,6 +262,35 @@
                 <div class="control-group">
                     <label
                         class="control-label"
+                        for="settings-spoolman-display-settings-spoolListFilter"
+                    >
+                        Spool Select Modal list filter
+                    </label>
+                    <div class="controls">
+                        <div>
+                            <input
+                                id="settings-spoolman-display-settings-spoolListFilter"
+                                type="text"
+                                class="input-xlarge text-left"
+                                data-bind="textInput: pluginSettings.spoolListFilter"
+                                placeholder="filament.material=PLA&amp;location=Shelf A"
+                            >
+                        </div>
+                        <div style="margin-top: 0.25em">
+                            <small>
+                                Optional filter applied whenever the Spool Select Modal lists the available spools. The value is passed as query string parameters to Spoolman's spool search endpoint, so any of its search parameters can be used, eg. <code>filament.name=PLA A1</code>, <code>filament.material=PLA</code>, <code>filament.vendor.name=Prusament</code>, <code>location=Shelf A</code> or <code>lot_nr=12345</code>. Multiple parameters can be separated with <code>&amp;</code>.
+                                <br/>
+                                All searches are partial and case-insensitive; multiple comma-separated terms within a single parameter act as an OR (use quotes to match an exact term). See Spoolman's <a href="https://donkie.github.io/Spoolman/" target="_blank" rel="noopener">API documentation</a> for the full list of supported parameters (any unsupported parameter is simply ignored).
+                                <br/>
+                                The filter only affects the spools listed in the Spool Select Modal - spool assignments, the sidebar and the pre-print verification always operate on the full spool list. Keep in mind that the spool currently assigned to a tool may not be visible in the list if it does not match the filter.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="control-group">
+                    <label
+                        class="control-label"
                         for="settings-spoolman-display-settings-showLotNumberColumnInSpoolSelectModal"
                     >
                         Show Lot Number column in Spool Select Modal

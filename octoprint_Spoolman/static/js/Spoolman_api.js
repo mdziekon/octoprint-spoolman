@@ -17,6 +17,20 @@ const createApi = () => {
     const cacheGetSpoolmanSpoolsResult = cache.registerResource("getSpoolmanSpools", {
         getter: sharedGetSpoolmanSpools,
     });
+    const sharedGetSpoolmanSpoolsFiltered = async () => {
+        const request = await getSpoolmanSpools(apiClient, {
+            isFilterEnabled: true,
+        });
+
+        if (!request.isSuccess) {
+            console.error("Request error", request.error);
+        }
+
+        return request;
+    };
+    const cacheGetSpoolmanSpoolsFilteredResult = cache.registerResource("getSpoolmanSpoolsFiltered", {
+        getter: sharedGetSpoolmanSpoolsFiltered,
+    });
     const sharedGetCurrentJobRequirements = async () => {
         const request = await getCurrentJobRequirements(apiClient);
 
@@ -43,12 +57,19 @@ const createApi = () => {
         throw new Error('[Spoolman][api] Could not create cached "getSpoolmanSpools"');
     }
 
+    if (!cacheGetSpoolmanSpoolsFilteredResult.isSuccess) {
+        throw new Error('[Spoolman][api] Could not create cached "getSpoolmanSpoolsFiltered"');
+    }
+
     const pluginSpoolmanApiNamespace = {
         cache,
 
         /** @type {typeof sharedGetSpoolmanSpools & { invalidate: CachedGetterFn['invalidate'] }} */
         // @ts-ignore
         getSpoolmanSpools: cacheGetSpoolmanSpoolsResult.getter,
+        /** @type {typeof sharedGetSpoolmanSpoolsFiltered & { invalidate: CachedGetterFn['invalidate'] }} */
+        // @ts-ignore
+        getSpoolmanSpoolsFiltered: cacheGetSpoolmanSpoolsFilteredResult.getter,
         getCurrentJobRequirements: sharedGetCurrentJobRequirements,
         updateActiveSpool: sharedUpdateActiveSpool,
     };
